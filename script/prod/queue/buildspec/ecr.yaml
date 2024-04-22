@@ -1,0 +1,23 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - AccountID=$(aws sts get-caller-identity --query Account --output text)
+      - CommitID="$(echo $GitCommitID | head -c 8)"
+      - $(aws ecr get-login --registry-ids $AccountID --no-include-email --region ${AWS_DEFAULT_REGION})
+      - REPO_URI="$AccountID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/$ServiceName"
+      - REPOSITORY_URI="$REPO_URI-$BranchName"
+  build:
+    commands:
+        - DOCKER_BUILDKIT=0 docker build -f script/prod/queue/docker/Dockerfile -t ${REPOSITORY_URI}:${CommitID} .
+        - docker tag ${REPOSITORY_URI}:${CommitID} ${REPOSITORY_URI}:latest
+  post_build:
+    commands:
+      - docker push ${REPOSITORY_URI}:${CommitID}
+      - docker push ${REPOSITORY_URI}:latest
+      - printf '[{"name":"task-%s","imageUri":"%s:%s"}]' "$ServiceName-$BranchName" "$REPOSITORY_URI" "$CommitID" > taskdef.json
+artifacts:
+  files: taskdef.json

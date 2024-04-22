@@ -1,0 +1,328 @@
+#==================================================================================================
+# This CloudFormation template deploy dockerized application using task definition and service via
+# CodePipline.
+#
+# (c) HijazWorld, Inc 2022
+# v1.3 2022-08-01
+#==================================================================================================
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "This CloudFormation template deploy dockrized application using task definition and service to ECS"
+
+#--------------------------------------------------------------------------------------------
+# Parameters
+#--------------------------------------------------------------------------------------------
+Parameters:
+
+  ServiceName:
+    Type: String
+    Default: hw-backend
+    Description: Service Name
+  ServicePath:
+    Type: String
+    Default: /
+    Description: Service Path
+  BranchName:
+    Type: String
+    Default: queue-main
+    Description: Branch Name
+  AsContainersMin:
+    Type: Number
+    Default: 1
+    Description: Min mumber of tasks
+  AsContainersMax:
+    Type: Number
+    Default: 3
+    Description: Max mumber of tasks
+  AsContainersDesired:
+    Type: Number
+    Default: 1
+    Description: Desired number of tasks
+  AsTargetCpuUtilization:
+    Type: Number
+    Default: 75
+    Description: Target CPU utilization (%)
+  ContainerCpu:
+    Type: Number
+    Default: 512
+    Description: How much CPU to give the container. 1024 is 1 CPU
+  ContainerMemory:
+    Type: Number
+    Default: 1024
+    Description: How much memory in megabytes to give the container
+  ClusterName:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/ClusterName"
+  FargateContainerSecurityGroup:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/ECSContainerSecurityGroup"
+  ECSTaskExecutionRole:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/ECSTaskExecutionRole"
+  PrivateSubnet1:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/PrivateSubnetOne"
+  PrivateSubnet2:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/PrivateSubnetTwo"
+  VpcId:
+    Type: "AWS::SSM::Parameter::Value<String>"
+    Default: "/HW/VPCId"
+
+Resources:
+
+  TaskRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub "task-${ServiceName}-${BranchName}"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - "ssmmessages:CreateControlChannel"
+                  - "ssmmessages:CreateDataChannel"
+                  - "ssmmessages:OpenControlChannel"
+                  - "ssmmessages:OpenDataChannel"
+                Resource: '*'
+
+#--------------------------------------------------------------------------------------------------------
+# ECS Task Definition
+# This is a simple metadata description of what container to run, and what resource requirements it has.
+#--------------------------------------------------------------------------------------------------------
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Sub "${ServiceName}-${BranchName}"
+      Cpu: !Ref ContainerCpu
+      Memory: !Ref ContainerMemory
+      NetworkMode: awsvpc
+      RequiresCompatibilities:
+        - FARGATE
+      ExecutionRoleArn: !Ref ECSTaskExecutionRole
+      TaskRoleArn: !Ref TaskRole
+      ContainerDefinitions:
+        - Name: !Sub "task-${ServiceName}-${BranchName}"
+          Cpu: !Ref 'ContainerCpu'
+          Memory: !Ref ContainerMemory
+          Image: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ServiceName}-${BranchName}"
+
+          Environment:
+            - Name: APP_NAME
+              Value: "HijazWorld"
+            - Name: APP_ENV
+              Value: "production"
+            - Name: APP_DEBUG
+              Value: "false"
+            - Name: APP_URL
+              Value: "https://platform.hijazworld.com"
+              
+            - Name: LOG_CHANNEL
+              Value: "stderr"      
+
+            - Name: BROADCAST_DRIVER
+              Value: "redis"
+            - Name: CACHE_DRIVER
+              Value: "file"
+            - Name: QUEUE_CONNECTION
+              Value: "redis"
+            - Name: SESSION_DRIVER
+              Value: "file"
+            - Name: SESSION_LIFETIME
+              Value: "120"
+       
+            - Name: REDIS_CLIENT
+              Value: "predis"
+
+            - Name: MAIL_MAILER
+              Value:  "ses"   
+               
+            - Name: MAIL_ENCRYPTION
+              Value: "tls"   
+            - Name: MAIL_FROM_ADDRESS
+              Value: "no-reply@hijazworld.com"   
+            - Name: MAIL_FROM_NAME
+              Value: "HijazWorld"  
+
+            - Name: PASSWORD_PROTECTED
+              Value: "false"   
+
+            - Name: CASHIER_CURRENCY
+              Value: "gbp"       
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+          Secrets:
+          # Getting Database credntials from AWS Secret Manager
+            - Name: DB_HOST
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:host::"
+            - Name: DB_PORT
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:port::"
+            - Name: DB_DATABASE
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:dbname::"
+            - Name: DB_USERNAME
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:username::"
+            - Name: DB_CONNECTION
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:engine::"          
+            - Name: DB_PASSWORD
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:password::"
+            - Name: DB_ROOT_PASSWORD
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hw-db-LweJ8x:password::"
+           # Getting Redis credntials from AWS Secret Manager
+            - Name: REDIS_HOST
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:redis-credentials-lXQrmF:host::"
+            - Name: REDIS_PASSWORD
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:redis-credentials-lXQrmF:password::"
+            - Name: REDIS_PORT
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:redis-credentials-lXQrmF:port::"
+          # Getting App key secret from AWS Secret Manager
+            - Name: APP_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:app-key-BhJYVN:appkey::"
+          # Getting SES mail credentials from AWS Secret Manager
+            - Name: AWS_SES_ACCESS_KEY_ID
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mail-secrets-mPk1R4:username::"
+            - Name: AWS_SES_SECRET_ACCESS_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mail-secrets-mPk1R4:password::"
+            - Name: AWS_SES_DEFAULT_REGION
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mail-secrets-mPk1R4:region::"
+            - Name: MAIL_PORT
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mail-secrets-mPk1R4:port::"                                                           
+          # Getting JWT secret from AWS Secret Manager
+            - Name: JWT_SECRET
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:jwt-secret-WY9vKE:jwtsecret::"             
+          # Getting Stripe Key secrets from AWS Secret Manager
+            - Name: STRIPE_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:stripe-credentials-Ggfz3H:stripekey::"
+            - Name: STRIPE_SECRET
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:stripe-credentials-Ggfz3H:stripescret::"
+            - Name: MIX_STRIPE_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:stripe-credentials-Ggfz3H:stripekey::"                            
+          # Getting Mix-GA-Key secret from AWS Secret Manager
+            - Name: MIX_GA_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mix-ga-key-K2dt8e:mixgakey::"
+          # Getting HCAPTCHA SITE KEY secrets from AWS Secret Manager
+            - Name: HCAPTCHA_SITE_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hcaptcha-credentials-VAeXdp:hcaptchasitekey::"    
+            - Name: HCAPTCHA_SECRET_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hcaptcha-credentials-VAeXdp:hcaptchasecretkey::" 
+            - Name: MIX_HCAPTCHA_SITE_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hcaptcha-credentials-VAeXdp:hcaptchasitekey::" 
+            - Name: MIX_HCAPTCHA_SECRET_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:hcaptcha-credentials-VAeXdp:hcaptchasecretkey::" 
+          # Getting S3 Credentials from AWS Secret Manager
+            - Name: AWS_ACCESS_KEY_ID
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:S3-Credentials-6tzexK:accesskey::"    
+            - Name: AWS_SECRET_ACCESS_KEY
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:S3-Credentials-6tzexK:secretaccesskey::" 
+            - Name: AWS_DEFAULT_REGION
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:S3-Credentials-6tzexK:region::" 
+            - Name: AWS_BUCKET
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:S3-Credentials-6tzexK:bucket::"
+          # Getting Apple Store Credentials from AWS Secret Manager
+            - Name: APPLE_STORE_URL
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:apple-store-x2lZ0s:applestoreurl::"    
+            - Name: APPLE_STORE_SECRET
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:apple-store-x2lZ0s:applestoresecret::"
+          # Getting Mix Terms and privacy from AWS Secret Manager
+            - Name: MIX_TERMS_LINK
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mix-terms-privacy-50jBTf:mixterms::"    
+            - Name: MIX_PRIVACY_LINK
+              ValueFrom: "arn:aws:secretsmanager:us-east-1:119890996072:secret:mix-terms-privacy-50jBTf:mixprivacy::"                                            
+
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-create-group: "true"
+              awslogs-region: !Sub "${AWS::Region}"
+              awslogs-group: !Sub "${ServiceName}-${BranchName}"
+              awslogs-stream-prefix: !Sub "${ServiceName}-${BranchName}"
+
+#--------------------------------------------------------------------------------------------------
+# ECS Services 
+# The service is a resource which allows you to run multiple copies of a type of task, and gather
+# up their logs and metrics, as well as monitor the number of running tasks and replace any that 
+# have crashed
+#--------------------------------------------------------------------------------------------------
+
+  Service:
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub "${ServiceName}-${BranchName}"
+      Cluster: !Ref ClusterName
+      LaunchType: FARGATE
+      EnableExecuteCommand: true
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 75
+      DesiredCount: !Ref AsContainersDesired
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          # AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref FargateContainerSecurityGroup
+          Subnets:
+            - !Ref PrivateSubnet1
+            - !Ref PrivateSubnet2
+      TaskDefinition: !Ref 'TaskDefinition'
+      
+#--------------------------------------------------------------------------------------------------
+# Log Group 
+#--------------------------------------------------------------------------------------------------
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "${ServiceName}-${BranchName}"
+
+  AutoScalingTarget:
+    DependsOn: Service
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: !Ref AsContainersMin
+      MaxCapacity: !Ref AsContainersMax
+      ResourceId: !Sub "service/${ClusterName}/${ServiceName}-${BranchName}"
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+      # "The Amazon Resource Name (ARN) of an AWS Identity and Access Management (IAM) role that allows Application Auto Scaling to modify your scalable target."
+      RoleARN: !GetAtt AutoScalingRole.Arn
+
+#--------------------------------------------------------------------------------------------------
+# Auto Scaling Group policy to handle load and mange traffic
+#--------------------------------------------------------------------------------------------------
+  AutoScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub "${ServiceName}-${BranchName}-AutoScalingPolicy"
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref AutoScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        ScaleInCooldown: 10
+        ScaleOutCooldown: 10
+        # Keep things at or lower than 50% CPU utilization, for example
+        TargetValue: !Ref AsTargetCpuUtilization
+
+#--------------------------------------------------------------------------------------------------
+# Auto Scaling IAM Role for specific permissions
+#-------------------------------------------------------------------------------------------------- 
+  AutoScalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ecs-tasks.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceAutoscaleRole'

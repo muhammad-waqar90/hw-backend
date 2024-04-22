@@ -1,0 +1,12 @@
+{
+    "cinzel": {
+        "normal": "cinzel_normal_4b7b9d5724837e1bcaf16e4ed2bc7457"
+    },
+    "edwardian": {
+        "normal": "edwardian_normal_3583c4e1258aa3bf08ad060e8fdb7773"
+    },
+    "montserrat": {
+        "normal": "\/var\/www\/html\/storage\/pdfs\/fonts\/\/montserrat_normal_2d2ef023665b0dceaa7a555181def2ad",
+        "bold": "montserrat_bold_b960be78a62d89d19faa7f8ced14484f"
+    }
+}

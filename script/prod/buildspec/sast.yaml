@@ -1,0 +1,27 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - pip install dependency-check
+      - pip install safety
+      - pip install bandit
+  build:
+    commands:
+      - AccountID=$(aws sts get-caller-identity --query Account --output text)
+      - Region=$(aws configure list | grep region | awk '{print $2}')
+      - CommitID="$(echo $GitCommitID | head -c 8)"
+      - echo "Running Dependency Check..."
+      - DEPENDENCY_CHECK_VERSION=6.0.0
+      - rm -rf ~/.local/dependency-check/bin/
+      - dependency-check
+      - dependency-check --enableExperimental -s . -o $CommitID.html
+      - aws s3 cp $CommitID.html s3://cicd-pipeline-aritfacts-$AccountID-$Region/$ServiceName-$BranchName/$CommitID/sast-dependency-check-$CommitID.html
+      - echo "Running Safety..."
+      - safety check --continue-on-error --output text > insecure_report.txt 
+      - cat insecure_report.txt
+      - aws s3 cp insecure_report.txt s3://cicd-pipeline-aritfacts-$AccountID-$Region/$ServiceName-$BranchName/$CommitID/sast-safety-$CommitID.txt
+      - echo "Running Bandit..."
+      - bandit -r . -f txt -o bandit-report.txt
+      - cat bandit-report.txt
+      - aws s3 cp bandit-report.txt s3://cicd-pipeline-aritfacts-$AccountID-$Region/$ServiceName-$BranchName/$CommitID/sast-bandit-$CommitID.txt

@@ -1,0 +1,20 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+  pre_build:
+    commands:
+      - apt update
+      - apt install rpm -y
+      - export VERSION=$(curl --silent "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+      - wget https://github.com/aquasecurity/trivy/releases/download/v${VERSION}/trivy_${VERSION}_Linux-64bit.deb
+      - dpkg -i trivy_${VERSION}_Linux-64bit.deb
+  build:
+    commands:
+      - AccountID=$(aws sts get-caller-identity --query Account --output text)
+      - CommitID="$(echo $GitCommitID | head -c 8)"
+      - docker build -t trivy:test .
+      - trivy --no-progress --exit-code 1 --severity HIGH,CRITICAL trivy:test 2>&1 | tee report.txt
+      - aws s3 cp report.txt s3://$AccountID-devtools/$ServiceName-$BranchName/$CommitID/container-sec-trivy-$CommitID.txt
+      - echo "Trivy execution Finished..."

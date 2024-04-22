@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+    pre_build:
+        commands:
+        - echo Pulling the hadolint docker image
+        - docker pull hadolint/hadolint:v1.16.2
+    build:
+        commands:
+        - echo Build started on `date`
+        - echo Scanning with Hadolint...
+        - # rules: https://github.com/hadolint/hadolint#rules
+        - result=`docker run --rm -i hadolint/hadolint:v1.16.2 hadolint --ignore DL3008 --ignore DL3015 -f json - < Dockerfile`
+    post_build:
+        commands:
+        - echo $result
+        - echo Build completed on `date`
