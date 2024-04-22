@@ -26,7 +26,8 @@
         "mavinoo/laravel-batch": "^2.3",
         "predis/predis": "^2.2",
         "spatie/laravel-fractal": "^6.0",
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.0",
+        "sweetalert2": "^11.7.20"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.13",
