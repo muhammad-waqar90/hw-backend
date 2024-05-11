@@ -1,4 +1,4 @@
-FROM php:8.0-fpm
+FROM php:8.2-fpm
 
 ## Copy deps / composer.lock and composer.json
 # COPY composer.lock composer.json package.json /var/www/
