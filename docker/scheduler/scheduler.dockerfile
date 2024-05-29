@@ -1,4 +1,4 @@
-FROM php:8.0-fpm-alpine
+FROM php:8.2.13-fpm-alpine
 
 # Copy startup script
 COPY ./docker/scheduler/start.sh /usr/local/bin/start
