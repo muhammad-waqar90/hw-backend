@@ -1,7 +1,8 @@
 <?php
+
 namespace App\Services\InApp;
 
-use App\Traits\CurlRequestTrait AS curl;
+use App\Traits\CurlRequestTrait as curl;
 
 /*
  *
@@ -22,18 +23,18 @@ use App\Traits\CurlRequestTrait AS curl;
  *
  */
 
-class InAppService {
-
+class InAppService
+{
     use curl;
 
-    static private $verifyReceipt = '/verifyReceipt';
+    private static $verifyReceipt = '/verifyReceipt';
 
-    static private function url($endpoint)
+    private static function url($endpoint)
     {
         return config('inapp.url').$endpoint;
     }
 
-    static public function verifyReceipt($receiptData)
+    public static function verifyReceipt($receiptData)
     {
         /**
          * $payload = [
@@ -45,7 +46,7 @@ class InAppService {
         $payload = [
             'receipt-data' => $receiptData,
             'password' => config('inapp.secret'),
-            'exclude-old-transactions' => false
+            'exclude-old-transactions' => false,
         ];
 
         $response = curl::post(self::url(self::$verifyReceipt), json_encode($payload));

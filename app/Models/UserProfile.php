@@ -15,7 +15,7 @@ class UserProfile extends Model
      * @var array
      */
     protected $guarded = [
-        'id', 'deleted_at', 'created_at', 'updated_at'
+        'id', 'deleted_at', 'created_at', 'updated_at',
     ];
 
     protected $hidden = [
@@ -25,11 +25,11 @@ class UserProfile extends Model
         'linkedin_url',
         'snapchat_url',
         'youtube_url',
-        'pinterest_url'
+        'pinterest_url',
     ];
 
     public function role()
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 }

@@ -8,25 +8,21 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('lessons', function (Blueprint $table) {
-            $table->string('img')->default(NULL)->nullable()->change();
+            $table->string('img')->default(null)->nullable()->change();
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('lessons', function (Blueprint $table) {
-            $table->string('img')->default(NULL)->nullable(false)->change();
+            $table->string('img')->default(null)->nullable(false)->change();
         });
     }
 };

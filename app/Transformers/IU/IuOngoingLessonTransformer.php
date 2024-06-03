@@ -10,7 +10,6 @@ class IuOngoingLessonTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param Lesson $lesson
      * @return array
      */
     public function transform(Lesson $lesson)
@@ -19,8 +18,8 @@ class IuOngoingLessonTransformer extends TransformerAbstract
             'id' => $lesson->id,
             'lesson_name' => $lesson->lesson_name,
             'module_name' => $lesson->module_name,
-            'level_name'  => $lesson->level_name,
-            'published'   => $lesson->published
+            'level_name' => $lesson->level_name,
+            'published' => $lesson->published,
         ];
     }
 }

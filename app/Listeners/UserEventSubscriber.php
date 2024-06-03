@@ -18,15 +18,14 @@ class UserEventSubscriber implements ShouldQueue
 {
     use UtilsTrait;
 
-    private $iuUserRepository, $authRepository, $passwordHistoryRepository;
+    private $iuUserRepository;
+
+    private $authRepository;
+
+    private $passwordHistoryRepository;
+
     /**
      * Create the event listener.
-     *
-     * @param IuUserRepository $iuUserRepository
-     * @param AuthenticationRepository $authRepository
-     * @param PasswordHistoryRepository $passwordHistoryRepository
-     *
-     * @return void
      */
     public function __construct(
         IuUserRepository $iuUserRepository,
@@ -40,9 +39,6 @@ class UserEventSubscriber implements ShouldQueue
 
     /**
      * Handle the event IuUserCreated.
-     *
-     * @param  object  $event
-     * @return void
      */
     public function handleIuAccountCreated($event)
     {
@@ -61,9 +57,6 @@ class UserEventSubscriber implements ShouldQueue
 
     /**
      * Handle the event UserPasswordUpdated.
-     *
-     * @param  object  $event
-     * @return void
      */
     public function handleUserPasswordUpdated($event)
     {
@@ -73,9 +66,6 @@ class UserEventSubscriber implements ShouldQueue
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
-     * @return void
      */
     public function subscribe($events)
     {

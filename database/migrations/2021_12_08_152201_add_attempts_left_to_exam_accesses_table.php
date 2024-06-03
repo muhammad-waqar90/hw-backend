@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('exam_accesses', function (Blueprint $table) {
             $table->unsignedTinyInteger('attempts_left')->after('quiz_id')->default(0);
@@ -20,10 +18,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('exam_accesses', function (Blueprint $table) {
             $table->dropColumn('attempts_left');

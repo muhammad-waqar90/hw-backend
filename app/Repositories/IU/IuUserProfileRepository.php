@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Lang;
 
 class IuUserProfileRepository
 {
-
     private UserProfile $userProfile;
 
     public function __construct(UserProfile $userProfile)
@@ -34,23 +33,24 @@ class IuUserProfileRepository
                 'linkedin_url' => $request->linkedinUrl,
                 'snapchat_url' => $request->snapchatUrl,
                 'youtube_url' => $request->youtubeUrl,
-                'pinterest_url' => $request->pinterestUrl
+                'pinterest_url' => $request->pinterestUrl,
             ]);
     }
 
     public static function getIsProfileCompleted(UserProfile $userProfile)
     {
-        return (!!$userProfile->gender && !!$userProfile->phone_number && !!$userProfile->occupation && self::getIsProfileAddressCompleted($userProfile));
+        return (bool) $userProfile->gender && (bool) $userProfile->phone_number && (bool) $userProfile->occupation && self::getIsProfileAddressCompleted($userProfile);
     }
 
     public static function getIsProfileAddressCompleted(UserProfile $userProfile)
     {
-        return (!!$userProfile->city && !!$userProfile->country && !!$userProfile->address && !!$userProfile->postal_code);
+        return (bool) $userProfile->city && (bool) $userProfile->country && (bool) $userProfile->address && (bool) $userProfile->postal_code;
     }
 
     public static function getIsMinor($userId)
     {
         $userProfile = UserProfile::select('date_of_birth')->where('user_id', $userId)->first();
+
         return $userProfile->date_of_birth > Carbon::now()->subYears(13)->format('Y-m-d');
     }
 
@@ -61,12 +61,12 @@ class IuUserProfileRepository
         $authenticatedUser = auth()->user();
 
         $this->userProfile->where('user_id', $authenticatedUser->id)->update([
-            'enable_salary_scale' => $request->enable_salary_scale
+            'enable_salary_scale' => $request->enable_salary_scale,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => Lang::get('general.salaryScaleFlag')
+            'message' => Lang::get('general.salaryScaleFlag'),
         ]);
     }
 
@@ -75,10 +75,10 @@ class IuUserProfileRepository
         return $this->userProfile
             ->where('user_id', $userId)
             ->update([
-                'address'       => $address,
-                'city'          => $city,
-                'country'       => $country,
-                'postal_code'   => $postalCode
+                'address' => $address,
+                'city' => $city,
+                'country' => $country,
+                'postal_code' => $postalCode,
             ]);
     }
 }

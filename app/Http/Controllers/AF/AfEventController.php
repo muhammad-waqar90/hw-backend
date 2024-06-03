@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AF\Events\AfEventsCreateUpdateRequest;
 use App\Http\Requests\AF\Events\AfEventsListRequest;
 use App\Repositories\AF\AfEventRepository;
-use App\Transformers\AF\AfEventTransformer;
 use App\Traits\FileSystemsCloudTrait;
+use App\Transformers\AF\AfEventTransformer;
 use Illuminate\Support\Facades\Lang;
 
 class AfEventController extends Controller
@@ -43,24 +43,28 @@ class AfEventController extends Controller
 
         $fractal = fractal($events->getCollection(), new AfEventTransformer);
         $events->setCollection(collect($fractal));
+
         return response()->json($events, 200);
     }
 
     public function getEvent(int $id)
     {
         $event = $this->afEventRepository->getEvent($id);
-        if(!$event)
+        if (! $event) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $event = fractal($event, new AfEventTransformer);
+
         return response()->json($event, 200);
     }
 
     public function updateEvent(AfEventsCreateUpdateRequest $request, int $id)
     {
         $event = $this->afEventRepository->getEvent($id);
-        if(!$event)
+        if (! $event) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $img = $request->img ? $this->updateFile($this->afEventRepository->getImageS3StoragePath(), $event->img, $request->img) : $event->img;
 
@@ -81,8 +85,9 @@ class AfEventController extends Controller
     public function deleteEvent(int $id)
     {
         $event = $this->afEventRepository->getEvent($id);
-        if(!$event)
+        if (! $event) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afEventRepository->deleteEvent($id);
 

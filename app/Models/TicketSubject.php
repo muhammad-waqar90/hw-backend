@@ -10,15 +10,15 @@ class TicketSubject extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at', 'pivot'
+        'created_at', 'updated_at', 'pivot',
     ];
 
     public function ticketCategory()
     {
-        return $this->belongsTo('App\Models\TicketCategory');
+        return $this->belongsTo(TicketCategory::class);
     }
 }

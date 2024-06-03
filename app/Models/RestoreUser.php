@@ -13,10 +13,10 @@ class RestoreUser extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function userProfile() {
-        return $this->hasOne('App\Models\UserProfile', 'user_id', 'user_id');
+        return $this->hasOne(UserProfile::class, 'user_id', 'user_id');
     }
 }

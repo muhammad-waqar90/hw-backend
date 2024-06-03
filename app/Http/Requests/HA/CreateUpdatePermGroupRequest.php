@@ -24,10 +24,26 @@ class CreateUpdatePermGroupRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:2|max:30|unique:perm_groups,name,'. ($this->id ?: ''),
-            'users' => 'present|array',
-            'permissions' => 'present|array',
-            'description' => 'present|string|nullable|max:255'
+            'name' => [
+                'required',
+                'min:2',
+                'max:30',
+                'unique:perm_groups,name,'. ($this->id ?: ''),
+            ],
+            'users' => [
+                'present',
+                'array',
+            ],
+            'permissions' => [
+                'present',
+                'array',
+            ],
+            'description' => [
+                'present',
+                'string',
+                'nullable',
+                'max:255',
+            ],
         ];
     }
 }

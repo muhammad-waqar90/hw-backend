@@ -3,9 +3,9 @@
 namespace App\Console\Commands\Ticket;
 
 use App\DataObject\Tickets\TicketStatusData;
-use App\Models\Ticket;
 use App\Mail\IU\Ticket\IuTicketReminderEmail;
-use Carbon\Carbon;
+use App\Models\Ticket;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -26,7 +26,7 @@ class SendIuTicketReminderEmail extends Command
     protected $description = 'Send IU reminder email to reply to ticket';
 
     /**
-     * @var Ticket $ticket
+     * @var Ticket
      */
     protected $ticket;
 
@@ -49,10 +49,11 @@ class SendIuTicketReminderEmail extends Command
     public function handle()
     {
         $ticketsNotSeenByUser = $this->getStaleTickets();
-        if($ticketsNotSeenByUser->isEmpty())
+        if ($ticketsNotSeenByUser->isEmpty()) {
             return;
+        }
 
-        foreach($ticketsNotSeenByUser as $ticket) {
+        foreach ($ticketsNotSeenByUser as $ticket) {
             Mail::to($ticket->user->userProfile->email)->queue(new IuTicketReminderEmail($ticket->user, $ticket->subject, $ticket->id));
         }
 

@@ -11,18 +11,25 @@ use App\Models\ExamAccess;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\UserQuiz;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class IuQuizRepository
 {
     private Quiz $quiz;
+
     private UserQuiz $userQuiz;
+
     private Lesson $lesson;
+
     private CourseModule $courseModule;
+
     private CourseLevel $courseLevel;
+
     private ExamAccess $examAccess;
+
     private Course $course;
+
     private IuQuizItemRepository $iuQuizItemRepository;
 
     public function __construct(Quiz $quiz, UserQuiz $userQuiz, Lesson $lesson, CourseModule $courseModule, CourseLevel $courseLevel,
@@ -62,8 +69,10 @@ class IuQuizRepository
     public function getUserQuiz($id, $uuid = null)
     {
         $userQuiz = $this->userQuiz->where('id', $id);
-        if($uuid)
+        if ($uuid) {
             $userQuiz->where('uuid', $uuid);
+        }
+
         return $userQuiz->first();
     }
 
@@ -86,13 +95,13 @@ class IuQuizRepository
             'entity_type' => $quiz->entity_type,
             'uuid' => Str::orderedUuid()->toString(),
             'questions' => json_encode($generatedQuestionsAnswers['questions']),
-            'answers'   => json_encode($generatedQuestionsAnswers['answers']),
-            'duration'  => $quiz->duration,
-            'status'    => QuizData::STATUS_IN_PROGRESS,
+            'answers' => json_encode($generatedQuestionsAnswers['answers']),
+            'duration' => $quiz->duration,
+            'status' => QuizData::STATUS_IN_PROGRESS,
             'num_of_questions' => $quiz->num_of_questions,
             'score' => 0,
-            'user_answers' => NULL,
-            'started_at' => Carbon::now()->toDateTimeString()
+            'user_answers' => null,
+            'started_at' => Carbon::now()->toDateTimeString(),
         ]);
 
     }
@@ -100,19 +109,21 @@ class IuQuizRepository
     public function invalidateUserQuiz($id)
     {
         $this->userQuiz->where('id', $id)
-        ->update([
-            'status'    => QuizData::STATUS_COMPLETED,
-            'score' => 0,
-            'user_answers' => NULL
-        ]);
+            ->update([
+                'status' => QuizData::STATUS_COMPLETED,
+                'score' => 0,
+                'user_answers' => null,
+            ]);
     }
 
     public function answerKeysMatch($answers1, $answers2)
     {
         sort($answers1);
         sort($answers2);
-        if(array_keys($answers1) === array_keys($answers2))
+        if (array_keys($answers1) === array_keys($answers2)) {
             return true;
+        }
+
         return false;
     }
 
@@ -121,7 +132,7 @@ class IuQuizRepository
         $quizAnswers = (array) $userQuiz->answers;
 
         $score = 0;
-        foreach($quizAnswers as $key => $quizAnswer) {
+        foreach ($quizAnswers as $key => $quizAnswer) {
             $score += $this->scoreAnswer($quizAnswer, $userAnswers[$key]);
         }
 
@@ -177,9 +188,9 @@ class IuQuizRepository
     {
         return $this->examAccess->create(
             [
-                'user_id'      => $userId,
-                'quiz_id'      => $quizId,
-                'attempts_left' => QuizData::QUIZ_EXAM_ALLOWED_ATTEMPTS
+                'user_id' => $userId,
+                'quiz_id' => $quizId,
+                'attempts_left' => QuizData::QUIZ_EXAM_ALLOWED_ATTEMPTS,
             ]
         );
     }
@@ -187,7 +198,7 @@ class IuQuizRepository
     public function updateExamAccessAttemptsLeft($userId, $quizId)
     {
         $examAccess = self::getLatestExamAccess($userId, $quizId);
-        
+
         return $this->examAccess->where('id', $examAccess->id)
             ->decrement('attempts_left');
     }
@@ -207,7 +218,7 @@ class IuQuizRepository
             ->where('id', $courseId)
             ->with('courseLevel', function ($query) use ($courseLevelId, $userId) {
                 $query->where('id', $courseLevelId)
-                    ->with('courseModules', function ($query) use ($courseLevelId, $userId) {
+                    ->with('courseModules', function ($query) use ($userId) {
                         $query->select('qz.id as quizId', 'course_modules.id as courseModuleId', 'course_modules.name as name', 'qz.price as price',
                             'ea.id as purchased', 'course_modules.course_level_id')
                             ->join('quizzes as qz', function ($query) {
@@ -220,66 +231,80 @@ class IuQuizRepository
                                     ->where('user_id', $userId)
                                     ->where('attempts_left', '>', 0);
                             });
-                        });
+                    });
             })
             ->first();
     }
 
     private function scoreAnswer($quizAnswer, $userAnswer)
     {
-        if($userAnswer['answerId'] === null)
-            $userAnswer['answerId'] = "";
+        if ($userAnswer['answerId'] === null) {
+            $userAnswer['answerId'] = '';
+        }
 
-        if(gettype($quizAnswer['answerId']) !== gettype($userAnswer['answerId']))
+        if (gettype($quizAnswer['answerId']) !== gettype($userAnswer['answerId'])) {
             throw new InvalidAnswerDataException();
+        }
 
         // calculate score for specific type of question
-        if($quizAnswer['type']  === QuizData::QUESTION_MCQ_SINGLE)
+        if ($quizAnswer['type'] === QuizData::QUESTION_MCQ_SINGLE) {
             return $this->scoreAnswerMcqSingle($quizAnswer['answerId'], $userAnswer['answerId']);
-        if($quizAnswer['type']  === QuizData::QUESTION_MCQ_MULTIPLE)
+        }
+        if ($quizAnswer['type'] === QuizData::QUESTION_MCQ_MULTIPLE) {
             return $this->scoreAnswerMcqMultiple($quizAnswer['answerId'], $userAnswer['answerId'], $quizAnswer['maxChoices']);
-        if($quizAnswer['type']  === QuizData::QUESTION_MISSING_WORD)
+        }
+        if ($quizAnswer['type'] === QuizData::QUESTION_MISSING_WORD) {
             return $this->scoreAnswerMissingWord($quizAnswer['answerId'], $userAnswer['answerId']);
-        if($quizAnswer['type']  === QuizData::QUESTION_LINKING)
+        }
+        if ($quizAnswer['type'] === QuizData::QUESTION_LINKING) {
             return $this->scoreAnswerLinking($quizAnswer['answerId'], $userAnswer['answerId']);
+        }
 
         return 0;
     }
 
     private function scoreAnswerMcqSingle($quizAnswer, $userAnswer)
     {
-        if($quizAnswer == $userAnswer)
+        if ($quizAnswer == $userAnswer) {
             return 1;
+        }
+
         return 0;
     }
 
     private function scoreAnswerMcqMultiple($quizAnswer, $userAnswer, $maxChoices)
     {
-        if(count($userAnswer) > $maxChoices)
+        if (count($userAnswer) > $maxChoices) {
             throw new InvalidAnswerDataException();
+        }
 
         $score = 0;
-        foreach($userAnswer as $answer)
+        foreach ($userAnswer as $answer) {
             $score += in_array($answer, $quizAnswer) ? 1 : 0;
+        }
 
         return $score / $maxChoices;
     }
 
     private function scoreAnswerMissingWord($quizAnswer, $userAnswer)
     {
-        if($quizAnswer == $userAnswer)
+        if ($quizAnswer == $userAnswer) {
             return 1;
+        }
+
         return 0;
     }
 
     private function scoreAnswerLinking($linkingAnswers, $userLinkingAnswers)
     {
-        if(count($userLinkingAnswers) > count($linkingAnswers))
+        if (count($userLinkingAnswers) > count($linkingAnswers)) {
             throw new InvalidAnswerDataException();
+        }
 
         $score = 0;
-        foreach($linkingAnswers as $key => $answer)
+        foreach ($linkingAnswers as $key => $answer) {
             $score += array_key_exists($key, $userLinkingAnswers) && $answer == $userLinkingAnswers[$key] ? 1 : 0;
+        }
 
         return $score / count($linkingAnswers);
     }
@@ -299,17 +324,16 @@ class IuQuizRepository
         return $this->userQuiz->select('user_quizzes.*')
             ->join('quizzes as qz', function ($query) {
                 $query->on('qz.entity_id', 'user_quizzes.entity_id')
-                    ->on('qz.entity_type','user_quizzes.entity_type')
+                    ->on('qz.entity_type', 'user_quizzes.entity_type')
                     ->join('exam_accesses as ea', function ($query) {
                         $query->on('ea.quiz_id', 'qz.id');
                     });
             })
-            ->where('ea.id',$entityId)
+            ->where('ea.id', $entityId)
             ->where('user_quizzes.user_id', $userId)
             ->where('status', QuizData::STATUS_IN_PROGRESS)
             ->update([
                 'status' => QuizData::STATUS_COMPLETED,
             ]);
     }
-
 }

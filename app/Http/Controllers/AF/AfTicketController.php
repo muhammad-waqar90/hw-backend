@@ -13,18 +13,18 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AF\Tickets\AfReplyToTicketRequest;
 use App\Http\Requests\AF\Tickets\AfTicketListRequest;
 use App\Http\Requests\AF\Tickets\AfUpdateTicketCategoryRequest;
-use App\Http\Requests\AF\TicketSubjects\AfTicketSubjectListRequest;
 use App\Http\Requests\AF\TicketSubjects\AfCreateUpdateTicketSubjectRequest;
+use App\Http\Requests\AF\TicketSubjects\AfTicketSubjectListRequest;
 use App\Mail\ClosedGuestTicketEmail;
 use App\Models\TicketCategory;
-use App\Repositories\AF\AfTicketRepository;
 use App\Repositories\AF\AfLessonFaqRepository;
-use App\Repositories\IU\IuLessonQaRepository;
+use App\Repositories\AF\AfTicketRepository;
 use App\Repositories\HA\PermissionRepository;
+use App\Repositories\IU\IuLessonQaRepository;
 use App\Repositories\TicketRepository;
 use App\Transformers\AF\AfSpecificTicketTransformer;
-use App\Transformers\AF\AfTicketTransformer;
 use App\Transformers\AF\AfTicketMessageTransformer;
+use App\Transformers\AF\AfTicketTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
@@ -33,17 +33,23 @@ use Illuminate\Support\Facades\Mail;
 
 class AfTicketController extends Controller
 {
-
     private TicketRepository $ticketRepository;
+
     private AfTicketRepository $afTicketRepository;
+
     private PermissionRepository $permissionRepository;
+
     private AfLessonFaqRepository $afLessonFaqRepository;
+
     private IuLessonQaRepository $iuLessonQaRepository;
 
-    public function __construct(TicketRepository $ticketRepository, AfTicketRepository $afTicketRepository,
-                                PermissionRepository $permissionRepository, AfLessonFaqRepository $afLessonFaqRepository,
-                                IuLessonQaRepository $iuLessonQaRepository)
-    {
+    public function __construct(
+        TicketRepository $ticketRepository,
+        AfTicketRepository $afTicketRepository,
+        PermissionRepository $permissionRepository,
+        AfLessonFaqRepository $afLessonFaqRepository,
+        IuLessonQaRepository $iuLessonQaRepository
+    ) {
         $this->ticketRepository = $ticketRepository;
         $this->afTicketRepository = $afTicketRepository;
         $this->permissionRepository = $permissionRepository;
@@ -54,42 +60,50 @@ class AfTicketController extends Controller
     public function createTicketSubject(AfCreateUpdateTicketSubjectRequest $request)
     {
         $this->ticketRepository->createTicketSubject($request->categoryId, $request->name, $request->desc, $request->only_logged_in);
+
         return response()->json(['message' => 'Successfully created ticket subject'], 200);
     }
 
     public function getTicketCategories()
     {
         $data = $this->ticketRepository->getTicketCategories();
+
         return response()->json($data, 200);
     }
 
     public function getTicketSubjectList(AfTicketSubjectListRequest $request)
     {
         $data = $this->ticketRepository->getTicketSubjectPaginatedList($request->query('searchText'));
+
         return response()->json($data, 200);
     }
 
     public function getTicketSubject($id)
     {
         $data = $this->ticketRepository->getTicketSubject($id);
-        if(!$data)
+        if (! $data) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
+
         return response()->json($data, 200);
     }
 
     public function updateTicketSubject($id, AfCreateUpdateTicketSubjectRequest $request)
     {
         $this->ticketRepository->updateTicketSubject($id, $request->categoryId, $request->name, $request->desc, $request->only_logged_in);
+
         return response()->json(['message' => 'Successfully updated ticket subject'], 200);
     }
 
     public function deleteTicketSubject(int $id)
     {
         $ticketSubject = $this->ticketRepository->getTicketSubject($id);
-        if(!$ticketSubject)
+        if (! $ticketSubject) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->ticketRepository->deleteTicketSubject($ticketSubject);
+
         return response()->json(['message' => 'Successfully deleted ticket subject'], 200);
     }
 
@@ -101,16 +115,17 @@ class AfTicketController extends Controller
         $searchStatus = $this->afTicketRepository->parseSearchStatus($request->status);
         $searchSubject = $request->subject;
 
-        if(!$searchCategories || empty($searchCategories) || !$searchStatus)
+        if (! $searchCategories || empty($searchCategories) || ! $searchStatus) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         $data = $this->afTicketRepository->getTicketQuery($searchCategories, $searchStatus, $searchSubject)
-            ->orderBy('created_at')
+            ->oldest()
             ->paginate(20)
             ->appends([
-                'category'  => $request->category,
-                'status'    => $request->status,
-                'subject'   => $request->subject
+                'category' => $request->category,
+                'status' => $request->status,
+                'subject' => $request->subject,
             ]);
         $fractal = fractal($data->getCollection(), new AfTicketTransformer());
         $data->setCollection(collect($fractal));
@@ -123,19 +138,24 @@ class AfTicketController extends Controller
         $userId = $request->user()->id;
         $ticket = $this->afTicketRepository->getTicket($id);
 
-        if(!$ticket)
+        if (! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if($ticket->admin_id && $ticket->admin_id == $userId)
+        }
+        if ($ticket->admin_id && $ticket->admin_id == $userId) {
             return response()->json(['errors' => 'You have already claimed the ticket'], 400);
-        if($ticket->admin_id && $ticket->admin_id != $userId)
+        }
+        if ($ticket->admin_id && $ticket->admin_id != $userId) {
             return response()->json(['errors' => 'Ticket already claimed by somebody else'], 400);
-        if($ticket->ticket_status_id == TicketStatusData::RESOLVED)
+        }
+        if ($ticket->ticket_status_id == TicketStatusData::RESOLVED) {
             return response()->json(['errors' => 'Cannot claim resolved ticket'], 400);
+        }
 
-        $userPermissions =  $this->permissionRepository->getUserPermissionIds($request->user()->id)->toArray();
+        $userPermissions = $this->permissionRepository->getUserPermissionIds($request->user()->id)->toArray();
         $userCategoryAccess = $this->afTicketRepository->userTicketCategoriesFromPermissions($userPermissions);
-        if(!in_array($ticket->ticket_category_id, $userCategoryAccess))
+        if (! in_array($ticket->ticket_category_id, $userCategoryAccess)) {
             return response()->json(['errors' => 'Permission missing to claim this ticket'], 400);
+        }
 
         DB::beginTransaction();
         try {
@@ -148,22 +168,25 @@ class AfTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $ticket->id,
-                'Admin "'. $userName.'" has claimed your ticket',
+                'Admin "'.$userName.'" has claimed your ticket',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             DB::commit();
 
-            if(!$ticket->user_id)
+            if (! $ticket->user_id) {
                 return response()->json(['message' => 'Successfully claimed ticket', 'data' => $message], 200);
+            }
 
-            if($ticket->ticket_category_id != TicketCategoryData::LESSON_QA)
+            if ($ticket->ticket_category_id != TicketCategoryData::LESSON_QA) {
                 AfTicketClaimed::dispatch($ticket->id, $ticket->user_id, $ticket->subject, $userName, $message->message);
+            }
 
             return response()->json(['message' => 'Successfully claimed ticket', 'data' => $message], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfTicketController@claimTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -173,12 +196,15 @@ class AfTicketController extends Controller
         $userId = $request->user()->id;
         $ticket = $this->afTicketRepository->getTicket($id);
 
-        if(!$ticket)
+        if (! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if(!$ticket->admin_id)
+        }
+        if (! $ticket->admin_id) {
             return response()->json(['errors' => 'You have not claimed the ticket yet'], 400);
-        if($ticket->admin_id && $ticket->admin_id != $userId)
+        }
+        if ($ticket->admin_id && $ticket->admin_id != $userId) {
             return response()->json(['errors' => 'Ticket claimed by somebody else'], 400);
+        }
 
         DB::beginTransaction();
         try {
@@ -191,19 +217,21 @@ class AfTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $ticket->id,
-                'Admin "'. $userName.'" has unclaimed your ticket',
+                'Admin "'.$userName.'" has unclaimed your ticket',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             DB::commit();
 
-            if($ticket->user_id && $ticket->ticket_category_id != TicketCategoryData::LESSON_QA)
+            if ($ticket->user_id && $ticket->ticket_category_id != TicketCategoryData::LESSON_QA) {
                 AfTicketUnclaimed::dispatch($ticket->id, $ticket->user_id, $ticket->subject, $userName, $message->message);
+            }
 
             return response()->json(['message' => 'Successfully unclaimed ticket', 'data' => $message], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfTicketController@unclaimTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -213,12 +241,15 @@ class AfTicketController extends Controller
         $userId = $request->user()->id;
         $ticket = $this->afTicketRepository->getTicket($id);
 
-        if(!$ticket)
+        if (! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if (!$ticket->admin_id)
+        }
+        if (! $ticket->admin_id) {
             return response()->json(['errors' => 'You have not claimed the ticket yet'], 400);
-        if ($ticket->admin_id && $ticket->admin_id != $userId)
+        }
+        if ($ticket->admin_id && $ticket->admin_id != $userId) {
             return response()->json(['errors' => 'Ticket claimed by somebody else'], 400);
+        }
 
         DB::beginTransaction();
         try {
@@ -229,7 +260,7 @@ class AfTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $ticket->id,
-                'Admin "' . $userName . '" has put your ticket on hold',
+                'Admin "'.$userName.'" has put your ticket on hold',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             DB::commit();
@@ -239,6 +270,7 @@ class AfTicketController extends Controller
             DB::rollback();
 
             Log::error('Exception: AfTicketController@onHoldTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -246,8 +278,9 @@ class AfTicketController extends Controller
     public function getTicket($id, Request $request)
     {
         $ticket = $request->page == null ? $this->parseAfGetTicketData($id) : null;
-        if($request->page == null && !$ticket)
+        if ($request->page == null && ! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $messages = $this->afTicketRepository->getTicketMessagesList($id);
 
@@ -255,12 +288,14 @@ class AfTicketController extends Controller
         $messages->setCollection(collect($fractal));
 
         $data = (object) [
-            'messages' => $messages
+            'messages' => $messages,
         ];
-        if($request->page == null)
+        if ($request->page == null) {
             $data->ticket = fractal($ticket, new AfSpecificTicketTransformer($request->user()->id));
-        if($ticket && $ticket->admin_id == $request->user()->id)
+        }
+        if ($ticket && $ticket->admin_id == $request->user()->id) {
             $this->ticketRepository->ticketSeenByAdmin($ticket->id, true);
+        }
 
         return response()->json($data, 200);
     }
@@ -268,7 +303,7 @@ class AfTicketController extends Controller
     private function parseAfGetTicketData($id)
     {
         $searchCategories = array_values(TicketCategoryData::getConstants());
-        $searchStatus = array_values(TicketStatusData::getConstants());;
+        $searchStatus = array_values(TicketStatusData::getConstants());
 
         return $this->afTicketRepository->getTicketQuery($searchCategories, $searchStatus, null)
             ->where('tickets.id', $id)
@@ -279,20 +314,26 @@ class AfTicketController extends Controller
     {
         $userId = $request->user()->id;
         $ticket = $this->afTicketRepository->getTicket($id);
-        if(!$ticket)
+        if (! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if($ticket->ticket_category_id == $request->categoryId)
+        }
+        if ($ticket->ticket_category_id == $request->categoryId) {
             return response()->json(['errors' => 'Ticket already has the selected category'], 400);
-        if(!$ticket->user_id && $request->categoryId != TicketCategoryData::SYSTEM)
+        }
+        if (! $ticket->user_id && $request->categoryId != TicketCategoryData::SYSTEM) {
             return response()->json(['errors' => Lang::get('tickets.guTicketCategoryNonChangeable')], 400);
-        if($ticket->ticket_category_id == TicketCategoryData::LESSON_QA)
+        }
+        if ($ticket->ticket_category_id == TicketCategoryData::LESSON_QA) {
             return response()->json(['errors' => Lang::get('tickets.lectureQaTicketCategoryNonChangeable')], 400);
-        if($request->categoryId == TicketCategoryData::LESSON_QA)
+        }
+        if ($request->categoryId == TicketCategoryData::LESSON_QA) {
             return response()->json(['errors' => Lang::get('tickets.ticketCategoryNonChangeableToLectureQa')], 400);
+        }
 
-        $hasAdmin = !!$ticket->admin_id;
-        if($hasAdmin)
+        $hasAdmin = (bool) $ticket->admin_id;
+        if ($hasAdmin) {
             $this->unclaimTicket($id, $request);
+        }
 
         DB::beginTransaction();
         try {
@@ -306,16 +347,17 @@ class AfTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $ticket->id,
-                'Admin "'. $userName.'" has updated ticket category to: "' . $newTicketCategory->name .'"',
+                'Admin "'.$userName.'" has updated ticket category to: "'.$newTicketCategory->name.'"',
                 TicketMessageTypeData::ADMIN_ONLY_SYSTEM_MESSAGE
             );
             DB::commit();
 
             return response()->json(['message' => 'Successfully updated ticket category', 'data' => $message], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfTicketController@updateTicketCategory', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -335,17 +377,20 @@ class AfTicketController extends Controller
                 TicketMessageTypeData::ADMIN_MESSAGE
             );
 
-            if(!$ticket->user_id)
+            if (! $ticket->user_id) {
                 return $this->handleReplyGuestTicket($userName, $ticket, $message);
+            }
 
-            if($ticket->ticket_category_id === TicketCategoryData::LESSON_QA)
+            if ($ticket->ticket_category_id === TicketCategoryData::LESSON_QA) {
                 return $this->handleReplyLessonQATicket($ticket, $message);
+            }
 
             return $this->handleReplyUserTicket($ticket, $message, $request->assets);
         } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfTicketController@replyToTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -356,12 +401,12 @@ class AfTicketController extends Controller
 
         $ticket->ticket_status_id = TicketStatusData::RESOLVED;
         $ticket->seen_by_user = false;
-        $ticket->user_email = "guest";
+        $ticket->user_email = 'guest';
         $ticket->save();
 
         $data = (object) [
-            'ticket'    => $ticket,
-            'message'   => $message
+            'ticket' => $ticket,
+            'message' => $message,
         ];
 
         DB::commit();
@@ -377,13 +422,14 @@ class AfTicketController extends Controller
         $ticket->seen_by_user = false;
         $ticket->save();
         $data = (object) [
-            'ticket'    => $ticket,
-            'message'   => $message
+            'ticket' => $ticket,
+            'message' => $message,
         ];
         DB::commit();
 
-        if(empty($ticket->lesson->toArray()))
+        if (empty($ticket->lesson->toArray())) {
             return;
+        }
 
         $iuTicketLinkIds = [
             'lessonId' => $ticket->lesson[0]->id,
@@ -410,14 +456,15 @@ class AfTicketController extends Controller
             $messages = [...$messages, ...$assets];
         }
 
-        foreach ($messages as $key => $msg)
+        foreach ($messages as $key => $msg) {
             $messages[$key] = fractal($msg, new AfTicketMessageTransformer());
+        }
 
         $ticket->seen_by_user = false;
         $ticket->save();
         $data = (object) [
-            'ticket'    => $ticket,
-            'message'   => $messages
+            'ticket' => $ticket,
+            'message' => $messages,
         ];
 
         DB::commit();
@@ -438,13 +485,14 @@ class AfTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $id,
-                '"' . $userName . '" marked the ticket as resolved',
+                '"'.$userName.'" marked the ticket as resolved',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             $ticket->ticket_status_id = TicketStatusData::RESOLVED;
             $ticket->seen_by_user = false;
-            if(!$ticket->user_id)
-                $ticket->user_email = "guest";
+            if (! $ticket->user_id) {
+                $ticket->user_email = 'guest';
+            }
 
             $ticket->save();
 
@@ -463,6 +511,7 @@ class AfTicketController extends Controller
             DB::rollback();
 
             Log::error('Exception: AfTicketController@resolveTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -471,13 +520,14 @@ class AfTicketController extends Controller
     {
         $userId = $request->user()->id;
         $searchStatus = $this->afTicketRepository->parseSearchStatus($request->status);
-        if(!$searchStatus)
+        if (! $searchStatus) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         $data = $this->afTicketRepository->getMyTicketList($userId, $searchStatus, $request->subject)
             ->appends([
                 'subject' => $request->subject,
-                'status' => $request->status
+                'status' => $request->status,
             ]);
 
         $fractal = fractal($data->getCollection(), new AfTicketTransformer());
@@ -490,23 +540,26 @@ class AfTicketController extends Controller
     {
         $adminId = $request->user()->id;
         $ticket = $this->afTicketRepository->getTicket($id);
-        if(!$ticket || empty($ticket?->lesson))
+        if (! $ticket || empty($ticket?->lesson)) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if(
+        if (
             empty($ticket->lesson->toArray()) ||
             $ticket->ticket_category_id != TicketCategoryData::LESSON_QA ||
             $ticket->ticket_status_id != TicketStatusData::RESOLVED ||
             $adminId != $ticket->admin_id
-        )
+        ) {
             return response()->json(['errors' => 'Ticket can not be saved as lesson faq'], 400);
+        }
 
         $question = $this->afTicketRepository->getTicketMessageByType($ticket->id, TicketMessageTypeData::USER_MESSAGE)->message;
 
         $lessonId = $ticket->lesson[0]->id;
         $lessonFaq = $this->afLessonFaqRepository->getLessonFaqByLessonId($lessonId, $question);
-        if($lessonFaq)
+        if ($lessonFaq) {
             return response()->json(['errors' => 'Question already exist in lesson faq'], 400);
+        }
 
         $answer = $this->afTicketRepository->getTicketMessageByType($ticket->id, TicketMessageTypeData::ADMIN_MESSAGE)->message;
         $this->afLessonFaqRepository->createLessonFaq($lessonId, $question, $answer);

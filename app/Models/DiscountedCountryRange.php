@@ -11,11 +11,11 @@ class DiscountedCountryRange extends Model
 
     protected $fillable = [
         'discount_option',
-        'discount_range'
+        'discount_range',
     ];
 
     protected $casts = [
-        'discount_range' => 'array'
+        'discount_range' => 'array',
     ];
 
     public function discountedCountry()

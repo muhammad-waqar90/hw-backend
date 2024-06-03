@@ -24,9 +24,21 @@ class AfCreateUpdateLessonFaq extends FormRequest
     public function rules()
     {
         return [
-            'lesson_id' => 'required',
-            'question'  => 'required|string|min:5|max:5000',
-            'answer'    => 'required|string|min:5|max:10000'
+            'lesson_id' => [
+                'required',
+            ],
+            'question'  => [
+                'required',
+                'string',
+                'min:5',
+                'max:5000',
+            ],
+            'answer'    => [
+                'required',
+                'string',
+                'min:5',
+                'max:10000',
+            ],
         ];
     }
 }

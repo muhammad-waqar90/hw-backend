@@ -39,6 +39,7 @@ return [
     'payment' => [
         'successfullyUpdatedPaymentMethod' => 'Successfully updated payment method',
         'successfullyDeletedPaymentMethod' => 'Successfully deleted payment method',
+        'minorCannotSavePaymentMethod' => 'Minor not allowed to update payment method',
     ],
     'purchases' => [
         'cart' => [

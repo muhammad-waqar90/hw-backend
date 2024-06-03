@@ -5,16 +5,13 @@ namespace App\Mail;
 class ClosedGuestTicketEmail extends AbstractMail
 {
     public $ticketSubject;
-    public $adminName;
-    public $adminMessage;
 
+    public $adminName;
+
+    public $adminMessage;
 
     /**
      * Create a new message instance.
-     * @param $userProfile
-     * @param $ticketSubject
-     * @param $adminName
-     * @param $adminMessage
      */
     public function __construct($userProfile, $ticketSubject, $adminName, $adminMessage)
     {

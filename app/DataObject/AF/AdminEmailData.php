@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DataObject\AF;
 
 class AdminEmailData

@@ -7,8 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AF\Lessons\AfLessonCreateRequest;
 use App\Http\Requests\AF\Lessons\AfLessonSortingRequest;
 use App\Http\Requests\AF\Lessons\AfLessonUpdateRequest;
-use App\Repositories\AF\AfCourseRepository;
 use App\Repositories\AF\AfCourseModuleRepository;
+use App\Repositories\AF\AfCourseRepository;
 use App\Repositories\AF\AfLessonEbookRepository;
 use App\Repositories\AF\AfLessonRepository;
 use App\Repositories\AF\AfPublishLessonRepository;
@@ -22,9 +22,13 @@ class AfLessonController extends Controller
     use UtilsTrait;
 
     private AfCourseRepository $afCourseRepository;
+
     private AfCourseModuleRepository $afCourseModuleRepository;
+
     private AfLessonRepository $afLessonRepository;
+
     private AfPublishLessonRepository $afPublishLessonRepository;
+
     private AfLessonEbookRepository $afLessonEbookRepository;
 
     public function __construct(
@@ -44,15 +48,18 @@ class AfLessonController extends Controller
     public function createLesson(AfLessonCreateRequest $request, int $courseId, int $levelId, int $courseModuleId)
     {
         $course = $this->afCourseRepository->getCourse($courseId);
-        if(!$course)
+        if (! $course) {
             return response()->json(['errors' => 'Course not found'], 404);
+        }
 
         $module = $this->afCourseModuleRepository->getModule($courseModuleId, $levelId, $courseId);
-        if(!$module)
+        if (! $module) {
             return response()->json(['errors' => 'Module not found'], 404);
+        }
 
-        if($request->published && $this->afLessonRepository->getLastLessonByModuleId($module->id) && !$this->afLessonRepository->getLastLessonByModuleId($module->id)->published)
+        if ($request->published && $this->afLessonRepository->getLastLessonByModuleId($module->id) && ! $this->afLessonRepository->getLastLessonByModuleId($module->id)->published) {
             return response()->json(['errors' => 'Can not add lesson with Published status after lesson with Un-Published status'], 403);
+        }
 
         $thumbnail = $request->img ? $this->uploadFile($this->afLessonRepository->getThumbnailS3StoragePath(), $request->img) : null;
         $lesson = $this->afLessonRepository->createLesson(
@@ -66,8 +73,9 @@ class AfLessonController extends Controller
             $request->published
         );
 
-        if(!$request->published)
+        if (! $request->published) {
             $this->afPublishLessonRepository->updateOrCreatePublishLesson($lesson->id, $request->publish_at);
+        }
 
         return response()->json(['message' => Lang::get('general.successfullyCreated', ['model' => 'lesson'])], 200);
     }
@@ -75,17 +83,20 @@ class AfLessonController extends Controller
     public function updateLesson(AfLessonUpdateRequest $request, int $courseId, int $levelId, int $courseModuleId, int $lessonId)
     {
         $lesson = $this->afLessonRepository->getLesson($courseId, $courseModuleId, $lessonId);
-        if(!$lesson)
+        if (! $lesson) {
             return response()->json(['errors' => 'Lesson not found'], 404);
+        }
 
-        if($request->published != $lesson->published && !$this->afLessonRepository->checkIfLessonUpdateValid($courseModuleId, $lesson->published ? $lesson->order_id + 1 : $lesson->order_id - 1, $lesson->published))
+        if ($request->published != $lesson->published && ! $this->afLessonRepository->checkIfLessonUpdateValid($courseModuleId, $lesson->published ? $lesson->order_id + 1 : $lesson->order_id - 1, $lesson->published)) {
             return response()->json(['errors' => 'Can not update lesson. Lessons status should be in sequence of Published to Unpublished.'], 403);
+        }
 
         $course = $this->afCourseRepository->getCourse($courseId);
 
         // cannot un-published if CourseStatus not DRAFT or COMING_SOON
-        if($lesson->published && !$request->published && !$this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON]))
+        if ($lesson->published && ! $request->published && ! $this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON])) {
             return response()->json(['errors' => 'Lesson cannot be un-published as course status is not DRAFT or COMING SOON'], 403);
+        }
 
         $thumbnail = $request->img ? $this->updateFile($this->afLessonRepository->getThumbnailS3StoragePath(), $lesson->img, $request->img) : $lesson->img;
         $this->afLessonRepository->updateLesson(
@@ -109,15 +120,18 @@ class AfLessonController extends Controller
     {
         $lessonIds = explode(',', $lessonIds);
         $lessons = $this->afLessonRepository->checkIfAllLessonsExist($courseId, $courseModuleId, $lessonIds);
-        if(!$lessons)
+        if (! $lessons) {
             return response()->json(['errors' => 'Lesson not found'], 404);
+        }
 
         $this->afLessonRepository->deleteLesson($lessonIds);
 
         $this->updateModuleHasEbook($courseModuleId);
 
         $level = $this->afCourseRepository->getCourseLevel($courseId, $levelId);
-        if ($level->value === 1) $this->afCourseRepository->updateCourseHasLevel1Ebook($level->course_id, $level->id);
+        if ($level->value === 1) {
+            $this->afCourseRepository->updateCourseHasLevel1Ebook($level->course_id, $level->id);
+        }
 
         return response()->json(['message' => Lang::get('general.successfullyDeleted', ['model' => 'lessons'])], 200);
     }
@@ -128,13 +142,16 @@ class AfLessonController extends Controller
         $lessonIds = array_column($lessons, 'id');
 
         $exists = $this->afLessonRepository->checkIfAllLessonsExist($courseId, $courseModuleId, $lessonIds);
-        if(!$exists)
+        if (! $exists) {
             return response()->json(['errors' => 'Lesson not found'], 404);
+        }
 
-        if(!$this->afLessonRepository->checkIfLessonSortValid($lessons))
+        if (! $this->afLessonRepository->checkIfLessonSortValid($lessons)) {
             return response()->json(['errors' => 'Can not sort lessons. Lessons status should be in sequence of Published to Unpublished.'], 403);
+        }
 
         $this->afLessonRepository->sortLesson($lessons);
+
         return response()->json(['message' => Lang::get('general.successfullySorted', ['model' => 'lessons'])], 200);
     }
 

@@ -14,9 +14,9 @@ use App\Mail\IU\Account\IuAccountDeletedEmail;
 use App\Mail\IU\Account\IuAccountTrashedEmail;
 use App\Repositories\AF\AfCourseRepository;
 use App\Repositories\AF\AfPurchaseRepository;
+use App\Repositories\AF\AfUserRepository;
 use App\Repositories\GdprRepository;
 use App\Repositories\IU\IuUserRepository;
-use App\Repositories\AF\AfUserRepository;
 use App\Repositories\TicketRepository;
 use App\Transformers\AF\AfCourseListTransformer;
 use App\Transformers\AF\AfPurchaseItemTransformer;
@@ -28,10 +28,15 @@ use Illuminate\Support\Facades\Mail;
 class AfUserController extends Controller
 {
     private AfUserRepository $afUserRepository;
+
     private IuUserRepository $iuUserRepository;
+
     private AfCourseRepository $afCourseRepository;
+
     private AfPurchaseRepository $afPurchaseRepository;
+
     private GdprRepository $gdprRepository;
+
     private TicketRepository $ticketRepository;
 
     public function __construct(
@@ -52,7 +57,7 @@ class AfUserController extends Controller
 
     /**
      * Query filter params
-     * @param AfUserListRequest $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function getUsersList(AfUserListRequest $request)
@@ -71,20 +76,24 @@ class AfUserController extends Controller
     public function getUser($id)
     {
         $user = $this->iuUserRepository->getUser($id, true, RoleData::INDEPENDENT_USER, true);
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $user->makeVisible('deleted_at');
+
         return response()->json($user, 200);
     }
 
     public function getUserCourses($id, AfUserCourseListRequest $request)
     {
         $user = $this->iuUserRepository->getUser($id, true, RoleData::INDEPENDENT_USER, true);
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $data = $this->afCourseRepository->getUserEnrolledCourses($id, (string) $request->query('searchText'));
+
         return response()->json($data, 200);
     }
 
@@ -92,10 +101,12 @@ class AfUserController extends Controller
     {
         $user = $this->iuUserRepository->getUser($id);
 
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if($user->is_enabled)
+        }
+        if ($user->is_enabled) {
             return response()->json(['errors' => Lang::get('auth.alreadyEnabled')], 400);
+        }
 
         $this->iuUserRepository->enableUser($user);
 
@@ -106,10 +117,12 @@ class AfUserController extends Controller
     {
         $user = $this->iuUserRepository->getUser($id);
 
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if(!$user->is_enabled)
+        }
+        if (! $user->is_enabled) {
             return response()->json(['errors' => Lang::get('auth.alreadyDisable')], 400);
+        }
 
         $this->iuUserRepository->disableUser($user);
 
@@ -120,8 +133,9 @@ class AfUserController extends Controller
     {
         $user = $this->iuUserRepository->getUser($id, true, RoleData::INDEPENDENT_USER, true);
 
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $data = $this->afPurchaseRepository->getUserPurchases(
             $id,
@@ -144,8 +158,9 @@ class AfUserController extends Controller
     {
         $user = $this->iuUserRepository->getUser($id, false, RoleData::INDEPENDENT_USER, true);
 
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $items = array_map('intval', explode(',', $items));
 
@@ -160,14 +175,16 @@ class AfUserController extends Controller
         DB::beginTransaction();
         try {
             $user = $this->iuUserRepository->getUser($id, true, RoleData::INDEPENDENT_USER, true);
-            if(!$user)
+            if (! $user) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
-            if(!$user->restoreUser) {
+            if (! $user->restoreUser) {
                 // soft delete: create restore user
                 $exists = $this->ticketRepository->checkIfAnyUnResolvedTicketsExist($user->id, [TicketCategoryData::REFUND]);
-                if($exists)
+                if ($exists) {
                     return response()->json(['errors' => Lang::get('auth.unresolvedRefundRequests')], 400);
+                }
 
                 $this->iuUserRepository->createRestoreUser($user->id);
 
@@ -184,13 +201,15 @@ class AfUserController extends Controller
             }
 
             DB::commit();
+
             return response()->json(['message' => $resMessage], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfUserController@deleteUser', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -199,13 +218,13 @@ class AfUserController extends Controller
     public function exportUserGDPRData(int $id)
     {
         $user = $this->iuUserRepository->getUser($id);
-        if(!$user)
+        if (! $user) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $gdprRequest = $this->gdprRepository->init($id);
         ExportUserGdprDataJob::dispatch($user->id, $gdprRequest->uuid)->onQueue('low');
 
         return response()->json(['message' => Lang::get('iu.gdprRequest.successfullyInit')], 201);
     }
-
 }

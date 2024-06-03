@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('identity_verifications', function (Blueprint $table) {
             $table->renameColumn('img', 'identity_file');
@@ -20,10 +18,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('identity_verifications', function (Blueprint $table) {
             $table->renameColumn('identity_file', 'img');

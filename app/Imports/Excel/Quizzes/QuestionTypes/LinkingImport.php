@@ -12,14 +12,16 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
-class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class LinkingImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     use Importable;
 
     private Collection $collection;
+
     private string $fileName;
+
     private int $row = 2;
 
     public function __construct(string $fileName)
@@ -32,11 +34,13 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
      */
     public function collection(Collection $collection): Collection
     {
-        $validator =Validator::make($collection->toArray(), $this->rules());
-        if($validator->fails())
+        $validator = Validator::make($collection->toArray(), $this->rules());
+        if ($validator->fails()) {
             throw new LinkingImportException('Data is invalid', 101, 0, $this->fileName, $validator->messages()->get('*'));
+        }
 
         $this->collection = $this->parseQuestionList($collection);
+
         return $this->collection;
     }
 
@@ -47,16 +51,16 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     {
         $parsedQuestions = [];
         $uniqueQuestions = [];
-        for($i = 0; $i < $collection->count(); $i+=2) {
-            $question = $this->parseQuestion($collection[$i], $collection[$i+1]);
+        for ($i = 0; $i < $collection->count(); $i += 2) {
+            $question = $this->parseQuestion($collection[$i], $collection[$i + 1]);
             $uniqueQuestions[] = $question['question'];
-            if(count($uniqueQuestions) !== count(array_unique($uniqueQuestions)))
+            if (count($uniqueQuestions) !== count(array_unique($uniqueQuestions))) {
                 throw new LinkingImportException('Non unique question found at current row', 100, $this->row, $this->fileName);
+            }
 
             $parsedQuestions[] = $question;
             $this->row = $this->row + 2;
         }
-
 
         return collect($parsedQuestions);
     }
@@ -81,11 +85,12 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     public function mapAnswer($options): Collection
     {
         $answerId = [];
-        for($i = 0; $i < count($options['leftSide']); $i++)
+        for ($i = 0; $i < count($options['leftSide']); $i++) {
             $answerId[$options['leftSide'][$i]['id']] = $options['rightSide'][$i]['id'];
+        }
 
         return collect([
-            'answerId' => $answerId
+            'answerId' => $answerId,
         ]);
     }
 
@@ -97,7 +102,7 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             'difficulty' => QuizQuestionDifficultyData::difficultyStringToInt($leftSide['difficulty']),
             'type' => QuizData::QUESTION_LINKING,
             'options' => $options->toJson(),
-            'answer' => $this->mapAnswer($options)->toJson()
+            'answer' => $this->mapAnswer($options)->toJson(),
         ]);
     }
 
@@ -107,18 +112,20 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     public function getOptions($leftSide, $rightSide): Collection
     {
         $options = ['leftSide' => [], 'rightSide' => []];
-        for($i = 0; $i < 10; $i++) {
-            if(!strlen($leftSide['link_' . $i+1]) && strlen($rightSide['link_' . $i+1]) || strlen($leftSide['link_' . $i+1]) && !strlen($rightSide['link_' . $i+1]))
-                throw new LinkingImportException('Answer missing in link_' . $i+1, 100, $this->row, $this->fileName);
-            if(!strlen($leftSide['link_' . $i+1]) && !strlen($rightSide['link_' . $i+1]))
+        for ($i = 0; $i < 10; $i++) {
+            if (! strlen($leftSide['link_'.$i + 1]) && strlen($rightSide['link_'.$i + 1]) || strlen($leftSide['link_'.$i + 1]) && ! strlen($rightSide['link_'.$i + 1])) {
+                throw new LinkingImportException('Answer missing in link_'.$i + 1, 100, $this->row, $this->fileName);
+            }
+            if (! strlen($leftSide['link_'.$i + 1]) && ! strlen($rightSide['link_'.$i + 1])) {
                 continue;
+            }
             $options['leftSide'][] = [
                 'id' => Str::orderedUuid()->toString(),
-                'value' => $leftSide['link_' . $i+1]
+                'value' => $leftSide['link_'.$i + 1],
             ];
             $options['rightSide'][] = [
                 'id' => Str::orderedUuid()->toString(),
-                'value' => $rightSide['link_' . $i+1]
+                'value' => $rightSide['link_'.$i + 1],
             ];
         }
 
@@ -130,26 +137,31 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
      */
     public function validateQuestion($leftSide, $rightSide)
     {
-        if(!($this->hasUniqueOptions($leftSide) && $this->hasUniqueOptions($rightSide)))
+        if (! ($this->hasUniqueOptions($leftSide) && $this->hasUniqueOptions($rightSide))) {
             throw new LinkingImportException('Found duplicate options', 100, $this->row, $this->fileName);
+        }
 
-        $validator = Validator::make($leftSide->toArray(),[
+        $validator = Validator::make($leftSide->toArray(), [
             'difficulty' => [
                 'required',
-                Rule::in(QuizQuestionDifficultyData::getStringConstants())
+                Rule::in(QuizQuestionDifficultyData::getStringConstants()),
             ],
             'question' => 'required',
         ]);
-        if($validator->fails())
+        if ($validator->fails()) {
             throw new LinkingImportException('Data is invalid', 101, 0, $this->fileName, $validator->messages()->get('*'));
+        }
     }
 
     public function hasUniqueOptions($question): bool
     {
         $options = [];
-        for($i = 0; $i < 10; $i++)
-            if(strlen($question['link_' . $i+1]))
-                $options[] = $question['link_' . $i+1];
+        for ($i = 0; $i < 10; $i++) {
+            if (strlen($question['link_'.$i + 1])) {
+                $options[] = $question['link_'.$i + 1];
+            }
+        }
+
         return count($options) === count(array_unique($options));
     }
 
@@ -172,7 +184,7 @@ class LinkingImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             '*.link_7' => 'present',
             '*.link_8' => 'present',
             '*.link_9' => 'present',
-            '*.link_10' => 'present'
+            '*.link_10' => 'present',
         ];
     }
 }

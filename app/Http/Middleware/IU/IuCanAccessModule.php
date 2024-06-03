@@ -13,16 +13,15 @@ class IuCanAccessModule
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         $userId = $request->user()->id;
         $canAccess = $this->canAccessLevel($userId, $request->courseModuleId);
-        if (!$canAccess)
+        if (! $canAccess) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }
@@ -33,12 +32,14 @@ class IuCanAccessModule
             ->with('courseLevel')
             ->first();
 
-        if($courseModule->courseLevel->value === 1)
+        if ($courseModule->courseLevel->value === 1) {
             return true;
+        }
 
-        $previousLevelProgress = LessonRepository::getUserLevelProgress($userId, $courseModule->course_id, $courseModule->courseLevel->value-1);
-        if(!$previousLevelProgress || $previousLevelProgress->progress !== 100)
+        $previousLevelProgress = LessonRepository::getUserLevelProgress($userId, $courseModule->course_id, $courseModule->courseLevel->value - 1);
+        if (! $previousLevelProgress || $previousLevelProgress->progress !== 100) {
             return false;
+        }
 
         return true;
     }

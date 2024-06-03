@@ -12,16 +12,11 @@ class IuAccountTrashed
 
     /**
      * IU Account Trashed (soft delete)
-     *
-     * @var $userId
      */
     public $userId;
 
     /**
      * Create a new event instance.
-     *
-     * @param $userId
-     * @return void
      */
     public function __construct($userId)
     {

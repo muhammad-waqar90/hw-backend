@@ -5,13 +5,11 @@ namespace App\Mail;
 class VerificationEmail extends AbstractMail
 {
     public $userProfile;
+
     public $token;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $token
      */
     public function __construct($userProfile, $token)
     {

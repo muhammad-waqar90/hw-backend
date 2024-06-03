@@ -24,16 +24,26 @@ class IuUpdateUserSalaryScaleRequest extends FormRequest
     public function rules()
     {
         return [
-            'discounted_country_id' => 'required|numeric|exists:discounted_countries,id',
-            'discounted_country_range_id' => 'required_with:discounted_country_id|numeric|exists:discounted_country_ranges,id',
-            'declaration' => 'prohibited'
+            'discounted_country_id' => [
+                'required',
+                'numeric',
+                'exists:discounted_countries,id',
+            ],
+            'discounted_country_range_id' => [
+                'required_with:discounted_country_id',
+                'numeric',
+                'exists:discounted_country_ranges,id',
+            ],
+            'declaration' => [
+                'prohibited',
+            ],
         ];
     }
 
     public function messages()
     {
         return [
-            'declaration.prohibited' => 'The declaration cannot be updated.'
+            'declaration.prohibited' => 'The declaration cannot be updated.',
         ];
     }
 }

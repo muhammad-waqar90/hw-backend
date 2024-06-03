@@ -13,17 +13,17 @@ trait UrlTrait
     /**
      * domain suffix extraction - handling signle level subdomain only
      *
-     * @param $url
      * @return host-suffix
      */
     public function getHostWithOutSubDomain($url)
     {
         $host = $this->getHost($url);
-        $hostArray = explode(".", str_replace('www.', '', $host));
+        $hostArray = explode('.', str_replace('www.', '', $host));
 
         $count = count($hostArray);
-        if($count >= 3)
-            return implode(".",[$hostArray[$count - 2], $hostArray[$count - 1]]);
+        if ($count >= 3) {
+            return implode('.', [$hostArray[$count - 2], $hostArray[$count - 1]]);
+        }
 
         return $host;
     }
@@ -46,6 +46,7 @@ trait UrlTrait
     public function getPathDirname($path)
     {
         $parsedPath = $this->parseUrlPath($path);
+
         return isset($parsedPath['dirname']) ? $parsedPath['dirname'] : null;
     }
 
@@ -57,17 +58,17 @@ trait UrlTrait
     public function getUrlRequiredSigned($key, $file = '/*')
     {
         $dirname = $this->getPathDirname($key);
-        return config('aws.cloudfront.cname') . $dirname . $file;
+
+        return config('aws.cloudfront.cname').$dirname.$file;
     }
 
     /**
-     * @param string $url
-     *
      * @return PATHINFO_EXTENSION
      */
-    public function getUrlExtension($url)
+    public function getUrlExtension(string $url)
     {
         $path = $this->getPath($url);
+
         return pathinfo($path, PATHINFO_EXTENSION);
     }
 }

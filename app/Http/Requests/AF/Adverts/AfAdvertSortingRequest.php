@@ -24,9 +24,19 @@ class AfAdvertSortingRequest extends FormRequest
     public function rules()
     {
         return [
-            'data' => 'required|array|min:1',
-            'data.*.id' => 'integer|distinct',
-            'data.*.priority' => 'integer|distinct'
+            'data' => [
+                'required',
+                'array',
+                'min:1',
+            ],
+            'data.*.id' => [
+                'integer',
+                'distinct',
+            ],
+            'data.*.priority' => [
+                'integer',
+                'distinct',
+            ],
         ];
     }
 }

@@ -40,16 +40,16 @@ class AfLessonFaqRepository
                         ->orWhere('answer', 'LIKE', "%$searchText%");
                 });
             })
-            ->orderBy('created_at', 'DESC')
+            ->latest()
             ->get();
     }
 
     public function createLessonFaq($lessonId, $question, $answer)
     {
         return $this->lessonFaq->create([
-            'lesson_id' =>  $lessonId,
-            'question'  =>  $question,
-            'answer'    =>  $answer
+            'lesson_id' => $lessonId,
+            'question' => $question,
+            'answer' => $answer,
         ]);
     }
 
@@ -59,8 +59,8 @@ class AfLessonFaqRepository
             ->where('id', $id)
             ->where('lesson_id', $lessonId)
             ->update([
-                'question'  =>  $question,
-                'answer'    =>  $answer
+                'question' => $question,
+                'answer' => $answer,
             ]);
     }
 

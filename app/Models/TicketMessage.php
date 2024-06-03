@@ -11,20 +11,18 @@ class TicketMessage extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     protected $hidden = [
-        'pivot'
+        'pivot',
     ];
 
     /**
      * Get the user that owns the TicketMessage
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 }

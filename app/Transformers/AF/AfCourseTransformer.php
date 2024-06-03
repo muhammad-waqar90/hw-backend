@@ -13,8 +13,6 @@ class AfCourseTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'category',
@@ -38,8 +36,8 @@ class AfCourseTransformer extends TransformerAbstract
             'course_levels_count' => $course->course_levels_count,
             'video_preview' => $course->video_preview,
             'status' => $course->status,
-            'is_discounted' => (bool)$course->is_discounted,
-            'img' => $this->generateS3Link(AfCourseRepository::getThumbnailS3StoragePath() . $course->img, 1)
+            'is_discounted' => (bool) $course->is_discounted,
+            'img' => $this->generateS3Link(AfCourseRepository::getThumbnailS3StoragePath().$course->img, 1),
         ];
     }
 

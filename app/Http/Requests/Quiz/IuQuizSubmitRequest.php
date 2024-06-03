@@ -24,8 +24,15 @@ class IuQuizSubmitRequest extends FormRequest
     public function rules()
     {
         return [
-            'answers' => 'required|array|max:65535',
-            'answers.*.answerId' => 'present|string_or_array'
+            'answers' => [
+                'required',
+                'array',
+                'max:65535',
+            ],
+            'answers.*.answerId' => [
+                'present',
+                'string_or_array',
+            ],
         ];
     }
 }

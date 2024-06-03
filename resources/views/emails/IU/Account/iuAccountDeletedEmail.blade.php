@@ -1,33 +1,33 @@
 @extends('emails.layouts.emailTemplate')
 
 @section('title')
-    <title>Delete Account</title>
+    <title>Account Deleted</title>
 @endsection
 
 @section('content')
-<table style="font-size:15px">
+<table style="line-height: 21px;font-size:14px;font-weight: 400;font-family: 'Montserrat';color:#384860;">
   <tbody>
     <tr>
-      <td style="font-size:15px;font-family: 'Montserrat';">
+      <td>
         Your account deletion request has processed.
       </td>
     </tr>
 
     <tr>
-      <td height="25" style="height: 25px;line-height: 25px;"></td>
+      <td height="20" style="height: 20px;line-height: 20px;"></td>
     </tr>
     <tr>
-      <td style="font-family: 'Montserrat';">
+      <td>
         All of your saved data, including your account information, saved settings, and any saved files or documents,
         have been permanently removed from our system. This action cannot be undone.
       </td>
     </tr>
 
     <tr>
-      <td height="10" style="height: 10px;line-height: 10px;"></td>
+      <td height="20" style="height: 20px;line-height: 20px;"></td>
     </tr>
     <tr>
-      <td style="width: 100%;color: #222222;font-weight:500;">
+      <td>
         Thank you for using HijazWorld!
       </td>
     </tr>

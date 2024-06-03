@@ -9,17 +9,11 @@ use Illuminate\Support\Facades\Lang;
 
 class CheckOrPermission
 {
-    /**
-     * @var PermissionRepository
-     */
     private PermissionRepository $permissionRepository;
 
     /**
      * Handle an incoming request.
-     *
-     * @param PermissionRepository $permissionRepository
      */
-
     public function __construct(PermissionRepository $permissionRepository)
     {
         $this->permissionRepository = $permissionRepository;
@@ -28,8 +22,9 @@ class CheckOrPermission
     public function handle(Request $request, Closure $next, ...$permissions)
     {
         $userPermissions = $this->permissionRepository->getUserPermissionIds($request->user()->id)->toArray();
-        if (!$this->canAccess($permissions, $userPermissions))
+        if (! $this->canAccess($permissions, $userPermissions)) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }

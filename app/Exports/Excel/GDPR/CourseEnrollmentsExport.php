@@ -28,7 +28,7 @@ class CourseEnrollmentsExport implements FromQuery, WithHeadings, WithMapping
             'id',
             'name',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -38,7 +38,7 @@ class CourseEnrollmentsExport implements FromQuery, WithHeadings, WithMapping
             $row->pivot->id,
             $row->name,
             $row->pivot->created_at,
-            $row->pivot->updated_at
+            $row->pivot->updated_at,
         ];
     }
 }

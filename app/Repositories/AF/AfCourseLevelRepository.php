@@ -24,7 +24,7 @@ class AfCourseLevelRepository
     {
         return $this->courseLevel->create([
             'course_id' => $courseId,
-            'value' => $levelValue
+            'value' => $levelValue,
         ]);
     }
 
@@ -33,7 +33,7 @@ class AfCourseLevelRepository
         return $this->courseLevel
             ->where('id', $id)
             ->update([
-                'name' => $name
+                'name' => $name,
             ]);
     }
 
@@ -64,7 +64,7 @@ class AfCourseLevelRepository
     {
         return $this->courseLevel
             ->where('course_id', $courseId)
-            ->orderBy('value', 'DESC')
+            ->latest('value')
             ->get();
     }
 

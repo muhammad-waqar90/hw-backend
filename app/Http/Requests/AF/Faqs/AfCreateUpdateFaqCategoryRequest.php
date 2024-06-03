@@ -24,8 +24,17 @@ class AfCreateUpdateFaqCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'   => 'required|string|min:4|max:100',
-            'faq_category_id' => 'present|nullable|integer',
+            'name'   => [
+                'required',
+                'string',
+                'min:4',
+                'max:100',
+            ],
+            'faq_category_id' => [
+                'present',
+                'nullable',
+                'integer',
+            ],
         ];
     }
 }

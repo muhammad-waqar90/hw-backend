@@ -6,7 +6,6 @@ use App\Models\Tier;
 
 class AfInAppTiersRepository
 {
-
     private Tier $tier;
 
     public function __construct(Tier $tier)

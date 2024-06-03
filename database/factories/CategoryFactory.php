@@ -10,24 +10,16 @@ use Illuminate\Support\Str;
 class CategoryFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Category::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
      */
-
     public function definition()
     {
         return [
-            'parent_category_id'    =>  null,
-            'root_category_id'      =>  null,
-            'name'                  =>  Str::random(10),
+            'parent_category_id' => null,
+            'root_category_id' => null,
+            'name' => Str::random(10),
         ];
     }
 
@@ -35,36 +27,38 @@ class CategoryFactory extends Factory
     {
         if ($category->root_category_id == null) {
             return $this->state(fn () => [
-                'parent_category_id'    =>  $category->id,
-                'root_category_id'      =>  $category->id,
+                'parent_category_id' => $category->id,
+                'root_category_id' => $category->id,
             ]);
-        } else if ($category->root_category_id != null) {
+        } elseif ($category->root_category_id != null) {
             return $this->state(fn () => [
-                'parent_category_id'    =>  $category->id,
-                'root_category_id'      =>  $category->root_category_id,
+                'parent_category_id' => $category->id,
+                'root_category_id' => $category->root_category_id,
             ]);
         }
     }
+
     public function withCategoryId()
     {
         $categories = DB::table('categories')->pluck('id');
         if ($categories->isEmpty()) {
-            return $this->state(fn ()  =>  []);
+            return $this->state(fn () => []);
         } else {
             return $this->state(fn () => [
-                'parent_category_id'    =>  $categories->random(),
+                'parent_category_id' => $categories->random(),
             ]);
         }
     }
+
     public function withRootCategoryId()
     {
         $categories = DB::table('categories')->whereNull('parent_category_id')->whereNull('root_category_id')->get();
         if ($categories->isEmpty()) {
-            return $this->state(fn ()  =>  []);
+            return $this->state(fn () => []);
         } else {
             return $this->state(fn () => [
-                'parent_category_id'    =>  $categories->pluck('id')->random(),
-                'root_category_id'      =>  $categories->where('id', $categories->pluck('id')->random())->pluck('parent_category_id')->first(),
+                'parent_category_id' => $categories->pluck('id')->random(),
+                'root_category_id' => $categories->where('id', $categories->pluck('id')->random())->pluck('parent_category_id')->first(),
             ]);
         }
     }
@@ -73,7 +67,7 @@ class CategoryFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($name) {
             return [
-                'name'  => $name
+                'name' => $name,
             ];
         });
     }

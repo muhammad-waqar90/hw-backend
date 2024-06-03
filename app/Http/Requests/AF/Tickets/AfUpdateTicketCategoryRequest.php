@@ -26,11 +26,11 @@ class AfUpdateTicketCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            'categoryId'        => [
+            'categoryId' => [
                 'required',
                 'integer',
-                Rule::in(array_values(TicketCategoryData::getConstants()))
-            ]
+                Rule::in(array_values(TicketCategoryData::getConstants())),
+            ],
         ];
     }
 }

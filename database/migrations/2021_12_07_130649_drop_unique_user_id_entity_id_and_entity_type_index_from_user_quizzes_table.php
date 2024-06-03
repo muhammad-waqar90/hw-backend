@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('user_quizzes', function (Blueprint $table) {
             $table->dropForeign(['user_id']);
@@ -26,10 +24,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('user_quizzes', function (Blueprint $table) {
             $table->unique(['user_id', 'entity_id', 'entity_type']);

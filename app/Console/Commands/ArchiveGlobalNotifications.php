@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Repositories\AF\AfGlobalNotificationRepository;
+use Illuminate\Console\Command;
 
 class ArchiveGlobalNotifications extends Command
 {
@@ -26,14 +26,10 @@ class ArchiveGlobalNotifications extends Command
      *
      * @return void
      */
-    /**
-     * @var AfGlobalNotificationRepository
-     */
     private AfGlobalNotificationRepository $afGlobalNotificationRepository;
 
     /**
      * ArchiveGlobalNotifications constructor.
-     * @param AfGlobalNotificationRepository $afGlobalNotificationRepository
      */
     public function __construct(AfGlobalNotificationRepository $afGlobalNotificationRepository)
     {

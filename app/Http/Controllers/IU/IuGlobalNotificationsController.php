@@ -4,12 +4,11 @@ namespace App\Http\Controllers\IU;
 
 use App\Http\Controllers\Controller;
 use App\Repositories\IU\IuGlobalNotificationRepository;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 
 class IuGlobalNotificationsController extends Controller
 {
-
     private IuGlobalNotificationRepository $iuGlobalNotificationRepository;
 
     public function __construct(IuGlobalNotificationRepository $iuGlobalNotificationRepository)
@@ -21,8 +20,9 @@ class IuGlobalNotificationsController extends Controller
     {
         $notification = $this->iuGlobalNotificationRepository->getGlobalNotification($id);
 
-        if(!$notification)
+        if (! $notification) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json($notification, 200);
     }
@@ -30,12 +30,14 @@ class IuGlobalNotificationsController extends Controller
     public function markGlobalNotificationRead(int $id, Request $request)
     {
         $userId = $request->user()->id;
-        
+
         $notification = $this->iuGlobalNotificationRepository->getGlobalNotification($id);
-        if(!$notification)
+        if (! $notification) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->iuGlobalNotificationRepository->markGlobalNotificationRead($userId, $id);
+
         return response()->json(['message' => Lang::get('global_notifications.success.read')], 200);
     }
 
@@ -43,6 +45,7 @@ class IuGlobalNotificationsController extends Controller
     {
         $userId = $request->user()->id;
         $this->iuGlobalNotificationRepository->markGlobalNotificationsModalRead($userId);
+
         return response()->json(['message' => Lang::get('global_notifications.success.bulkModalRead')], 200);
     }
 }

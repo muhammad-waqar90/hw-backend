@@ -10,10 +10,9 @@ use League\Fractal\TransformerAbstract;
 class IuSingleProductTransformer extends TransformerAbstract
 {
     use FileSystemsCloudTrait;
+
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'category',
@@ -32,7 +31,7 @@ class IuSingleProductTransformer extends TransformerAbstract
             'course_module_id' => $product->course_module_id,
             'name' => $product->name,
             'description' => $product->description,
-            'img' => $this->generateS3Link('products/thumbnails/' . $product->img, 1),
+            'img' => $this->generateS3Link('products/thumbnails/'.$product->img, 1),
             'meta' => $product->meta,
             'price' => $product->price,
             'is_available' => $product->is_available,

@@ -24,8 +24,16 @@ class ResendParentVerificationCodeRequest extends FormRequest
     public function rules()
     {
         return [
-            'username' => 'required|min:3|max:255',
-            'parentEmailAddress' => 'required|email|max:255'
+            'username' => [
+                'required',
+                'min:3',
+                'max:255',
+            ],
+            'parentEmailAddress' => [
+                'required',
+                'email',
+                'max:255',
+            ],
         ];
     }
 }

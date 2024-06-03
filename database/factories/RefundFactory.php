@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\DB;
 class RefundFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Refund::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -27,30 +20,30 @@ class RefundFactory extends Factory
         $purchase_item_id = DB::table('purchase_items')->pluck('id');
 
         return [
-            'user_id'           =>  $user_id->random(),
-            'admin_id'          =>  $admin_id->random(),
-            'purchase_item_id'  =>  $purchase_item_id->random(),
+            'user_id' => $user_id->random(),
+            'admin_id' => $admin_id->random(),
+            'purchase_item_id' => $purchase_item_id->random(),
         ];
     }
 
     public function withUserId($id)
     {
         return $this->state(fn () => [
-            'user_id'   =>  $id,
+            'user_id' => $id,
         ]);
     }
 
     public function withAdminId($id)
     {
         return $this->state(fn () => [
-            'admin_id'  =>  $id,
+            'admin_id' => $id,
         ]);
     }
 
     public function withPurchaseItemId($id)
     {
         return $this->state(fn () => [
-            'purchase_item_id'  =>  $id,
+            'purchase_item_id' => $id,
         ]);
     }
 }

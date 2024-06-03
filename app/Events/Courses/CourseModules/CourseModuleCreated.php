@@ -13,15 +13,12 @@ class CourseModuleCreated
 
     /**
      * Course module created
-     *
-     * @var int $moduleId
      */
-    public $moduleId;
+    public int $moduleId;
 
     /**
      * Create a new event instance.
      *
-     * @param CourseModule $courseModule
      * @return void
      */
     public function __construct(CourseModule $courseModule)

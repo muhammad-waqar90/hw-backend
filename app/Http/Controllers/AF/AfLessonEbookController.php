@@ -4,6 +4,7 @@ namespace App\Http\Controllers\AF;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\AF\Lessons\Ebooks\AfCreateUpdateLessonEbookRequest;
+use App\Http\Requests\AF\Lessons\Ebooks\AfLessonEbookRequest;
 use App\Repositories\AF\AfCourseModuleRepository;
 use App\Repositories\AF\AfCourseRepository;
 use App\Repositories\AF\AfLessonEbookRepository;
@@ -15,26 +16,16 @@ use Illuminate\Support\Facades\Log;
 
 class AfLessonEbookController extends Controller
 {
-    /**
-     * @var AfLessonEbookRepository
-     * @var AfLessonRepository
-     * @var AfCourseModuleRepository
-     * @var AfCourseRepository
-     * @var IuEbookRepository
-     */
     private AfLessonEbookRepository $afLessonEbookRepository;
+
     private AfLessonRepository $afLessonRepository;
+
     private AfCourseModuleRepository $afCourseModuleRepository;
+
     private AfCourseRepository $afCourseRepository;
+
     private IuEbookRepository $iuEbookRepository;
 
-    /**
-     * @param AfLessonEbookRepository $afLessonEbookRepository
-     * @param AfLessonRepository $afLessonRepository
-     * @param AfCourseModuleRepository $afCourseModuleRepository
-     * @param AfCourseRepository $afCourseRepository
-     * @param IuEbookRepository $iuEbookRepository
-     */
     public function __construct(
         AfLessonEbookRepository $afLessonEbookRepository,
         AfLessonRepository $afLessonRepository,
@@ -49,15 +40,16 @@ class AfLessonEbookController extends Controller
         $this->iuEbookRepository = $iuEbookRepository;
     }
 
-    public function getLessonEbook(int $courseId, int $levelId, int $courseModuleId, int $lessonId)
+    public function getLessonEbook(AfLessonEbookRequest $request, int $courseId, int $levelId, int $courseModuleId, int $lessonId)
     {
         $ebook = $this->afLessonEbookRepository->getLessonEbook($lessonId);
-        if($ebook)
-            $ebook->src =  $this->iuEbookRepository->generateS3SignedEbook($ebook->content);
+        if ($ebook && $request->with_src) {
+            $ebook->src = $this->iuEbookRepository->generateS3SignedEbook($ebook->content);
+        }
 
         $ebook = (object) [
             'ebook' => fractal($ebook, new AfLessonEbookTransformer()),
-            'price' => $this->getEbooksPrice($lessonId)
+            'price' => $this->getEbooksPrice($lessonId),
         ];
 
         return response()->json($ebook, 200);
@@ -67,8 +59,9 @@ class AfLessonEbookController extends Controller
     {
         try {
             $ebook = $this->afLessonEbookRepository->getLessonEbook($lessonId);
-            if($ebook)
+            if ($ebook) {
                 return response()->json(['errors' => 'Lecture e-notes already uploaded'], 400);
+            }
 
             $this->afLessonEbookRepository->createLessonEbook($lessonId, $request->content);
 
@@ -78,6 +71,7 @@ class AfLessonEbookController extends Controller
             return response()->json(['message' => 'Successfully uploaded lecture e-notes'], 200);
         } catch (\Exception $e) {
             Log::error('Exception: AfLessonEbookController@createLessonEbook', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -86,14 +80,16 @@ class AfLessonEbookController extends Controller
     {
         try {
             $ebook = $this->afLessonEbookRepository->getLessonEbookById($ebookId);
-            if(!$ebook)
+            if (! $ebook) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $this->afLessonEbookRepository->updateLessonEbook($ebookId, $lessonId, $request->content);
 
             return response()->json(['message' => 'Successfully updated lecture e-notes'], 200);
         } catch (\Exception $e) {
             Log::error('Exception: AfLessonEbookController@updateLessonEbook', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -102,8 +98,9 @@ class AfLessonEbookController extends Controller
     {
         try {
             $ebook = $this->afLessonEbookRepository->getLessonEbookById($ebookId);
-            if(!$ebook)
+            if (! $ebook) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $this->afLessonEbookRepository->deleteLessonEbook($ebookId);
 
@@ -113,6 +110,7 @@ class AfLessonEbookController extends Controller
             return response()->json(['message' => 'Successfully deleted lecture e-notes'], 200);
         } catch (\Exception $e) {
             Log::error('Exception: AfLessonEbookController@deleteLessonEbook', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -129,6 +127,7 @@ class AfLessonEbookController extends Controller
     private function getEbooksPrice($lessonId)
     {
         $lesson = $this->afLessonRepository->getLessonById($lessonId);
+
         return $this->afCourseModuleRepository->getModuleById($lesson->course_module_id)->ebook_price;
     }
 
@@ -137,8 +136,9 @@ class AfLessonEbookController extends Controller
         $lesson = $this->afLessonRepository->getLessonById($lessonId, true);
 
         $level = $lesson->courseModule->courseLevel;
-        if ($level->value !== 1)
+        if ($level->value !== 1) {
             return;
+        }
 
         return $this->afCourseRepository->updateCourseHasLevel1Ebook($level->course_id, $level->id);
     }

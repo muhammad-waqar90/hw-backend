@@ -23,12 +23,13 @@ class AfBulkImportQuizzesJob implements ShouldQueue
     use ZipTrait;
 
     private int $bisId;
+
     private BulkImportStatus $bis;
+
     private string $workingDirectory;
 
     /**
      * Create a new job instance.
-     * @param $bisId
      */
     public function __construct($bisId)
     {
@@ -42,6 +43,7 @@ class AfBulkImportQuizzesJob implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     *
      * @throws \Exception
      */
     public function handle()
@@ -51,7 +53,7 @@ class AfBulkImportQuizzesJob implements ShouldQueue
         $this->downloadZipFile();
         $this->unzipToCurrentFolder(AfBulkImportQuizzesRepository::getCourseQuizzesZipFullPath($this->bis->id));
 
-        (new IndexImport($this->bis, $this->workingDirectory, 'index.xlsx'))->import($this->workingDirectory . '/index.xlsx');
+        (new IndexImport($this->bis, $this->workingDirectory, 'index.xlsx'))->import($this->workingDirectory.'/index.xlsx');
 
         $this->cleanup($this->bis);
     }
@@ -66,16 +68,18 @@ class AfBulkImportQuizzesJob implements ShouldQueue
 
     private function downloadZipFile()
     {
-        $file = Storage::disk('s3')->get(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id) . "/$this->bisId.zip");
-        Storage::disk('local')->put(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id) . "/$this->bisId.zip", $file);
+        $file = Storage::disk('s3')->get(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id)."/$this->bisId.zip");
+        Storage::disk('local')->put(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id)."/$this->bisId.zip", $file);
     }
 
-    private function cleanup($bis, Throwable $exception = null)
+    private function cleanup($bis, ?Throwable $exception = null)
     {
-        if($exception)
+        if ($exception) {
             $this->handleException($bis, $exception);
-        if(!$exception)
+        }
+        if (! $exception) {
             $this->handleSuccess($bis);
+        }
 
         Storage::deleteDirectory(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id));
         Storage::disk('s3')->deleteDirectory(AfBulkImportQuizzesRepository::getStoragePath($this->bis->id));
@@ -90,17 +94,18 @@ class AfBulkImportQuizzesJob implements ShouldQueue
     private function handleException($bis, $exception)
     {
         $errors = null;
-        if($exception instanceof AbstractQuestionException)
+        if ($exception instanceof AbstractQuestionException) {
             $errors = $exception->formatError();
-        else
+        } else {
             $errors = ['message' => Str::substr($exception->getMessage(), 0, 2000)];
+        }
 
         $bis->status = BulkImportStatusData::FAILED;
         $bis->errors = $errors;
         $bis->save();
     }
 
-    public function failed(Throwable $exception = null)
+    public function failed(?Throwable $exception = null)
     {
         $this->cleanup($this->bis, $exception);
     }

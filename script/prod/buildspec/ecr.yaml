@@ -1,8 +1,6 @@
 version: 0.2
 phases:
   install:
-    runtime-versions:
-      docker: 18
     commands:
       - aws sts get-caller-identity
       - mkdir ~/.aws/ && touch ~/.aws/config
@@ -22,7 +20,7 @@ phases:
     commands:
       - AccountID=$(aws sts get-caller-identity --query Account --output text)
       - CommitID="$(echo $GitCommitID | head -c 8)"
-      - $(aws ecr get-login --registry-ids $AccountID --no-include-email --region ${AWS_DEFAULT_REGION})
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AccountID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/$ServiceName
       - REPO_URI="$AccountID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/$ServiceName"		
       - REPOSITORY_URI="$REPO_URI-$BranchName"            
   build:

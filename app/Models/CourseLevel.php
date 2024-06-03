@@ -10,16 +10,16 @@ class CourseLevel extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function courseModules()
     {
-        return $this->hasMany('App\Models\CourseModule');
+        return $this->hasMany(CourseModule::class);
     }
 
     public function course()
     {
-        return $this->belongsTo('App\Models\Course', 'course_id');
+        return $this->belongsTo(Course::class, 'course_id');
     }
 }

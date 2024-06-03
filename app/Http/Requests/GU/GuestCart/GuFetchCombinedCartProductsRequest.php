@@ -24,7 +24,10 @@ class GuFetchCombinedCartProductsRequest extends FormRequest
     public function rules()
     {
         return [
-            'items' => 'required|array'
+            'items' => [
+                'required',
+                'array',
+            ],
         ];
     }
 }

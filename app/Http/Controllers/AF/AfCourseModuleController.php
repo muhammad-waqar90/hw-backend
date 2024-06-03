@@ -22,7 +22,9 @@ class AfCourseModuleController extends Controller
     use FileSystemsCloudTrait;
 
     private AfCourseRepository $afCourseRepository;
+
     private AfCourseModuleRepository $afCourseModuleRepository;
+
     private AfProductRepository $afProductRepository;
 
     public function __construct(AfCourseRepository $afCourseRepository, AfCourseModuleRepository $afCourseModuleRepository, AfProductRepository $afProductRepository)
@@ -35,12 +37,12 @@ class AfCourseModuleController extends Controller
     public function createModule(AfCourseModuleCreateRequest $request, int $courseId, int $levelId)
     {
         $course = $this->afCourseRepository->getCourse($courseId);
-        if (!$course) {
+        if (! $course) {
             return response()->json(['errors' => 'Course not found'], 404);
         }
 
         $level = $this->afCourseRepository->getCourseLevel($course->id, $levelId);
-        if (!$level) {
+        if (! $level) {
             return response()->json(['errors' => 'Level not found'], 404);
         }
 
@@ -72,6 +74,7 @@ class AfCourseModuleController extends Controller
             DB::rollback();
 
             Log::error('Exception: AfCourseModuleController@createModule', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -79,11 +82,11 @@ class AfCourseModuleController extends Controller
     public function updateModule(AfCourseModuleUpdateRequest $request, int $courseId, int $levelId, int $courseModuleId)
     {
         $module = $this->afCourseModuleRepository->getModule($courseModuleId, $levelId, $courseId);
-        if (!$module) {
+        if (! $module) {
             return response()->json(['errors' => 'Module not found'], 404);
         }
 
-        if(!$module->has_ebook && $request->book_id) {
+        if (! $module->has_ebook && $request->book_id) {
             return response()->json(['errors' => 'Can not bind a book. Please make sure module have atleast one lecture with lecture notes'], 403);
         }
 
@@ -104,11 +107,12 @@ class AfCourseModuleController extends Controller
             $boundedBook = $this->afProductRepository->getBookBoundedWithModule([$courseModuleId])->first();
             if ($request->book_id && $request->book_id != $boundedBook?->id) {
                 //unbind old book and bind new one
-                if ($boundedBook)
+                if ($boundedBook) {
                     $this->afProductRepository->unbindPhysicalBookWithCourseModule([$courseModuleId]);
+                }
 
                 $this->afProductRepository->bindPhysicalBookWithCourseModule($request->book_id, $courseModuleId);
-            } else if ((!$request->book_id) && $boundedBook) {
+            } elseif ((! $request->book_id) && $boundedBook) {
                 //unbind book
                 $this->afProductRepository->unbindPhysicalBookWithCourseModule([$courseModuleId]);
             }
@@ -121,6 +125,7 @@ class AfCourseModuleController extends Controller
             DB::rollback();
 
             Log::error('Exception: AfCourseModuleController@updateModule', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -129,14 +134,14 @@ class AfCourseModuleController extends Controller
     {
         $moduleIds = explode(',', $moduleIds);
         $modules = $this->afCourseModuleRepository->checkIfAllModulesExist($moduleIds, $levelId, $courseId);
-        if (!$modules) {
+        if (! $modules) {
             return response()->json(['errors' => 'Module not found'], 404);
         }
 
         DB::beginTransaction();
         try {
             $boundedBooks = $this->afProductRepository->getBookBoundedWithModule($moduleIds);
-            if($boundedBooks) {
+            if ($boundedBooks) {
                 $this->afProductRepository->unbindPhysicalBookWithCourseModule($moduleIds);
             }
 
@@ -153,6 +158,7 @@ class AfCourseModuleController extends Controller
             DB::rollback();
 
             Log::error('Exception: AfCourseModuleController@deleteModule', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -163,11 +169,12 @@ class AfCourseModuleController extends Controller
         $moduleIds = array_column($modules, 'id');
 
         $exists = $this->afCourseModuleRepository->checkIfAllModulesExist($moduleIds, $levelId, $courseId);
-        if (!$exists) {
+        if (! $exists) {
             return response()->json(['errors' => 'Module not found'], 404);
         }
 
         $this->afCourseModuleRepository->sortModule($modules);
+
         return response()->json(['message' => Lang::get('general.successfullySorted', ['model' => 'modules'])], 200);
     }
 }

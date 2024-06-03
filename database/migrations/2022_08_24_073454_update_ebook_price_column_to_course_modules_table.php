@@ -9,27 +9,23 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('course_modules', function (Blueprint $table) {
             $table->float('ebook_price', 8, 2)->default(0)->change();
             DB::table('course_modules')
-                ->where('ebook_price', NULL)
+                ->where('ebook_price', null)
                 ->update([
-                    'ebook_price' => 0
+                    'ebook_price' => 0,
                 ]);
         });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('course_modules', function (Blueprint $table) {
             $table->float('ebook_price', 8, 2)->nullable()->change();

@@ -5,26 +5,34 @@
 @endsection
 
 @section('content')
-<table style="font-size:15px;font-family: 'Montserrat';">
+<table style="line-height: 21px;font-size:14px;font-weight: 400;font-family: 'Montserrat';color:#384860;">
   <tbody>
     <tr>
-      <td style="color: #222222;font-family: 'Montserrat';">
-        <p>Thank you for your patience.</p>
-        <p></p>
-        <p>Please click the link below to download your personal data.</p>
+      <td>
+        Thank you for your patience.
       </td>
     </tr>
-
+    <tr>
+      <td height="20" style="height: 20px;line-height: 20px;"></td>
+    </tr>
     <tr>
       <td>
-        <table style="background:#f2f4fb;border-radius: 20px;">
+        Please click the link below to download your personal data.
+      </td>
+    </tr>
+    <tr>
+      <td height="40" style="height: 40px;line-height: 40px;"></td>
+    </tr>
+    <tr>
+      <td>
+        <table style="background:#1982EF;border-radius: 4px;">
           <tbody>
             <tr><td colspan="3" style="line-height:4px;height:4px;mso-line-height-rule:exactly;">&nbsp;</td></tr>
             <tr>
               <td width="6" style="width:6px;"></td>
               <td>
-                <a style="color: #2c86ee;text-decoration:none;font-family: 'Montserrat';" href="{{config('app.url')}}/api/gdpr/user/{{$uuid}}">
-                  <strong style="font-weight:normal;word-break:break-all;">{{config('app.url')}}/api/gdpr/user/{{$uuid}}</strong>
+                <a style="color: #FFFFFF;text-decoration:none;font-weight:600" href="{{config('app.url')}}/api/gdpr/user/{{$uuid}}">
+                  <strong style="word-break:break-all;">{{config('app.url')}}/api/gdpr/user/{{$uuid}}</strong>
                 </a>
               </td>
               <td width="6" style="width:6px;"></td>
@@ -34,12 +42,20 @@
         </table>
       </td>
     </tr>
-
     <tr>
-      <td style="color: #222222;font-family: 'Montserrat';">
-        <p>This link will remain valid for 7 days.</p>
-        <p></p>
-        <p>Please don't hesitate to get in touch if you have any additional queries.</p>
+      <td height="40" style="height: 40px;line-height: 40px;"></td>
+    </tr>
+    <tr>
+      <td>
+        This link will remain valid for 7 days.
+      </td>
+    </tr>
+    <tr>
+      <td height="20" style="height: 20px;line-height: 20px;"></td>
+    </tr>
+    <tr>
+      <td>
+        Please don't hesitate to get in touch if you have any additional queries.
       </td>
     </tr>
   </tbody>

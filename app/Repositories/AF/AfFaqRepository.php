@@ -8,8 +8,8 @@ use App\Models\FaqCategory;
 
 class AfFaqRepository
 {
-
     private Faq $faq;
+
     private FaqCategory $faqCategory;
 
     public function __construct(Faq $faq, FaqCategory $faqCategory)
@@ -25,16 +25,17 @@ class AfFaqRepository
                 $query->where('name', 'LIKE', "%$searchText%");
             })
             ->when($type, function ($query) use ($type) {
-                if($type == FaqCategoryTypeData::ROOT_CATEGORY)
+                if ($type == FaqCategoryTypeData::ROOT_CATEGORY) {
                     $query->where('faq_category_id', null);
-                elseif($type == FaqCategoryTypeData::SUB_CATEGORY)
+                } elseif ($type == FaqCategoryTypeData::SUB_CATEGORY) {
                     $query->where('faq_category_id', '!=', null);
+                }
             })
             ->withCount('faqs')
             ->withCount('faqCategories')
             ->withCount('publishedFaqCategories')
             ->withCount('publishedFaqs')
-            ->orderBy('id', 'DESC');
+            ->latest('id');
     }
 
     public function getRootFaqCategoryList()
@@ -46,17 +47,18 @@ class AfFaqRepository
     public function getFaqSubCategoryList()
     {
         return $this->faqCategory->where('faq_category_id', '!=', null)
-            ->orderBy('name', 'ASC')
+            ->oldest('name')
             ->get();
     }
 
     public function createFaqCategory($name, $faqCategoryId)
     {
         return $this->faqCategory->create([
-            'name'              => $name,
-            'faq_category_id'   => $faqCategoryId
+            'name' => $name,
+            'faq_category_id' => $faqCategoryId,
         ]);
     }
+
     public function updateFaqCategory($id, $name, $faqCategoryId)
     {
         $faqCategory = $this->faqCategory->where('id', $id)->first();
@@ -66,8 +68,9 @@ class AfFaqRepository
         $faqCategory->faq_category_id = $faqCategoryId;
         $faqCategory->save();
 
-        if($rootFaqCategoryId)
+        if ($rootFaqCategoryId) {
             return $this->checkUnpublishRootFaqCategory($rootFaqCategoryId);
+        }
 
         return true;
     }
@@ -92,8 +95,9 @@ class AfFaqRepository
         $faqCategory->published = 0;
         $faqCategory->save();
 
-        if($faqCategory->faq_category_id)
+        if ($faqCategory->faq_category_id) {
             $this->checkUnpublishRootFaqCategory($faqCategory->faq_category_id);
+        }
 
         return true;
     }
@@ -106,8 +110,9 @@ class AfFaqRepository
         $originalFaqCategoryId = $faqCategory->faq_category_id;
         $faqCategory->delete();
 
-        if($originalFaqCategoryId)
+        if ($originalFaqCategoryId) {
             $this->checkUnpublishRootFaqCategory($originalFaqCategoryId);
+        }
 
         return true;
     }
@@ -117,8 +122,9 @@ class AfFaqRepository
         $faqCategory = $this->faqCategory->where('id', $id)
             ->withCount('publishedFaqCategories')
             ->first();
-        if($faqCategory->published_faq_categories_count)
+        if ($faqCategory->published_faq_categories_count) {
             return true;
+        }
 
         $faqCategory->published = 0;
         $faqCategory->save();
@@ -140,10 +146,10 @@ class AfFaqRepository
     public function createFaq($faqCategoryId, $question, $shortAnswer, $answer)
     {
         return $this->faq->create([
-            'faq_category_id'   => $faqCategoryId,
-            'question'          => $question,
-            'short_answer'      => $shortAnswer,
-            'answer'            => $answer
+            'faq_category_id' => $faqCategoryId,
+            'question' => $question,
+            'short_answer' => $shortAnswer,
+            'answer' => $answer,
         ]);
     }
 
@@ -194,7 +200,7 @@ class AfFaqRepository
             $query->where('question', 'LIKE', "%$searchText%");
         })
         ->with('faqCategory')
-        ->orderBy('id', 'DESC');
+        ->latest('id');
     }
 
     public function unpublishFaq($id)
@@ -214,12 +220,12 @@ class AfFaqRepository
         $faqCategory = $this->faqCategory->where('id', $id)
             ->withCount('publishedFaqs')
             ->first();
-        if($faqCategory->published_faqs_count)
+        if ($faqCategory->published_faqs_count) {
             return true;
+        }
 
         $this->unpublishFaqCategory($id);
 
         return true;
     }
-
 }

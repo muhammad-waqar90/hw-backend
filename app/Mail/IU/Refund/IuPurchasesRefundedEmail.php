@@ -11,9 +11,6 @@ class IuPurchasesRefundedEmail extends AbstractMail
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $items
      */
     public function __construct($userProfile, $items)
     {

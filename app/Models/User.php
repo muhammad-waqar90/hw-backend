@@ -37,6 +37,7 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     /**
@@ -61,57 +62,57 @@ class User extends Authenticatable implements JWTSubject
 
     public function role()
     {
-        return $this->belongsTo('App\Models\Role');
+        return $this->belongsTo(Role::class);
     }
 
     public function verifyUser()
     {
-        return $this->hasOne('App\Models\VerifyUser');
+        return $this->hasOne(VerifyUser::class);
     }
 
     public function verifyUserAge()
     {
-        return $this->hasOne('App\Models\VerifyUserAge');
+        return $this->hasOne(VerifyUserAge::class);
     }
 
     public function permGroups()
     {
-        return $this->belongsToMany('App\Models\PermGroup');
+        return $this->belongsToMany(PermGroup::class);
     }
 
     public function userProfile()
     {
-        return $this->hasOne('App\Models\UserProfile');
+        return $this->hasOne(UserProfile::class);
     }
 
     public function adminProfile()
     {
-        return $this->hasOne('App\Models\AdminProfile');
+        return $this->hasOne(AdminProfile::class);
     }
 
     public function customer()
     {
-        return $this->hasOne('App\Models\Customer');
+        return $this->hasOne(Customer::class);
     }
 
     public function notifications()
     {
-        return $this->hasMany('App\Models\Notification');
+        return $this->hasMany(Notification::class);
     }
 
     public function enrolledCourses()
     {
-        return $this->belongsToMany('App\Models\Course')->withPivot('id', 'created_at', 'updated_at');
+        return $this->belongsToMany(Course::class)->withPivot('id', 'created_at', 'updated_at');
     }
 
     public function identityVerification()
     {
-        return $this->hasOne('App\Models\IdentityVerification');
+        return $this->hasOne(IdentityVerification::class);
     }
 
     public function restoreUser()
     {
-        return $this->hasOne('App\Models\RestoreUser');
+        return $this->hasOne(RestoreUser::class);
     }
 
     public function shippingDetails()

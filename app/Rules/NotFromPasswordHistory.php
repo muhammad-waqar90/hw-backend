@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Lang;
 
 class NotFromPasswordHistory implements Rule
 {
-    private $user, $password;
+    private $user;
+
+    private $password;
 
     /**
      * Create a new rule instance.
@@ -28,12 +30,11 @@ class NotFromPasswordHistory implements Rule
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     *
      * @return bool
      */
     public function passes($attribute, $value)
     {
-        return !($this->user && PasswordHistoryRepository::isFromPasswordHistory($this->user->id, $this->password));
+        return ! ($this->user && PasswordHistoryRepository::isFromPasswordHistory($this->user->id, $this->password));
     }
 
     /**

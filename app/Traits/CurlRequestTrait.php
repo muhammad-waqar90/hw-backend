@@ -4,7 +4,7 @@ namespace App\Traits;
 
 trait CurlRequestTrait
 {
-    static public function post($url, $payload)
+    public static function post($url, $payload)
     {
         $curl = curl_init();
 

@@ -24,7 +24,10 @@ class BulkImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'file'   => 'required|mimes:zip',
+            'file'   => [
+                'required',
+                'mimes:zip',
+            ],
         ];
     }
 }

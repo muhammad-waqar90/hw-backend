@@ -16,7 +16,6 @@ class CourseModuleEventSubscriber
 
     /**
      * CourseModuleEventSubscriber constructor.
-     * @param AfQuizRepository $afQuizRepository
      */
     public function __construct(AfQuizRepository $afQuizRepository)
     {

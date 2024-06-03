@@ -31,7 +31,7 @@ class CertificatesExport implements FromQuery, WithHeadings, WithMapping
             'entity_type',
             'entity_name',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -53,7 +53,7 @@ class CertificatesExport implements FromQuery, WithHeadings, WithMapping
             $row->entity_type,
             $row->entity_name,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

@@ -9,8 +9,8 @@ use App\Http\Requests\AF\Adverts\AfAdvertSearchRequest;
 use App\Http\Requests\AF\Adverts\AfAdvertSortingRequest;
 use App\Http\Requests\AF\Adverts\AfAdvertUpdateRequest;
 use App\Repositories\AF\AfAdvertRepository;
-use App\Transformers\AF\AfAdvertTransformer;
 use App\Traits\FileSystemsCloudTrait;
+use App\Transformers\AF\AfAdvertTransformer;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -30,11 +30,11 @@ class AfAdvertController extends Controller
     public function getAdvertList(AfAdvertSearchRequest $request)
     {
         $data = $this->afAdvertRepository->getAdvertList($request->searchText, $request->status)
-                ->paginate(20)
-                ->appends([
-                    'searchText'  => $request->searchText,
-                    'status' => $request->status
-                ]);
+            ->paginate(20)
+            ->appends([
+                'searchText' => $request->searchText,
+                'status' => $request->status,
+            ]);
 
         $fractal = fractal($data->getCollection(), new AfAdvertTransformer());
         $data->setCollection(collect($fractal));
@@ -46,6 +46,7 @@ class AfAdvertController extends Controller
     {
         $imageName = $this->uploadAdvert($request);
         $this->afAdvertRepository->createAdvert($request->name, $request->url, $imageName, $request->status, $request->expires_at);
+
         return response()->json(['message' => Lang::get('advert.success.created')], 200);
     }
 
@@ -53,10 +54,12 @@ class AfAdvertController extends Controller
     {
         $advert = $this->afAdvertRepository->getAdvert($id);
 
-        if(!$advert)
+        if (! $advert) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $advert->img = $this->generateS3Link('adverts/images/'.$advert->img, AdvertData::DEFAULT_ADVERT_EXPIRY_DAYS);
+
         return response()->json($advert, 200);
     }
 
@@ -65,23 +68,26 @@ class AfAdvertController extends Controller
         try {
             $advert = $this->afAdvertRepository->getAdvert($id);
 
-            if(!$advert)
+            if (! $advert) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $imageName = $advert->img;
-            if($request->img) {
+            if ($request->img) {
                 Storage::disk(config('filesystems.cloud'))->delete("adverts/images/$imageName");
                 $imageName = $this->uploadAdvert($request);
             }
 
-            $priority = $advert->status != (int)$request->status ? AdvertData::DEFAULT_PRIORITY : $advert->priority;
+            $priority = $advert->status != (int) $request->status ? AdvertData::DEFAULT_PRIORITY : $advert->priority;
 
             $this->afAdvertRepository->updateAdvert($id, $request->name, $imageName, $request->url, $priority, $request->expires_at, $request->status);
+
             return response()->json(['message' => Lang::get('advert.success.updated')], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Exception: AfAdvertController@updateAdvert', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => Lang::get('advert.error.invalid')], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -90,23 +96,29 @@ class AfAdvertController extends Controller
     public function deleteAdvert($id)
     {
         $advert = $this->afAdvertRepository->getAdvert($id);
-        if(!$advert)
+        if (! $advert) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         Storage::disk(config('filesystems.cloud'))->delete("adverts/images/$advert->img");
         $advert->delete();
+
         return response()->json(['message' => Lang::get('advert.success.deleted')], 200);
     }
 
-    public function sortingAdvert(AfAdvertSortingRequest $request) {
+    public function sortingAdvert(AfAdvertSortingRequest $request)
+    {
         $this->afAdvertRepository->sortingAdvert($request->data);
+
         return response()->json(['message' => Lang::get('advert.success.sorted')], 200);
     }
 
-    private function uploadAdvert($request) {
+    private function uploadAdvert($request)
+    {
         $extension = $request->file('img')->extension();
-        $imageName = Str::uuid().".".$extension;
+        $imageName = Str::uuid().'.'.$extension;
         Storage::disk(config('filesystems.cloud'))->putFileAs('adverts/images/', $request->img, $imageName);
+
         return $imageName;
     }
 }

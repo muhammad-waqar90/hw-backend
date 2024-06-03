@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
@@ -15,8 +14,6 @@ abstract class AbstractMail extends Mailable
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
      */
     public function __construct($userProfile)
     {
@@ -29,5 +26,5 @@ abstract class AbstractMail extends Mailable
      *
      * @return $this
      */
-    abstract function build();
+    abstract public function build();
 }

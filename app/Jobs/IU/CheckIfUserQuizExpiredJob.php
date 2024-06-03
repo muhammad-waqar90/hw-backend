@@ -14,17 +14,16 @@ use Illuminate\Queue\SerializesModels;
 class CheckIfUserQuizExpiredJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * @var VerifyUser
      */
     private $userQuizId;
+
     private $userQuizUuid;
 
     /**
      * Create a new job instance.
-     *
-     * @param $userQuizId
-     * @param $userQuizUuid
      */
     public function __construct($userQuizId, $userQuizUuid)
     {
@@ -35,15 +34,16 @@ class CheckIfUserQuizExpiredJob implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param IuQuizRepository $iuQuizRepository
      * @return void
      */
     public function handle(IuQuizRepository $iuQuizRepository)
     {
         $userQuiz = $iuQuizRepository->getUserQuiz($this->userQuizId, $this->userQuizUuid);
-        if(!$userQuiz)
+        if (! $userQuiz) {
             return;
-        if($userQuiz->status === QuizData::STATUS_IN_PROGRESS)
+        }
+        if ($userQuiz->status === QuizData::STATUS_IN_PROGRESS) {
             $iuQuizRepository->invalidateUserQuiz($this->userQuizId);
+        }
     }
 }

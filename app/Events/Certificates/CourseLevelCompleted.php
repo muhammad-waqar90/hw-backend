@@ -12,20 +12,15 @@ class CourseLevelCompleted
 
     /**
      * courser level completed
-     *
-     * @var $userId
-     * @var $entityId
      */
-    public $userId;
-    public $entityId;
+    public int $userId;
+
+    public int $entityId;
 
     /**
      * Create a new event instance.
-     * @param userId
-     * @param entityId
-     * @return void
      */
-    public function __construct($userId, $entityId)
+    public function __construct(int $userId, int $entityId)
     {
         $this->userId = $userId;
         $this->entityId = $entityId;

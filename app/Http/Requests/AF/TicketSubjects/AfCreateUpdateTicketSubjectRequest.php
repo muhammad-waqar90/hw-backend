@@ -26,14 +26,27 @@ class AfCreateUpdateTicketSubjectRequest extends FormRequest
     public function rules()
     {
         return [
-            'categoryId'        => [
+            'categoryId' => [
                 'required',
                 'integer',
-                Rule::in(array_values(TicketCategoryData::getConstants()))
+                Rule::in(array_values(TicketCategoryData::getConstants())),
             ],
-            'name'              => 'string|required|min:4|max:100|unique:ticket_subjects,name,' . (request()->id ?: ''),
-            'desc'              => 'string|nullable|max:10000',
-            'only_logged_in'    => 'required|boolean'
+            'name'              => [
+                'string',
+                'required',
+                'min:4',
+                'max:100',
+                'unique:ticket_subjects,name,' . (request()->id ?: ''),
+            ],
+            'desc'              => [
+                'string',
+                'nullable',
+                'max:10000',
+            ],
+            'only_logged_in'    => [
+                'required',
+                'boolean',
+            ],
         ];
     }
 }

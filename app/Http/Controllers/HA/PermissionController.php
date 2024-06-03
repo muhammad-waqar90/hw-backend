@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class PermissionController extends Controller
 {
-
     private PermissionRepository $permissionRepository;
 
     public function __construct(PermissionRepository $permissionRepository)
@@ -23,6 +22,7 @@ class PermissionController extends Controller
     public function getPermissionList(Request $request)
     {
         $data = $this->permissionRepository->getPermissionList($request->query('searchText'));
+
         return response()->json($data, 200);
     }
 
@@ -32,19 +32,23 @@ class PermissionController extends Controller
         try {
             $permGroup = $this->permissionRepository->createPermGroup($request->name, $request->description);
 
-            if(!empty($request->users))
+            if (! empty($request->users)) {
                 $this->permissionRepository->updatePermGroupUsers($permGroup->id, $request->users);
-            if(!empty($request->permissions))
+            }
+            if (! empty($request->permissions)) {
                 $this->permissionRepository->updatePermGroupPermissions($permGroup->id, $request->permissions);
+            }
 
             DB::commit();
+
             return response()->json(['message' => 'Successfully created a new permission group'], 201);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: PermissionController@createPermGroup', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -53,6 +57,7 @@ class PermissionController extends Controller
     public function getPermGroupList(Request $request)
     {
         $data = $this->permissionRepository->getPermGroupList($request->query('searchText'));
+
         return response()->json(['data' => $data], 200);
     }
 
@@ -60,8 +65,9 @@ class PermissionController extends Controller
     {
         $data = $this->permissionRepository->getPermGroup($id);
 
-        if(!$data)
+        if (! $data) {
             return response()->json(['errors' => 'Group not found'], 404);
+        }
 
         return response()->json(['data' => $data], 200);
     }
@@ -76,13 +82,15 @@ class PermissionController extends Controller
             $this->permissionRepository->updatePermGroupPermissions($permGroup->id, $request->permissions);
 
             DB::commit();
+
             return response()->json(['message' => 'Successfully updated permission group'], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: PermissionController@updatePermGroup', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -95,13 +103,15 @@ class PermissionController extends Controller
             $this->permissionRepository->deletePermGroup($id);
 
             DB::commit();
+
             return response()->json(['message' => 'Successfully deleted permission group'], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: PermissionController@deletePermGroup', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }

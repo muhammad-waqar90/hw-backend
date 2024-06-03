@@ -12,40 +12,40 @@ class Ticket extends Model
     use HasFactory, SoftDeletes;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at', 'deleted_at'
+        'id', 'created_at', 'updated_at', 'deleted_at',
     ];
 
     protected $hidden = [
-        'pivot', 'deleted_at'
+        'pivot', 'deleted_at',
     ];
 
     public function latestTicketMessage()
     {
-        return $this->hasOne('App\Models\TicketMessage')->latest();
+        return $this->hasOne(TicketMessage::class)->latest();
     }
 
     public function ticketMessages()
     {
-        return $this->hasMany('App\Models\TicketMessage');
+        return $this->hasMany(TicketMessage::class);
     }
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo('App\Models\User');
+        return $this->belongsTo(User::class);
     }
 
     public function status()
     {
-        return $this->hasOne('App\Models\TicketStatus', 'id', 'ticket_status_id');
+        return $this->hasOne(TicketStatus::class, 'id', 'ticket_status_id');
     }
 
     public function hasAdminReply()
     {
-        return $this->hasOne('App\Models\TicketMessage')->where('type', TicketMessageTypeData::ADMIN_MESSAGE)->latest();
+        return $this->hasOne(TicketMessage::class)->where('type', TicketMessageTypeData::ADMIN_MESSAGE)->latest();
     }
 
     public function lesson()
     {
-        return $this->belongsToMany('App\Models\Lesson'); // ;) hack with relation
+        return $this->belongsToMany(Lesson::class); // ;) hack with relation
     }
 }

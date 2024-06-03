@@ -14,7 +14,6 @@ class IsValidHCaptcha implements Rule
      * Create a new rule instance.
      *
      * @param  string  $token
-     *
      * @return void
      */
     public function __construct($token)
@@ -27,7 +26,6 @@ class IsValidHCaptcha implements Rule
      *
      * @param  string  $attribute
      * @param  mixed  $value
-     *
      * @return bool
      */
     public function passes($attribute, $value)

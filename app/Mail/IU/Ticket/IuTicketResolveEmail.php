@@ -8,20 +8,16 @@ use Illuminate\Support\Facades\Lang;
 class IuTicketResolveEmail extends AbstractMail
 {
     public $ticketSubject;
+
     public $adminName;
+
     public $adminMessage;
+
     public $ticketId;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $ticketSubject
-     * @param $adminName
-     * @param $adminMessage
-     * @param $ticketId
      */
-
     public function __construct($userProfile, $ticketSubject, $adminName, $adminMessage, $ticketId)
     {
         parent::__construct($userProfile);

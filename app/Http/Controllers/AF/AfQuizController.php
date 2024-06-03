@@ -20,20 +20,24 @@ class AfQuizController extends Controller
     public function getModuleQuiz(int $courseId, int $levelId, int $courseModuleId)
     {
         $quiz = $this->iuQuizRepository->getQuizForEntity($courseModuleId, QuizData::ENTITY_COURSE_MODULE);
-        if(!$quiz)
+        if (! $quiz) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $fractal = fractal($quiz, new AfQuizTransformer);
+
         return response()->json($fractal, 200);
     }
 
     public function getLessonQuiz(int $courseId, int $levelId, int $courseModuleId, int $lessonId)
     {
         $quiz = $this->iuQuizRepository->getQuizForEntity($lessonId, QuizData::ENTITY_LESSON);
-        if(!$quiz)
+        if (! $quiz) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $fractal = fractal($quiz, new AfQuizTransformer);
+
         return response()->json($fractal, 200);
     }
 }

@@ -2,9 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\PasswordReset;
 use App\Models\VideoProgress;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class CleanExpiredVideoProgress extends Command
@@ -22,6 +21,7 @@ class CleanExpiredVideoProgress extends Command
      * @var string
      */
     protected $description = 'Clean expired video progress';
+
     /**
      * @var VideoProgress
      */
@@ -35,7 +35,6 @@ class CleanExpiredVideoProgress extends Command
 
     /**
      * CleanExpiredVerifyUser constructor.
-     * @param VideoProgress $videoProgress
      */
     public function __construct(VideoProgress $videoProgress)
     {
@@ -50,7 +49,7 @@ class CleanExpiredVideoProgress extends Command
      */
     public function handle()
     {
-        $this->videoProgress->where('created_at', '<',Carbon::now()->subWeeks(4))
+        $this->videoProgress->where('created_at', '<', Carbon::now()->subWeeks(4))
             ->delete();
 
         $this->info('Cleaning expired video progress');

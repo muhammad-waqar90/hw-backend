@@ -13,17 +13,14 @@ class IuCartCourseEbooksTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'courseModules'
+        'courseModules',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Course $course
      * @return array
      */
     public function transform(Course $course)
@@ -32,8 +29,9 @@ class IuCartCourseEbooksTransformer extends TransformerAbstract
             'id' => $course->id,
             'name' => $course->name,
             'img' => $this->generateS3Link(AfCourseRepository::getThumbnailS3StoragePath().$course->img, 1),
+            'price' => $course->price,
             'level_value' => $course->courseLevel->value,
-            'level_name' => $course->courseLevel->name
+            'level_name' => $course->courseLevel->name,
         ];
     }
 

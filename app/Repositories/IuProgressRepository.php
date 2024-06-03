@@ -15,10 +15,12 @@ use Illuminate\Support\Facades\DB;
 
 class IuProgressRepository
 {
-
     private UserProgress $userProgress;
+
     private Lesson $lesson;
+
     private CourseModule $courseModule;
+
     private CourseLevel $courseLevel;
 
     public function __construct(UserProgress $userProgress, Lesson $lesson, CourseModule $courseModule, CourseLevel $courseLevel)
@@ -33,20 +35,22 @@ class IuProgressRepository
     {
         $lesson = $this->lesson->find($lessonId);
 
-        if(!$userQuiz)
+        if (! $userQuiz) {
             $progress = UserProgressData::MIN_PROGRESS_TO_ACCESS_QUIZ;
-        if($userQuiz)
+        }
+        if ($userQuiz) {
             $progress = $userQuiz->score >= QuizData::DEFAULT_PASSING_SCORE ? UserProgressData::COMPLETED_PROGRESS : UserProgressData::MIN_PROGRESS_TO_ACCESS_QUIZ;
+        }
 
         $this->userProgress->updateOrCreate(
-                [
-                    'user_id'     => $userId,
-                    'entity_type' => UserProgressData::ENTITY_LESSON,
-                    'entity_id'   => $lessonId
-                ],
-                [
-                    'progress' => $progress
-                ]);
+            [
+                'user_id' => $userId,
+                'entity_type' => UserProgressData::ENTITY_LESSON,
+                'entity_id' => $lessonId,
+            ],
+            [
+                'progress' => $progress,
+            ]);
 
         $this->calculateCourseModuleProgress($userId, $lesson->course_module_id);
     }
@@ -55,8 +59,7 @@ class IuProgressRepository
     {
         $courseModule = $this->courseModule->select('course_modules.*', 'qz.id as quiz_id')
             ->where('course_modules.id', $courseModuleId)
-            ->leftJoin('quizzes as qz', function($query) use ($userId)
-            {
+            ->leftJoin('quizzes as qz', function ($query) {
                 $query->on('qz.entity_id', '=', 'course_modules.id')
                     ->where('qz.entity_type', UserProgressData::ENTITY_COURSE_MODULE);
             })
@@ -64,13 +67,13 @@ class IuProgressRepository
         $modifier = $courseModule->quiz_id ? UserProgressData::MODIFIER_FOR_ENTITY_WITH_QUIZ : 1;
         $progress = 0;
 
-        if($userQuiz)
+        if ($userQuiz) {
             $progress = $userQuiz->score >= QuizData::DEFAULT_PASSING_SCORE ? UserProgressData::COMPLETED_PROGRESS : UserProgressData::MIN_PROGRESS_TO_ACCESS_QUIZ;
-        if($progress == 0) {
+        }
+        if ($progress == 0) {
             $moduleLessons = DB::table('lessons')->select(DB::raw('count(lessons.id) as count, sum(up.progress) as sum_progress'))
                 ->where('lessons.course_module_id', $courseModuleId)
-                ->leftJoin('user_progress as up', function($query) use ($userId)
-                {
+                ->leftJoin('user_progress as up', function ($query) use ($userId) {
                     $query->on('up.entity_id', '=', 'lessons.id')
                         ->where('up.user_id', $userId)
                         ->where('up.entity_type', UserProgressData::ENTITY_LESSON);
@@ -80,17 +83,18 @@ class IuProgressRepository
         }
 
         $this->userProgress->updateOrCreate(
-                [
-                    'user_id'     => $userId,
-                    'entity_type' => UserProgressData::ENTITY_COURSE_MODULE,
-                    'entity_id'   => $courseModuleId
-                ],
-                [
-                    'progress' => $progress
-                ]);
+            [
+                'user_id' => $userId,
+                'entity_type' => UserProgressData::ENTITY_COURSE_MODULE,
+                'entity_id' => $courseModuleId,
+            ],
+            [
+                'progress' => $progress,
+            ]);
 
-        if($progress === UserProgressData::COMPLETED_PROGRESS)
+        if ($progress === UserProgressData::COMPLETED_PROGRESS) {
             CourseModuleCompleted::dispatch($userId, $courseModuleId);
+        }
 
         $this->calculateCourseLevelProgress($userId, $courseModule->course_level_id);
     }
@@ -99,8 +103,7 @@ class IuProgressRepository
     {
         $courseLevel = $this->courseLevel->select('course_levels.*', 'qz.id as quiz_id')
             ->where('course_levels.id', $courseLevelId)
-            ->leftJoin('quizzes as qz', function($query) use ($userId)
-            {
+            ->leftJoin('quizzes as qz', function ($query) {
                 $query->on('qz.entity_id', '=', 'course_levels.id')
                     ->where('qz.entity_type', UserProgressData::ENTITY_COURSE_LEVEL);
             })
@@ -108,13 +111,13 @@ class IuProgressRepository
         $progress = 0;
         $modifier = $courseLevel->quiz_id ? UserProgressData::MODIFIER_FOR_ENTITY_WITH_QUIZ : 1;
 
-        if($userQuiz)
+        if ($userQuiz) {
             $progress = $userQuiz->score >= QuizData::DEFAULT_PASSING_SCORE ? UserProgressData::COMPLETED_PROGRESS : UserProgressData::MIN_PROGRESS_TO_ACCESS_QUIZ;
-        if($progress == 0) {
+        }
+        if ($progress == 0) {
             $courseLevelModules = DB::table('course_modules')->selectRaw('count(course_modules.id) as count, sum(up.progress) as sum_progress')
                 ->where('course_modules.course_level_id', $courseLevelId)
-                ->leftJoin('user_progress as up', function($query) use ($userId)
-                {
+                ->leftJoin('user_progress as up', function ($query) use ($userId) {
                     $query->on('up.entity_id', '=', 'course_modules.id')
                         ->where('up.user_id', $userId)
                         ->where('up.entity_type', UserProgressData::ENTITY_COURSE_MODULE);
@@ -124,17 +127,18 @@ class IuProgressRepository
         }
 
         $this->userProgress->updateOrCreate(
-                [
-                    'user_id'     => $userId,
-                    'entity_type' => UserProgressData::ENTITY_COURSE_LEVEL,
-                    'entity_id'   => $courseLevelId
-                ],
-                [
-                    'progress' => $progress
-                ]);
+            [
+                'user_id' => $userId,
+                'entity_type' => UserProgressData::ENTITY_COURSE_LEVEL,
+                'entity_id' => $courseLevelId,
+            ],
+            [
+                'progress' => $progress,
+            ]);
 
-        if($progress === UserProgressData::COMPLETED_PROGRESS)
+        if ($progress === UserProgressData::COMPLETED_PROGRESS) {
             CourseLevelCompleted::dispatch($userId, $courseLevelId);
+        }
 
         $this->calculateCourseProgress($userId, $courseLevel->course_id);
     }
@@ -143,27 +147,26 @@ class IuProgressRepository
     {
         $courseLevels = DB::table('course_levels')->selectRaw('count(course_levels.id) as count, sum(up.progress) as sum_progress')
             ->where('course_levels.course_id', $courseId)
-            ->leftJoin('user_progress as up', function($query) use ($userId)
-            {
+            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                 $query->on('up.entity_id', '=', 'course_levels.id')
                     ->where('up.user_id', $userId)
                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE_LEVEL);
             })
             ->first();
-        $progress = (int) ceil($courseLevels->sum_progress / $courseLevels->count );
+        $progress = (int) ceil($courseLevels->sum_progress / $courseLevels->count);
 
         $this->userProgress->updateOrCreate(
-                [
-                    'user_id'     => $userId,
-                    'entity_type' => UserProgressData::ENTITY_COURSE,
-                    'entity_id'   => $courseId
-                ],
-                [
-                'progress' => $progress
+            [
+                'user_id' => $userId,
+                'entity_type' => UserProgressData::ENTITY_COURSE,
+                'entity_id' => $courseId,
+            ],
+            [
+                'progress' => $progress,
             ]);
 
-        if($progress === UserProgressData::COMPLETED_PROGRESS)
+        if ($progress === UserProgressData::COMPLETED_PROGRESS) {
             CourseCompleted::dispatch($userId, $courseId);
+        }
     }
-
 }

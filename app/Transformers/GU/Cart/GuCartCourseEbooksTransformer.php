@@ -9,17 +9,14 @@ class GuCartCourseEbooksTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'courseModules'
+        'courseModules',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Course $course
      * @return array
      */
     public function transform(Course $course)
@@ -28,7 +25,8 @@ class GuCartCourseEbooksTransformer extends TransformerAbstract
             'id' => $course->id,
             'name' => $course->name,
             'img' => $course->img,
-            'level_value' => $course->courseLevel->value
+            'price' => $course->price,
+            'level_value' => $course->courseLevel->value,
         ];
     }
 

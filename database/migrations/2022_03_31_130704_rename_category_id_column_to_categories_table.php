@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
             $table->renameColumn('category_id', 'parent_category_id');
@@ -20,10 +18,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('categories', function (Blueprint $table) {
             $table->renameColumn('parent_category_id', 'category_id');

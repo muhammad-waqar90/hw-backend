@@ -2,7 +2,7 @@
 
 namespace App\Traits;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 use ZipArchive;
 
 trait ZipTrait
@@ -10,11 +10,12 @@ trait ZipTrait
     public function unzipToCurrentFolder($filePath): bool
     {
         $zip = new ZipArchive;
-        if ($zip->open($filePath) === TRUE) {
+        if ($zip->open($filePath) === true) {
             $zip->extractTo(substr($filePath, 0, strrpos($filePath, '/')));
             $zip->close();
-        } else
+        } else {
             throw new \Exception('Cannot extract zip file');
+        }
 
         return true;
     }
@@ -22,9 +23,9 @@ trait ZipTrait
     public function zipToCurrentFolder($dirPath): bool
     {
         $zip = new ZipArchive;
-        if (true === ($zip->open(storage_path('app/'. $dirPath . '.zip'), ZipArchive::CREATE | ZipArchive::OVERWRITE))) {
+        if (true === ($zip->open(storage_path('app/'.$dirPath.'.zip'), ZipArchive::CREATE | ZipArchive::OVERWRITE))) {
             foreach (Storage::allFiles($dirPath) as $file) {
-                $zip->addFile(storage_path('app/' . $file), '/' . basename($file));
+                $zip->addFile(storage_path('app/'.$file), '/'.basename($file));
             }
             $zip->close();
         } else {

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Lang;
 
 class NotificationController extends Controller
 {
-
     private NotificationRepository $notificationRepository;
 
     public function __construct(NotificationRepository $notificationRepository)
@@ -21,12 +20,15 @@ class NotificationController extends Controller
         $userId = $request->user()->id;
         $notification = $this->notificationRepository->getNotification($id);
 
-        if(!$notification)
+        if (! $notification) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
-        if($notification->user_id && $notification->user_id != $userId)
+        }
+        if ($notification->user_id && $notification->user_id != $userId) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
-        if($notification->read)
+        }
+        if ($notification->read) {
             return response()->json(['errors' => Lang::get('notifications.errors.alreadyRead')], 400);
+        }
 
         $notification->read = 1;
         $notification->save();

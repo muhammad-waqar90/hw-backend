@@ -8,7 +8,7 @@ use App\DataObject\Tickets\TicketStatusData;
 use App\Mail\AF\Ticket\AfTicketClaimedButNotRespondedEmail;
 use App\Models\User;
 use App\Models\Ticket;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -29,12 +29,12 @@ class SendAfTicketClaimedButNotRespondedEmail extends Command
     protected $description = 'Send AF ticket claimed but not responded email';
 
     /**
-     * @var Ticket $ticket
+     * @var Ticket
      */
     protected $ticket;
 
     /**
-     * @var User $user
+     * @var User
      */
     protected $user;
 
@@ -58,12 +58,14 @@ class SendAfTicketClaimedButNotRespondedEmail extends Command
     public function handle()
     {
         $ticketsClaimedButNotResponded = $this->getClaimedButNotRespondedTickets();
-        if($ticketsClaimedButNotResponded->isEmpty())
+        if ($ticketsClaimedButNotResponded->isEmpty()) {
             return;
+        }
 
         $admins = $this->getTicketTeamLeaders();
-        if($admins->isEmpty())
+        if ($admins->isEmpty()) {
             return;
+        }
 
         $this->sendEmail($ticketsClaimedButNotResponded, $admins);
         $this->info('Sending AF ticket claimed but not responded email to Head AF');
@@ -95,10 +97,10 @@ class SendAfTicketClaimedButNotRespondedEmail extends Command
 
     public function sendEmail($ticketsClaimedButNotResponded, $admins)
     {
-        foreach($ticketsClaimedButNotResponded as $ticket) {
-            foreach($admins as $admin) {
-              Mail::to($admin->adminProfile->email)->queue(new AfTicketClaimedButNotRespondedEmail($admin, $ticket->subject, $ticket->id));
+        foreach ($ticketsClaimedButNotResponded as $ticket) {
+            foreach ($admins as $admin) {
+                Mail::to($admin->adminProfile->email)->queue(new AfTicketClaimedButNotRespondedEmail($admin, $ticket->subject, $ticket->id));
             }
-          }
+        }
     }
 }

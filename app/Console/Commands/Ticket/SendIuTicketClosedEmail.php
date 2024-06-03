@@ -5,7 +5,7 @@ namespace App\Console\Commands\Ticket;
 use App\DataObject\Tickets\TicketStatusData;
 use App\Jobs\Ticket\SendIuTicketClosedEmailJob;
 use App\Models\Ticket;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class SendIuTicketClosedEmail extends Command
@@ -25,7 +25,7 @@ class SendIuTicketClosedEmail extends Command
     protected $description = 'Send IU ticket closed email';
 
     /**
-     * @var Ticket $ticket
+     * @var Ticket
      */
     protected $ticket;
 
@@ -48,11 +48,13 @@ class SendIuTicketClosedEmail extends Command
     public function handle()
     {
         $ticketsNotSeenByUser = $this->getStaleTickets();
-        if($ticketsNotSeenByUser->isEmpty())
+        if ($ticketsNotSeenByUser->isEmpty()) {
             return;
+        }
 
-        foreach($ticketsNotSeenByUser as $ticket)
+        foreach ($ticketsNotSeenByUser as $ticket) {
             SendIuTicketClosedEmailJob::dispatch($ticket)->onQueue('low');
+        }
 
         $this->info('Sending IU ticket closed email');
     }

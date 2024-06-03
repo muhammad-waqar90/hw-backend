@@ -18,9 +18,9 @@ class PendingAgeVerificationException extends Exception
     public function getErrors(): array
     {
         return [
-            'errors'            => Lang::get('auth.parentEmailVerificationPending'),
+            'errors' => Lang::get('auth.parentEmailVerificationPending'),
             'unverified_parent' => true,
-            'username'          => $this->username
+            'username' => $this->username,
         ];
     }
 }

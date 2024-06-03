@@ -3,20 +3,20 @@
 namespace Tests\Feature\IU;
 
 use App\Models\User;
-
-use Tests\TestCase;
-
 use App\Traits\Tests\CourseTestTrait;
 use App\Traits\Tests\JSONResponseTestTrait;
+use Tests\TestCase;
 
 class IUBasicTest extends TestCase
 {
     use CourseTestTrait;
     use JSONResponseTestTrait;
 
-    private $wrongUser, $data;
+    private $wrongUser;
 
-    public function setUp(): void
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -28,13 +28,13 @@ class IUBasicTest extends TestCase
 
     public function testDefaultUserWorking()
     {
-        $response = $this->json('GET',  '/api/auth/me');
+        $response = $this->json('GET', '/api/auth/me');
         $response->assertOk();
     }
 
     public function testCoursesAvailableValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/available');
+        $response = $this->json('GET', '/api/iu/courses/available');
         $response->assertOk();
     }
 
@@ -44,20 +44,20 @@ class IUBasicTest extends TestCase
             'role_id' => 2,
         ]);
 
-        $response = $this->actingAs($user)->json('GET',  '/api/iu/courses/available');
+        $response = $this->actingAs($user)->json('GET', '/api/iu/courses/available');
         $response->assertStatus(403);
     }
 
     public function testCoursesOwnedValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/owned');
+        $response = $this->json('GET', '/api/iu/courses/owned');
         $response->assertOk();
         $this->assertNotEquals(count(json_decode($response->content())->data), 0);
     }
 
     public function testCoursesOwnedValidNoOwnedCourses()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/iu/courses/owned');
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/iu/courses/owned');
         $response->assertOk();
         $this->assertEquals(count(json_decode($response->content())->data), 0);
     }
@@ -68,34 +68,34 @@ class IUBasicTest extends TestCase
             'role_id' => 2,
         ]);
 
-        $response = $this->actingAs($wrongUser)->json('GET',  '/api/iu/courses/owned');
+        $response = $this->actingAs($wrongUser)->json('GET', '/api/iu/courses/owned');
         $response->assertStatus(403);
     }
 
     public function testCoursesGetValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/' . $this->data->course->id);
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id);
 
         $response->assertStatus(200);
     }
 
     public function testCoursesLevelGetValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/' . $this->data->course->id . '/level/' . $this->data->courseLevel->value);
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/level/'.$this->data->courseLevel->value);
 
         $response->assertStatus(200);
     }
 
     public function testCoursesLessonGetValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id);
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id);
 
         $response->assertStatus(200);
     }
 
     public function testCoursesLessonGetInvalidNotOwned()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id);
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id);
 
         $response->assertStatus(403);
     }

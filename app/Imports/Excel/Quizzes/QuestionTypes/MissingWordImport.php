@@ -14,12 +14,14 @@ use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
-class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
+class MissingWordImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
 {
     use Importable;
 
     private Collection $collection;
+
     private string $fileName;
+
     private int $row = 2;
 
     public function __construct(string $fileName)
@@ -33,10 +35,12 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     public function collection(Collection $collection): Collection
     {
         $validator = Validator::make($collection->toArray(), $this->rules());
-        if($validator->fails())
+        if ($validator->fails()) {
             throw new MissingWordImportException('Data is invalid', 101, 0, $this->fileName, $validator->messages()->get('*'));
+        }
 
         $this->collection = $this->parseQuestionList($collection);
+
         return $this->collection;
     }
 
@@ -46,10 +50,11 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     public function parseQuestionList($collection): Collection
     {
         $parsedQuestions = [];
-        foreach($collection as $item) {
+        foreach ($collection as $item) {
             $parsedQuestions[] = $this->parseQuestion($item);
             $this->row++;
         }
+
         return collect($parsedQuestions);
     }
 
@@ -71,11 +76,12 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
 
     public function mapAnswer($options, $item): Collection
     {
-        $correctAnswer = $options['list']->first(function ($option) use($item) {
+        $correctAnswer = $options['list']->first(function ($option) use ($item) {
             return $option['value'] === $item['correct_answer'];
         });
+
         return collect([
-            'answerId' => $correctAnswer['id']
+            'answerId' => $correctAnswer['id'],
         ]);
     }
 
@@ -87,7 +93,7 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
             'difficulty' => QuizQuestionDifficultyData::difficultyStringToInt($item['difficulty']),
             'type' => QuizData::QUESTION_MISSING_WORD,
             'options' => $options->toJson(),
-            'answer' => $this->mapAnswer($options, $item)->toJson()
+            'answer' => $this->mapAnswer($options, $item)->toJson(),
         ]);
     }
 
@@ -95,13 +101,16 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
     {
         $options = [];
         $list = [];
-        for($i = 0; $i < 10; $i++)
-            if(strlen($item['answer_' . $i+1]))
+        for ($i = 0; $i < 10; $i++) {
+            if (strlen($item['answer_'.$i + 1])) {
                 $list[] = [
                     'id' => Str::orderedUuid()->toString(),
-                    'value' => $item['answer_' . $i+1]
+                    'value' => $item['answer_'.$i + 1],
                 ];
+            }
+        }
         $options['list'] = collect($list);
+
         return collect($options);
     }
 
@@ -110,22 +119,27 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
      */
     public function validateQuestion($options, $question)
     {
-        if(!$this->hasUniqueOptions($question))
+        if (! $this->hasUniqueOptions($question)) {
             throw new MissingWordImportException('Found duplicate options', 100, $this->row, $this->fileName);
+        }
         //Check if answer is NOT found in the options
-        if(!$options['list']->contains(function ($item) use($question) {
+        if (! $options['list']->contains(function ($item) use ($question) {
             return $item['value'] === $question['correct_answer'];
-        }))
+        })) {
             throw new MissingWordImportException('Correct answer not found in the options', 100, $this->row, $this->fileName);
+        }
 
     }
 
     public function hasUniqueOptions($question): bool
     {
         $options = [];
-        for($i = 0; $i < 10; $i++)
-            if(strlen($question['answer_' . $i+1]))
-                $options[] = $question['answer_' . $i+1];
+        for ($i = 0; $i < 10; $i++) {
+            if (strlen($question['answer_'.$i + 1])) {
+                $options[] = $question['answer_'.$i + 1];
+            }
+        }
+
         return count($options) === count(array_unique($options));
     }
 
@@ -139,7 +153,7 @@ class MissingWordImport implements ToCollection, WithHeadingRow, SkipsEmptyRows
         return [
             '*.difficulty' => [
                 'required',
-                Rule::in(QuizQuestionDifficultyData::getStringConstants())
+                Rule::in(QuizQuestionDifficultyData::getStringConstants()),
             ],
             '*.question' => 'required|min:3|max:1000',
             '*.answer_1' => 'required',

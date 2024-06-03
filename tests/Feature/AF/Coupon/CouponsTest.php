@@ -13,9 +13,15 @@ class CouponsTest extends TestCase
 {
     use PermGroupUserTestTrait;
 
-    private $user, $admin, $wrongAdmin, $data;
-    
-    public function setUp(): void
+    private $user;
+
+    private $admin;
+
+    private $wrongAdmin;
+
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -39,13 +45,13 @@ class CouponsTest extends TestCase
         $response = $this->json('GET', '/api/af/coupons');
 
         $response->assertStatus(200);
-        $this->assertEquals(5,count(json_decode($response->content())->data));
+        $this->assertEquals(5, count(json_decode($response->content())->data));
     }
 
     public function testCouponsGetByIdRoute()
     {
         $coupon = Coupon::factory()->create();
-        $response = $this->json('GET', '/api/af/coupons/' . $coupon->id);
+        $response = $this->json('GET', '/api/af/coupons/'.$coupon->id);
 
         $response->assertStatus(200);
     }
@@ -53,21 +59,21 @@ class CouponsTest extends TestCase
     public function testCouponsPostRoute()
     {
         $response = $this->json('POST', '/api/af/coupons', [
-            "name"                  => Str::random(10),
-            "description"           => Str::random(50),
-            "code"                  => Str::random(10),
-            "value"                 => 10,
-            "value_type"            => CouponData::PERCENTAGE,
-            "status"                => CouponData::ACTIVE,
-            "redeem_limit"          => 1,
-            "redeem_limit_per_user" => 1,
-            "individual_use"        => 0,
-            "restrictions" => [
+            'name' => Str::random(10),
+            'description' => Str::random(50),
+            'code' => Str::random(10),
+            'value' => 10,
+            'value_type' => CouponData::PERCENTAGE,
+            'status' => CouponData::ACTIVE,
+            'redeem_limit' => 1,
+            'redeem_limit_per_user' => 1,
+            'individual_use' => 0,
+            'restrictions' => [
                 [
-                    "id"    =>  [116],
-                    "type"  =>  "course"
-                ]
-            ]
+                    'id' => [116],
+                    'type' => 'course',
+                ],
+            ],
         ]);
 
         $response->assertStatus(200);
@@ -76,12 +82,12 @@ class CouponsTest extends TestCase
     public function testCouponsPutRoute()
     {
         $coupon = Coupon::factory()->create();
-        $response = $this->json('PUT', '/api/af/coupons/' . $coupon->id, [
-            "name"                  => Str::random(10),
-            "description"           => Str::random(50),
-            "status"                => CouponData::ACTIVE,
-            "redeem_limit"          => 1,
-            "redeem_limit_per_user" => 1,  
+        $response = $this->json('PUT', '/api/af/coupons/'.$coupon->id, [
+            'name' => Str::random(10),
+            'description' => Str::random(50),
+            'status' => CouponData::ACTIVE,
+            'redeem_limit' => 1,
+            'redeem_limit_per_user' => 1,
         ]);
 
         $response->assertStatus(200);

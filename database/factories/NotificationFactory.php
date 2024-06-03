@@ -11,13 +11,6 @@ use Illuminate\Support\Str;
 class NotificationFactory extends Factory
 {
     /**
-     * The name of the notification's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Notification::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -25,12 +18,13 @@ class NotificationFactory extends Factory
     public function definition()
     {
         $user_id = DB::table('users')->pluck('id');
+
         return [
-            'user_id'       =>  $user_id->random(),
-            'title'         =>  Str::random(10),
-            'description'   =>  fake()->sentence,
-            'type'          =>  NotificationTypeData::SUPPORT_TICKET,
-            'read'          =>  0
+            'user_id' => $user_id->random(),
+            'title' => Str::random(10),
+            'description' => fake()->sentence,
+            'type' => NotificationTypeData::SUPPORT_TICKET,
+            'read' => 0,
         ];
     }
 

@@ -16,24 +16,24 @@ class TicketCategorySeeder extends Seeder
     public function run()
     {
         TicketCategory::updateOrCreate(
-            ['id'            => TicketCategoryData::SYSTEM],
-            ['name'          => 'System']
+            ['id' => TicketCategoryData::SYSTEM],
+            ['name' => 'System']
         );
         TicketCategory::updateOrCreate(
-            ['id'            => TicketCategoryData::CONTENT],
-            ['name'          => 'Content']
+            ['id' => TicketCategoryData::CONTENT],
+            ['name' => 'Content']
         );
         TicketCategory::updateOrCreate(
-            ['id'            => TicketCategoryData::REFUND],
-            ['name'          => 'Refund']
+            ['id' => TicketCategoryData::REFUND],
+            ['name' => 'Refund']
         );
         TicketCategory::updateOrCreate(
-            ['id'            => TicketCategoryData::GDPR],
-            ['name'          => 'GDPR']
+            ['id' => TicketCategoryData::GDPR],
+            ['name' => 'GDPR']
         );
         TicketCategory::updateOrCreate(
-            ['id'            => TicketCategoryData::LESSON_QA],
-            ['name'          => 'Lecture Q&A']
+            ['id' => TicketCategoryData::LESSON_QA],
+            ['name' => 'Lecture Q&A']
         );
     }
 }

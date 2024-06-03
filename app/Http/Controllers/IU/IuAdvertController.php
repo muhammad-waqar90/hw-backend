@@ -19,11 +19,12 @@ class IuAdvertController
     {
         $data = $this->advert
             ->where('status', AdvertData::STATUS_ACTIVE)
-            ->orderBy('priority', 'ASC')
-            ->orderBy('id', 'ASC')
+            ->oldest('priority')
+            ->oldest('id')
             ->get();
 
         $fractal = fractal($data, new IuAdvertTransformer());
+
         return response()->json($fractal, 200);
     }
 }

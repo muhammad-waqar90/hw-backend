@@ -24,10 +24,26 @@ class CreateAdminRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name' => 'required|min:2|max:20',
-            'last_name' => 'required|min:2|max:20',
-            'email' => 'required|unique:admin_profiles|email|max:255',
-            'permGroupIds' => 'present|array',
+            'first_name' => [
+                'required',
+                'min:2',
+                'max:20',
+            ],
+            'last_name' => [
+                'required',
+                'min:2',
+                'max:20',
+            ],
+            'email' => [
+                'required',
+                'unique:admin_profiles',
+                'email',
+                'max:255',
+            ],
+            'permGroupIds' => [
+                'present',
+                'array',
+            ],
         ];
     }
 }

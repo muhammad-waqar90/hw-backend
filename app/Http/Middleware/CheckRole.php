@@ -11,15 +11,13 @@ class CheckRole
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
-     * @param $role
      * @return mixed
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        if (!in_array($request->user()->role_id, explode('|', $role)))
+        if (! in_array($request->user()->role_id, explode('|', $role))) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }

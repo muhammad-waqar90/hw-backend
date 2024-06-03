@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\PasswordReset;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class CleanExpiredPasswordResets extends Command
@@ -34,7 +34,6 @@ class CleanExpiredPasswordResets extends Command
 
     /**
      * CleanExpiredVerifyUser constructor.
-     * @param PasswordReset $passwordReset
      */
     public function __construct(PasswordReset $passwordReset)
     {
@@ -49,7 +48,7 @@ class CleanExpiredPasswordResets extends Command
      */
     public function handle()
     {
-        $this->passwordReset->where('created_at', '<',Carbon::now()->subHours(12))
+        $this->passwordReset->where('created_at', '<', Carbon::now()->subHours(12))
             ->delete();
 
         $this->info('Cleaning expired password reset codes');

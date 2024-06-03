@@ -7,7 +7,7 @@ use App\Repositories\IU\IuCertificateRepository;
 use App\Traits\HierarchyTrait;
 use App\Transformers\IU\Certificate\IuCertificateTransformer;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Image;
 use PDF;
 
@@ -50,19 +50,19 @@ class IuCertificateController extends Controller
         $dateWithFullMonth = $parseDate->format('F Y');
         $year = $parseDate->format('Y');
 
-
         $pdf = PDF::loadView('pdfs.certificates.certificate', [
-            'userProfile'               => $request->user(),
-            'entityName'                => $this->getCourseHierarchyNameCertificate($certificate['hierarchy'], $certificate['type']),
-            'certificateCreatedAt'      => $fullDate,
-            'certificateDateWithMonth'  =>  $dateWithFullMonth,
-            'year'                      =>  $year,
-            'signatureImage'            =>  Image::make($this->iuCertificateRepository->getSignatureImage())->encode('data-url'),
-            'dateImage'                 =>  Image::make($this->iuCertificateRepository->getDateImage())->encode('data-url'),
-            'logoImage'                 =>  Image::make($this->iuCertificateRepository->getLogoImage())->encode('data-url')
+            'userProfile' => $request->user(),
+            'entityName' => $this->getCourseHierarchyNameCertificate($certificate['hierarchy'], $certificate['type']),
+            'certificateCreatedAt' => $fullDate,
+            'certificateDateWithMonth' => $dateWithFullMonth,
+            'year' => $year,
+            'signatureImage' => Image::make($this->iuCertificateRepository->getSignatureImage())->encode('data-url'),
+            'dateImage' => Image::make($this->iuCertificateRepository->getDateImage())->encode('data-url'),
+            'logoImage' => Image::make($this->iuCertificateRepository->getLogoImage())->encode('data-url'),
         ]);
 
         $pdf->setPaper('a4', 'landscape');
+
         return $pdf->download('certificate.pdf');
     }
 }

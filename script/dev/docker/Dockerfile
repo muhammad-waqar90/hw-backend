@@ -1,5 +1,5 @@
 # Application
-FROM public.ecr.aws/docker/library/php:8.0-fpm
+FROM public.ecr.aws/docker/library/php:8.2-fpm-bullseye
 
 # ARG AWS_CF
 # ENV AWS_CF=$AWS_CF
@@ -30,12 +30,13 @@ RUN apt-get update && apt-get install -y \
   curl \
   gnupg \
   nano
+# RUN apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0E98404D386FA1D9 6ED0E7B82643E131 F8D2585B8783D481  
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install extensions
-RUN docker-php-ext-install pdo_mysql zip exif pcntl
+RUN docker-php-ext-install pdo_mysql zip exif pcntl bcmath
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 RUN docker-php-ext-install gd
 

@@ -17,8 +17,8 @@ class PasswordHistoryRepository
     public function storeCurrentPassword($userId, $password)
     {
         return $this->passwordHistory->create([
-            'user_id'   => $userId,
-            'password'  => bcrypt($password)
+            'user_id' => $userId,
+            'password' => bcrypt($password),
         ]);
     }
 
@@ -39,7 +39,7 @@ class PasswordHistoryRepository
 
         $this->passwordHistory
             ->where('user_id', $userId)
-            ->whereNotIn('id',  $keepHistoriesIds)
+            ->whereNotIn('id', $keepHistoriesIds)
             ->delete();
     }
 

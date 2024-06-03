@@ -13,8 +13,6 @@ class CheckIfGdprDataIsProcessing
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -23,8 +21,9 @@ class CheckIfGdprDataIsProcessing
             ->where('status', GDPRStatusData::PROCESSING)
             ->exists();
 
-        if ($isGdprRequestAlreadyInProcess)
+        if ($isGdprRequestAlreadyInProcess) {
             return response()->json(['errors' => Lang::get('iu.gdprRequest.requestAlreadyInProcess')], 400);
+        }
 
         return $next($request);
     }

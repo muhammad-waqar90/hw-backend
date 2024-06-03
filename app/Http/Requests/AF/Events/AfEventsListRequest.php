@@ -26,7 +26,11 @@ class AfEventsListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText' => 'string|nullable|max:100',
+            'searchText' => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
             'type' => ['integer', Rule::in(EventTypeData::getEventTypes())],
         ];
     }

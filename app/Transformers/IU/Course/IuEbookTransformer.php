@@ -10,15 +10,14 @@ class IuEbookTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param Ebook $ebook
      * @return array
      */
     public function transform(Ebook $ebook)
     {
         return [
-            'id'    => $ebook->id,
-            'name'  => $ebook->content,
-            'src'   => $ebook->src,
+            'id' => $ebook->id,
+            'name' => $ebook->content,
+            'src' => $ebook->src,
         ];
     }
 }

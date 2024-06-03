@@ -6,18 +6,20 @@ namespace App\Traits;
 // TODO: string laravel's helper global function
 trait StringManipulationTrait
 {
-    public function truncate($string, $length = 255, $append = "..."): string
+    public function truncate($string, $length = 255, $append = '...'): string
     {
         $string = trim($string);
-        if (strlen($string) <= $length)
+        if (strlen($string) <= $length) {
             return $string;
+        }
 
         $string = wordwrap($string, $length);
 
         $string = explode("\n", $string, 2);
-        if (strlen($string[0]) > $length)
-            return substr($string[0], 0, $length) . $append;
+        if (strlen($string[0]) > $length) {
+            return substr($string[0], 0, $length).$append;
+        }
 
-        return $string[0] . $append;
+        return $string[0].$append;
     }
 }

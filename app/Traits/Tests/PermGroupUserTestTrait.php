@@ -2,22 +2,22 @@
 
 namespace App\Traits\Tests;
 
-use App\Models\User;
+use App\DataObject\PermissionData;
 use App\Models\PermGroup;
 use App\Models\Permission;
-
-use App\DataObject\PermissionData;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-
-trait PermGroupUserTestTrait {
-    public function permissionsSeeder($numOfGroupsAndUsers = 15) {
+trait PermGroupUserTestTrait
+{
+    public function permissionsSeeder($numOfGroupsAndUsers = 15)
+    {
         $permGroups = PermGroup::factory($numOfGroupsAndUsers)->create();
         $permissions = array_values(PermissionData::getConstants());
         $searchPermissions = Permission::factory(5)->withDisplayName('factory_permission')->create();
         $users = User::factory($numOfGroupsAndUsers)->verified()->admin()->create();
 
-        for($i=0; $i<$numOfGroupsAndUsers; $i++){
+        for ($i = 0; $i < $numOfGroupsAndUsers; $i++) {
             $permGroupPermissionData[] = ['perm_group_id' => $permGroups[$i]->id, 'permission_id' => $permissions[$i]];
             $permGroupUser[] = ['perm_group_id' => $permGroups[$i]->id, 'user_id' => $users->pluck('id')->random()];
         }
@@ -35,12 +35,13 @@ trait PermGroupUserTestTrait {
         return $data;
     }
 
-    public function assignAllPermissionToUser($user) {
+    public function assignAllPermissionToUser($user)
+    {
         $allPermissionsGroup = PermGroup::factory()->create();
 
         $permissions = array_values(PermissionData::getConstants());
 
-        for($i=0; $i< count($permissions); $i++){
+        for ($i = 0; $i < count($permissions); $i++) {
             $permGroupPermissionData[] = ['perm_group_id' => $allPermissionsGroup->id, 'permission_id' => $permissions[$i]];
         }
 
@@ -51,7 +52,8 @@ trait PermGroupUserTestTrait {
         ]);
     }
 
-    public function assignFAQCategoryManagementPermissionToUser($user) {
+    public function assignFAQCategoryManagementPermissionToUser($user)
+    {
         $CategoryManagementPermissionsGroup = PermGroup::factory()->create();
 
         DB::table('perm_group_permission')->insert([
@@ -64,7 +66,8 @@ trait PermGroupUserTestTrait {
         ]);
     }
 
-    public function assignSystemPermissionToUser($user) {
+    public function assignSystemPermissionToUser($user)
+    {
         $systemPermissionsGroup = PermGroup::factory()->create();
 
         DB::table('perm_group_permission')->insert([['perm_group_id' => $systemPermissionsGroup->id, 'permission_id' => PermissionData::TICKET_SYSTEM_MANAGEMENT]]);

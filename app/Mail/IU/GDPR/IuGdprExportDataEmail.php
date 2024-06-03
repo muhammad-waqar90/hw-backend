@@ -11,16 +11,12 @@ class IuGdprExportDataEmail extends AbstractMail
 
     /**
      * Create a new message instance.
-     *
-     * @param $uuid
      */
-
     public function __construct($userProfile, $uuid)
     {
         parent::__construct($userProfile);
         $this->uuid = $uuid;
     }
-
 
     /**
      * Build the message.

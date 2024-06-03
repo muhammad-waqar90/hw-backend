@@ -10,10 +10,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
             $table->dropForeign('products_product_category_id_foreign');
@@ -32,10 +30,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::create('product_categories', function (Blueprint $table) {
             $table->id();
@@ -59,12 +55,12 @@ return new class extends Migration
     {
         $booksCategory = Category::create([
             'parent_category_id' => null,
-            'root_category_id'   => null,
-            'name'               => 'Books'
+            'root_category_id' => null,
+            'name' => 'Books',
         ]);
 
         Product::query()->update([
-            'category_id' => $booksCategory->id
+            'category_id' => $booksCategory->id,
         ]);
     }
 };

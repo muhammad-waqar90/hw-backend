@@ -9,14 +9,14 @@ use App\DataObject\UserProgressData;
 use App\Models\Category;
 use App\Models\Course;
 use App\Models\CourseLevel;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\Repositories\IU\IuUserRepository;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class IuCourseRepository
 {
-
     private Course $course;
+
     private CourseLevel $courseLevel;
 
     public function __construct(Course $course, CourseLevel $courseLevel)
@@ -35,11 +35,11 @@ class IuCourseRepository
             ->when($categoryId, function ($query) use ($categoryId) {
                 $query->where('courses.category_id', $categoryId);
             })
-            ->when($order == CoursesData::AVAILABLE_COURSES_ORDER['popularity'], function($query) {
+            ->when($order == CoursesData::AVAILABLE_COURSES_ORDER['popularity'], function ($query) {
                 $query->selectRaw('count(cu.course_id) as popularity')
-                ->leftJoin('course_user as cu', 'courses.id', '=', 'cu.course_id')
-                ->groupBy('courses.id');
-              })
+                    ->leftJoin('course_user as cu', 'courses.id', '=', 'cu.course_id')
+                    ->groupBy('courses.id');
+            })
             ->with('category')
             ->with('tier')
             ->where('status', CourseStatusData::PUBLISHED)
@@ -64,8 +64,7 @@ class IuCourseRepository
     {
         return $this->course->select('courses.*', 'up.progress')
             ->whereIn('courses.id', IuUserRepository::courseIdsOwnedByUser($userId))
-            ->leftJoin('user_progress as up', function($query) use ($userId)
-            {
+            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                 $query->on('up.entity_id', '=', 'courses.id')
                     ->where('up.user_id', $userId)
                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE);
@@ -76,14 +75,14 @@ class IuCourseRepository
             ->when($categoryId, function ($query) use ($categoryId) {
                 $query->where('courses.category_id', $categoryId);
             })
-            ->when($order == CoursesData::OWNED_COURSES_ORDER['recentlyUsed'], function($query) {
+            ->when($order == CoursesData::OWNED_COURSES_ORDER['recentlyUsed'], function ($query) {
                 $query->addSelect('up.updated_at as progress_updated_at');
-              })
+            })
             ->with('category')
             ->orderBy($order, $orderDirection);
     }
 
-    public function getIuCoursePreview ($id)
+    public function getIuCoursePreview($id)
     {
         $course = $this->course
             ->select('courses.*')
@@ -91,11 +90,11 @@ class IuCourseRepository
             ->where('status', CourseStatusData::PUBLISHED)
             ->with('tier')
             ->with('courseLevels')
-            ->with('courseLevel', function ($query){
+            ->with('courseLevel', function ($query) {
                 $query->where('value', 1)
                     ->with('courseModules', function ($query) {
                         $query->select('course_modules.*')
-                            ->with('lessons', function($query) {
+                            ->with('lessons', function ($query) {
                                 $query->select('lessons.id', 'lessons.name', 'lessons.course_module_id', 'lessons.description', 'lessons.published',
                                     'lessons.order_id', 'lessons.img');
                             });
@@ -104,13 +103,14 @@ class IuCourseRepository
             ->leftJoin('course_levels as cl', 'courses.id', '=', 'cl.course_id')
             ->with('categoryWithRecursiveParents'.Category::minimalWithData())
             ->first();
-        if($course)
+        if ($course) {
             $course->preview = true;
+        }
 
         return $course;
     }
 
-    public function getIuCourse ($userId, $id)
+    public function getIuCourse($userId, $id)
     {
         return $this->course
             ->select('courses.*', 'up.progress')
@@ -119,14 +119,12 @@ class IuCourseRepository
             ->with('courseLevel', function ($query) use ($userId) {
                 $query->select('course_levels.*', 'up.progress', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
                     ->where('value', 1)
-                    ->leftJoin('user_progress as up', function($query) use ($userId)
-                    {
+                    ->leftJoin('user_progress as up', function ($query) use ($userId) {
                         $query->on('up.entity_id', '=', 'course_levels.id')
                             ->where('up.user_id', $userId)
                             ->where('up.entity_type', UserProgressData::ENTITY_COURSE_LEVEL);
                     })
-                    ->leftJoin('quizzes as qz', function($query)
-                    {
+                    ->leftJoin('quizzes as qz', function ($query) {
                         $query->on('qz.entity_id', '=', 'course_levels.id')
                             ->where('qz.entity_type', QuizData::ENTITY_COURSE_LEVEL);
                     })
@@ -137,28 +135,24 @@ class IuCourseRepository
                             ->where('status', QuizData::STATUS_COMPLETED)
                             ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                             ->where('entity_type', QuizData::ENTITY_COURSE_LEVEL)
-                            ->groupBy('entity_id')
-                        , 'uqz', function($join) {
-                        $join->on('course_levels.id', '=', 'uqz.entity_id');
-                    })
+                            ->groupBy('entity_id'), 'uqz', function ($join) {
+                                $join->on('course_levels.id', '=', 'uqz.entity_id');
+                            })
                     ->with('courseModules', function ($query) use ($userId) {
                         $query->select('course_modules.*', 'up.progress', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
-                            ->with('lessons', function($query) use ($userId) {
+                            ->with('lessons', function ($query) use ($userId) {
                                 $query->select('lessons.id', 'lessons.name', 'lessons.course_module_id', 'lessons.order_id',
-                                        'lessons.description','lessons.img', 'lessons.published', 'up.progress', 'ln.content as userNote', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
-                                   ->leftJoin('user_progress as up', function($query) use ($userId)
-                                    {
+                                    'lessons.description', 'lessons.img', 'lessons.published', 'up.progress', 'ln.content as userNote', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
+                                    ->leftJoin('user_progress as up', function ($query) use ($userId) {
                                         $query->on('up.entity_id', '=', 'lessons.id')
                                             ->where('up.user_id', $userId)
                                             ->where('up.entity_type', UserProgressData::ENTITY_LESSON);
                                     })
-                                    ->leftJoin('lesson_notes as ln', function($query) use ($userId)
-                                    {
+                                    ->leftJoin('lesson_notes as ln', function ($query) use ($userId) {
                                         $query->on('ln.lesson_id', '=', 'lessons.id')
                                             ->where('ln.user_id', $userId);
                                     })
-                                    ->leftJoin('quizzes as qz', function($query)
-                                    {
+                                    ->leftJoin('quizzes as qz', function ($query) {
                                         $query->on('qz.entity_id', '=', 'lessons.id')
                                             ->where('qz.entity_type', QuizData::ENTITY_LESSON);
                                     })
@@ -169,20 +163,17 @@ class IuCourseRepository
                                             ->where('status', QuizData::STATUS_COMPLETED)
                                             ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                                             ->where('entity_type', QuizData::ENTITY_LESSON)
-                                            ->groupBy('entity_id')
-                                        , 'uqz', function($join) {
-                                            $join->on('lessons.id', '=', 'uqz.entity_id');
-                                        });
+                                            ->groupBy('entity_id'), 'uqz', function ($join) {
+                                                $join->on('lessons.id', '=', 'uqz.entity_id');
+                                            });
 
                             })
-                            ->leftJoin('user_progress as up', function($query) use ($userId)
-                            {
+                            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                                 $query->on('up.entity_id', '=', 'course_modules.id')
                                     ->where('up.user_id', $userId)
                                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE_MODULE);
                             })
-                            ->leftJoin('quizzes as qz', function($query)
-                            {
+                            ->leftJoin('quizzes as qz', function ($query) {
                                 $query->on('qz.entity_id', '=', 'course_modules.id')
                                     ->where('qz.entity_type', QuizData::ENTITY_COURSE_MODULE);
                             })
@@ -193,15 +184,13 @@ class IuCourseRepository
                                     ->where('status', QuizData::STATUS_COMPLETED)
                                     ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                                     ->where('entity_type', QuizData::ENTITY_COURSE_MODULE)
-                                    ->groupBy('entity_id')
-                                , 'uqz', function($join) {
-                                $join->on('course_modules.id', '=', 'uqz.entity_id');
-                            });
+                                    ->groupBy('entity_id'), 'uqz', function ($join) {
+                                        $join->on('course_modules.id', '=', 'uqz.entity_id');
+                                    });
                     });
             })
             ->join('course_levels as cl', 'courses.id', '=', 'cl.course_id')
-            ->leftJoin('user_progress as up', function($query) use ($userId)
-            {
+            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                 $query->on('up.entity_id', '=', 'courses.id')
                     ->where('up.user_id', $userId)
                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE);
@@ -210,19 +199,17 @@ class IuCourseRepository
             ->first();
     }
 
-    public function getIuCourseLevel ($userId, $courseId, $value)
+    public function getIuCourseLevel($userId, $courseId, $value)
     {
         return $this->courseLevel->select('course_levels.*', 'up.progress', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
             ->where('course_id', $courseId)
             ->where('value', $value)
-            ->leftJoin('user_progress as up', function($query) use ($userId)
-            {
+            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                 $query->on('up.entity_id', '=', 'course_levels.id')
                     ->where('up.user_id', $userId)
                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE_LEVEL);
             })
-            ->leftJoin('quizzes as qz', function($query)
-            {
+            ->leftJoin('quizzes as qz', function ($query) {
                 $query->on('qz.entity_id', '=', 'course_levels.id')
                     ->where('qz.entity_type', QuizData::ENTITY_COURSE_LEVEL);
             })
@@ -233,28 +220,24 @@ class IuCourseRepository
                     ->where('status', QuizData::STATUS_COMPLETED)
                     ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                     ->where('entity_type', QuizData::ENTITY_COURSE_LEVEL)
-                    ->groupBy('entity_id')
-                , 'uqz', function($join) {
-                $join->on('course_levels.id', '=', 'uqz.entity_id');
-            })
-            ->with('courseModules', function ($query) use ($userId){
+                    ->groupBy('entity_id'), 'uqz', function ($join) {
+                        $join->on('course_levels.id', '=', 'uqz.entity_id');
+                    })
+            ->with('courseModules', function ($query) use ($userId) {
                 $query->select('course_modules.*', 'up.progress', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
-                    ->with('lessons', function($query) use ($userId) {
+                    ->with('lessons', function ($query) use ($userId) {
                         $query->select('lessons.id', 'lessons.name', 'lessons.course_module_id', 'lessons.order_id', 'lessons.img',
                             'ln.content as userNote', 'lessons.description', 'lessons.published', 'up.progress', 'qz.id as quiz_id', 'uqz.user_quiz_failed_id')
-                            ->leftJoin('user_progress as up', function($query) use ($userId)
-                            {
+                            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                                 $query->on('up.entity_id', '=', 'lessons.id')
                                     ->where('up.user_id', $userId)
                                     ->where('up.entity_type', UserProgressData::ENTITY_LESSON);
                             })
-                            ->leftJoin('lesson_notes as ln', function($query) use ($userId)
-                            {
+                            ->leftJoin('lesson_notes as ln', function ($query) use ($userId) {
                                 $query->on('ln.lesson_id', '=', 'lessons.id')
                                     ->where('ln.user_id', $userId);
                             })
-                            ->leftJoin('quizzes as qz', function($query)
-                            {
+                            ->leftJoin('quizzes as qz', function ($query) {
                                 $query->on('qz.entity_id', '=', 'lessons.id')
                                     ->where('qz.entity_type', QuizData::ENTITY_LESSON);
                             })
@@ -265,19 +248,16 @@ class IuCourseRepository
                                     ->where('status', QuizData::STATUS_COMPLETED)
                                     ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                                     ->where('entity_type', QuizData::ENTITY_LESSON)
-                                    ->groupBy('entity_id')
-                                , 'uqz', function($join) {
-                                $join->on('lessons.id', '=', 'uqz.entity_id');
-                            });
+                                    ->groupBy('entity_id'), 'uqz', function ($join) {
+                                        $join->on('lessons.id', '=', 'uqz.entity_id');
+                                    });
                     })
-                    ->leftJoin('user_progress as up', function($query) use ($userId)
-                    {
+                    ->leftJoin('user_progress as up', function ($query) use ($userId) {
                         $query->on('up.entity_id', '=', 'course_modules.id')
                             ->where('up.user_id', $userId)
                             ->where('up.entity_type', UserProgressData::ENTITY_COURSE_MODULE);
                     })
-                    ->leftJoin('quizzes as qz', function($query)
-                    {
+                    ->leftJoin('quizzes as qz', function ($query) {
                         $query->on('qz.entity_id', '=', 'course_modules.id')
                             ->where('qz.entity_type', QuizData::ENTITY_COURSE_MODULE);
                     })
@@ -288,10 +268,9 @@ class IuCourseRepository
                             ->where('status', QuizData::STATUS_COMPLETED)
                             ->where('score', '<', QuizData::DEFAULT_PASSING_SCORE)
                             ->where('entity_type', QuizData::ENTITY_COURSE_MODULE)
-                            ->groupBy('entity_id')
-                        , 'uqz', function($join) {
-                        $join->on('course_modules.id', '=', 'uqz.entity_id');
-                    });
+                            ->groupBy('entity_id'), 'uqz', function ($join) {
+                                $join->on('course_modules.id', '=', 'uqz.entity_id');
+                            });
             })
             ->first();
     }
@@ -301,8 +280,7 @@ class IuCourseRepository
         return $this->courseLevel->select('course_levels.*', 'up.progress')
             ->where('course_id', $courseId)
             ->where('value', $value)
-            ->leftJoin('user_progress as up', function($query) use ($userId)
-            {
+            ->leftJoin('user_progress as up', function ($query) use ($userId) {
                 $query->on('up.entity_id', '=', 'course_levels.id')
                     ->where('up.user_id', $userId)
                     ->where('up.entity_type', UserProgressData::ENTITY_COURSE_LEVEL);
@@ -313,10 +291,10 @@ class IuCourseRepository
     public function assignCourseToUser($userId, $courseId): bool
     {
         return DB::table('course_user')->insert([
-            'user_id'       => $userId,
-            'course_id'     => $courseId,
-            'created_at'    => Carbon::now(),
-            'updated_at'    => Carbon::now()
+            'user_id' => $userId,
+            'course_id' => $courseId,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
     }
 
@@ -325,7 +303,7 @@ class IuCourseRepository
         return $this->courseLevel->select('course_levels.*', 'cm.id as courseModuleId')
             ->where('course_levels.course_id', $id)
             ->where('value', 1)
-            ->leftJoin('course_modules as cm', function($query) {
+            ->leftJoin('course_modules as cm', function ($query) {
                 $query->on('cm.course_level_id', '=', 'course_levels.id')
                     ->where('cm.order_id', 1);
             })
@@ -333,7 +311,8 @@ class IuCourseRepository
     }
 
     // TODO: same fun for AF as well - can make it re-usable for both IU/AF
-    public function getCoursesListQuery($searchText = null, $detail = false, $courseIds = null) {
+    public function getCoursesListQuery($searchText = null, $detail = false, $courseIds = null)
+    {
         return $this->course
             ->when($searchText, function ($query, $searchText) {
                 return $query->where('name', 'LIKE', "%$searchText%");

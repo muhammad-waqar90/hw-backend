@@ -7,17 +7,15 @@ use League\Fractal\TransformerAbstract;
 
 class IuProfileTransformer extends TransformerAbstract
 {
-
     /**
      * A Fractal transformer.
      *
-     * @param UserProfile $userProfile
      * @return array
      */
     public function transform(UserProfile $userProfile)
     {
         return [
-            'id'    => $userProfile->id,
+            'id' => $userProfile->id,
             'first_name' => $userProfile->first_name,
             'last_name' => $userProfile->last_name,
             'date_of_birth' => $userProfile->date_of_birth,

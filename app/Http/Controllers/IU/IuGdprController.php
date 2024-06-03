@@ -21,15 +21,17 @@ class IuGdprController extends Controller
     {
         $gdprRequest = $this->gdprRepository->getGdprRequestByUuid($uuid);
 
-        if (!$gdprRequest)
+        if (! $gdprRequest) {
             return Lang::get('general.notFound');
-        if ($gdprRequest->status == GDPRStatusData::EXPIRED)
+        }
+        if ($gdprRequest->status == GDPRStatusData::EXPIRED) {
             return Lang::get('iu.gdprRequest.downloadLinkExpired');
+        }
 
-        $name = $uuid . '.zip';
-        $pathToFile = 'GDPR/' . $name;
+        $name = $uuid.'.zip';
+        $pathToFile = 'GDPR/'.$name;
 
-        if (!Storage::disk('s3')->exists($pathToFile)) {
+        if (! Storage::disk('s3')->exists($pathToFile)) {
             return Lang::get('general.notFound');
         }
 
@@ -40,12 +42,12 @@ class IuGdprController extends Controller
                 $file,
                 200,
                 [
-                    'Content-Type'        => 'application/zip',
-                    'Content-Disposition' => 'attachment; filename="' . $name . '"',
+                    'Content-Type' => 'application/zip',
+                    'Content-Disposition' => 'attachment; filename="'.$name.'"',
                 ]
             );
         }
 
-        return "Oops! Something went wrong";
+        return 'Oops! Something went wrong';
     }
 }

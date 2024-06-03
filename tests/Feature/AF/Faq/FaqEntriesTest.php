@@ -2,16 +2,13 @@
 
 namespace Tests\Feature\AF\Faq;
 
-use App\Models\User;
-use App\Models\FaqCategory;
 use App\Models\Faq;
-
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
+use App\Models\FaqCategory;
+use App\Models\User;
 use App\Traits\Tests\FaqCategoryTestTrait;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class FaqEntriesTest extends TestCase
 {
@@ -20,7 +17,7 @@ class FaqEntriesTest extends TestCase
 
     private $data;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -44,7 +41,7 @@ class FaqEntriesTest extends TestCase
     {
         $newFaqCategory = FaqCategory::factory()->withFaqCategoryId($this->data->faqCategory[0]->id)->create();
 
-        $response = $this->json('POST', '/api/af/faqs', array('faq_category_id'   =>  $newFaqCategory->id, 'question' =>  'someQuestion', 'short_answer' =>  'someShortAnswer', 'answer' =>  'someTestingLongerAnswer'));
+        $response = $this->json('POST', '/api/af/faqs', ['faq_category_id' => $newFaqCategory->id, 'question' => 'someQuestion', 'short_answer' => 'someShortAnswer', 'answer' => 'someTestingLongerAnswer']);
 
         $this->assertEquals('Successfully created faq', json_decode($response->content())->message);
     }
@@ -60,7 +57,7 @@ class FaqEntriesTest extends TestCase
 
     public function testAdminFaqGetValid()
     {
-        $response = $this->json('GET', '/api/af/faqs/' . $this->data->faq[0]->id);
+        $response = $this->json('GET', '/api/af/faqs/'.$this->data->faq[0]->id);
 
         $this->assertEquals($this->data->faq[0]->id, json_decode($response->content())->id);
     }
@@ -69,7 +66,7 @@ class FaqEntriesTest extends TestCase
     {
         $newFaqCategory = FaqCategory::factory()->withFaqCategoryId($this->data->faqCategory[0]->id)->create();
 
-        $response = $this->json('PUT', '/api/af/faqs/' . $this->data->faq[0]->id, array('faq_category_id' =>  $newFaqCategory->id, 'question' =>  'testPutQuestion', 'short_answer' =>  'testShortAnswer', 'answer' =>  'testAnswer'));
+        $response = $this->json('PUT', '/api/af/faqs/'.$this->data->faq[0]->id, ['faq_category_id' => $newFaqCategory->id, 'question' => 'testPutQuestion', 'short_answer' => 'testShortAnswer', 'answer' => 'testAnswer']);
 
         $this->assertEquals('Successfully updated faq', json_decode($response->content())->message);
     }
@@ -78,7 +75,7 @@ class FaqEntriesTest extends TestCase
     {
         FaqCategory::factory()->withFaqCategoryId($this->data->faqCategory[0]->id)->create();
 
-        $response = $this->json('PUT', '/api/af/faqs/' . $this->data->faq[0]->id, array('faq_category_id' =>  $this->data->faqCategory[0]->id, 'question' =>  'testPutQuestion', 'short_answer' =>  'testShortAnswer', 'answer' =>  'testAnswer'));
+        $response = $this->json('PUT', '/api/af/faqs/'.$this->data->faq[0]->id, ['faq_category_id' => $this->data->faqCategory[0]->id, 'question' => 'testPutQuestion', 'short_answer' => 'testShortAnswer', 'answer' => 'testAnswer']);
 
         $this->assertEquals('Invalid faq category', json_decode($response->content())->errors);
     }
@@ -88,21 +85,21 @@ class FaqEntriesTest extends TestCase
         $newFaqSubCategory = FaqCategory::factory()->withFaqCategoryId($this->data->faqCategory[0]->id)->create();
         $newFaqSubSubCategory = FaqCategory::factory()->withFaqCategoryId($newFaqSubCategory->id)->create();
 
-        $response = $this->json('PUT', '/api/af/faqs/' . $this->data->faq[0]->id, array('faq_category_id' =>  $newFaqSubSubCategory->id, 'question' =>  'testPutQuestion', 'short_answer' =>  'testShortAnswer', 'answer' =>  'testAnswer'));
+        $response = $this->json('PUT', '/api/af/faqs/'.$this->data->faq[0]->id, ['faq_category_id' => $newFaqSubSubCategory->id, 'question' => 'testPutQuestion', 'short_answer' => 'testShortAnswer', 'answer' => 'testAnswer']);
 
         $this->assertEquals('Successfully updated faq', json_decode($response->content())->message);
     }
 
     public function testAdminFaqDeleteValid()
     {
-        $response = $this->json('DELETE', '/api/af/faqs/' . $this->data->faq[0]->id);
+        $response = $this->json('DELETE', '/api/af/faqs/'.$this->data->faq[0]->id);
 
         $this->assertEquals('Successfully deleted faq', json_decode($response->content())->message);
     }
 
     public function testAdminFaqPublishValid()
     {
-        $response = $this->json('PUT', '/api/af/faqs/' . $this->data->faq[0]->id . '/publish');
+        $response = $this->json('PUT', '/api/af/faqs/'.$this->data->faq[0]->id.'/publish');
 
         $this->assertEquals('Successfully published faq', json_decode($response->content())->message);
     }
@@ -111,7 +108,7 @@ class FaqEntriesTest extends TestCase
     {
         $publishedFaq = Faq::factory()->withFaqCategoryId($this->data->faqCategory[0]->id)->published()->create();
 
-        $response = $this->json('PUT', '/api/af/faqs/' . $publishedFaq->id . '/unpublish');
+        $response = $this->json('PUT', '/api/af/faqs/'.$publishedFaq->id.'/unpublish');
 
         $this->assertEquals('Successfully unpublished faq', json_decode($response->content())->message);
     }
@@ -123,7 +120,7 @@ class FaqEntriesTest extends TestCase
 
         $faqInSubCategory = Faq::factory()->withFaqCategoryId($subFaqCategory->id)->published()->create();
 
-        $this->json('PUT', '/api/af/faqs/' . $faqInSubCategory->id . '/unpublish');
+        $this->json('PUT', '/api/af/faqs/'.$faqInSubCategory->id.'/unpublish');
 
         $isPublished = DB::table('faq_categories')->where('id', $rootFaqCategory->id)->value('published');
 

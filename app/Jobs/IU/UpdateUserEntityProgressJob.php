@@ -15,14 +15,13 @@ class UpdateUserEntityProgressJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $entityId;
+
     private $entityType;
+
     private $userId;
 
     /**
      * Create a new job instance.
-     * @param $userId
-     * @param $entityId
-     * @param $entityType
      */
     public function __construct($userId, $entityId, $entityType)
     {
@@ -34,17 +33,19 @@ class UpdateUserEntityProgressJob implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param IuProgressRepository $iuProgressRepository
      * @return void
      */
     public function handle(IuProgressRepository $iuProgressRepository)
     {
-        if($this->entityType == QuizData::ENTITY_LESSON)
+        if ($this->entityType == QuizData::ENTITY_LESSON) {
             $iuProgressRepository->calculateLessonProgress($this->userId, $this->entityId);
-        if($this->entityType == QuizData::ENTITY_COURSE_MODULE)
+        }
+        if ($this->entityType == QuizData::ENTITY_COURSE_MODULE) {
             $iuProgressRepository->calculateCourseModuleProgress($this->userId, $this->entityId);
-        if($this->entityType == QuizData::ENTITY_COURSE_LEVEL)
+        }
+        if ($this->entityType == QuizData::ENTITY_COURSE_LEVEL) {
             $iuProgressRepository->calculateCourseLevelProgress($this->userId, $this->entityId);
+        }
 
     }
 }

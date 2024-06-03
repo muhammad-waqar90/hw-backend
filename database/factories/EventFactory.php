@@ -10,27 +10,19 @@ use Illuminate\Support\Str;
 class EventFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Event::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
      */
-
     public function definition()
     {
         return [
-            'title'         =>  Str::random(10),
-            'description'   =>  Str::random(20),
-            'type'          =>  EventTypeData::NATIONAL,
-            'url'           =>  fake()->url,
-            'start_date'    =>  fake()->dateTimeBetween('now', '+10 days'),
-            'end_date'      =>  fake()->dateTimeBetween('now', '+15 days'),
+            'title' => Str::random(10),
+            'description' => Str::random(20),
+            'type' => EventTypeData::NATIONAL,
+            'url' => fake()->url,
+            'start_date' => fake()->dateTimeBetween('now', '+10 days'),
+            'end_date' => fake()->dateTimeBetween('now', '+15 days'),
         ];
     }
 

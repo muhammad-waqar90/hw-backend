@@ -10,15 +10,15 @@ class BulkImportStatus extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function admin()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function adminProfile() {
-        return $this->hasOne('App\Models\AdminProfile');
+        return $this->hasOne(AdminProfile::class);
     }
 }

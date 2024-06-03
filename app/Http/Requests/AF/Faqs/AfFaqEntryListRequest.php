@@ -24,7 +24,11 @@ class AfFaqEntryListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'    => 'string|nullable|max:100',
+            'searchText'    => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
         ];
     }
 }

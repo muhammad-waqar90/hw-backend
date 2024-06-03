@@ -13,18 +13,17 @@ use Illuminate\Http\Request;
 class AfCanUpdateModuleHasExam
 {
     use UtilsTrait;
-    /**
-     * @var AfCourseRepository $afCourseRepository
-     * @var IuQuizRepository $iuQuizRepository
-     */
-    private $afCourseRepository, $iuQuizRepository;
 
     /**
-     * AfCanUpdateModuleHasExam constructor.
-     *
-     * @param AfCourseRepository $afCourseRepository
-     * @param IuQuizRepository $iuQuizRepository
+     * @var AfCourseRepository
      */
+    private $afCourseRepository;
+
+    /**
+     * @var IuQuizRepository
+     */
+    private $iuQuizRepository;
+
     public function __construct(AfCourseRepository $afCourseRepository, IuQuizRepository $iuQuizRepository)
     {
         $this->afCourseRepository = $afCourseRepository;
@@ -33,11 +32,6 @@ class AfCanUpdateModuleHasExam
 
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure $next
-     *
-     * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
@@ -49,8 +43,9 @@ class AfCanUpdateModuleHasExam
         $course = $this->afCourseRepository->getCourse($courseId);
 
         // cannot change module_has_exam if course->status not DRAFT or COMING_SOON
-        if ((!!$request->module_has_exam !== $moduleHasExam) && (!$this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON])))
+        if (((bool) $request->module_has_exam !== $moduleHasExam) && (! $this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON]))) {
             return response()->json(['errors' => 'module_has_exam field cannot be changed as course status is not DRAFT or COMING_SOON'], 403);
+        }
 
         return $next($request);
     }

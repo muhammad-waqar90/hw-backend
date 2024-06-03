@@ -21,7 +21,7 @@ class AfCourseModuleRepository
         $name,
         $description,
         $thumbnail,
-        $videoPreview = null,
+        $videoPreview,
         $ebookPrice,
     ) {
 
@@ -53,7 +53,7 @@ class AfCourseModuleRepository
         $name,
         $description,
         $thumbnail,
-        $videoPreview = null,
+        $videoPreview,
         $ebookPrice
     ) {
         return $this->courseModule

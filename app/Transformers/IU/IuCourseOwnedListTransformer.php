@@ -13,17 +13,14 @@ class IuCourseOwnedListTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'category'
+        'category',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Course $course
      * @return array
      */
     public function transform(Course $course)
@@ -40,7 +37,7 @@ class IuCourseOwnedListTransformer extends TransformerAbstract
             'status' => $course->status,
             'created_at' => $course->created_at,
             'updated_at' => $course->updated_at,
-            'progress' => $course->progress
+            'progress' => $course->progress,
         ];
     }
 

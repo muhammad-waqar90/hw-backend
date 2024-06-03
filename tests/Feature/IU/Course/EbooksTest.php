@@ -2,21 +2,21 @@
 
 namespace Tests\Feature\IU\Course;
 
-use App\Models\User;
 use App\Models\Ebook;
 use App\Models\EbookAccess;
-
-use App\Traits\Tests\CourseTestTrait;;
-
+use App\Models\User;
+use App\Traits\Tests\CourseTestTrait;
 use Tests\TestCase;
 
 class EbooksTest extends TestCase
 {
     use CourseTestTrait;
 
-    private $user, $data;
+    private $user;
 
-    public function setUp(): void
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -29,23 +29,22 @@ class EbooksTest extends TestCase
 
     public function testCourseLevelEbooksValid()
     {
-        $response = $this->json('GET',  '/api/iu/courses/'.$this->data->course->id.'/level/1/ebooks');
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/level/1/ebooks');
 
         $response->assertOk();
     }
 
     public function testEbookValid()
     {
-        $response = $this->json('GET', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/ebooks');
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/ebooks');
 
         $response->assertOk();
     }
 
     public function testEbookDismiss()
     {
-        $response = $this->json('POST', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/ebooks/dismiss');
+        $response = $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/ebooks/dismiss');
 
         $response->assertStatus(200);
     }
-
 }

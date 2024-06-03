@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\AWS;
 
 /*
@@ -23,7 +24,6 @@ namespace App\Services\AWS;
 use Aws\CloudFront\CloudFrontClient;
 use Aws\Laravel\AwsFacade;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 /**
  * This service is used to intrect with amazon cloudfront
@@ -31,21 +31,20 @@ use Illuminate\Support\Facades\Storage;
  * @method __construct()
  * @method getSignedCookie()
  */
-class AmazonCloudFrontService {
-
+class AmazonCloudFrontService
+{
     /**
-     * @var array $cloudFrontClientConfig
-     * @var CloudFrontClient $client
+     * @var CloudFrontClient
      */
     private array $cloudFrontClientConfig;
+
     private CloudFrontClient $client;
 
     /**
-     * @param array|null $cloudFrontClientConfig [region, version]
-     *
+     * @param  array|null  $cloudFrontClientConfig  [region, version]
      * @return CloudFrontClient
      */
-    public function __construct(array $cloudFrontClientConfig = null)
+    public function __construct(?array $cloudFrontClientConfig = null)
     {
         $this->cloudFrontClientConfig = $cloudFrontClientConfig ?? config('aws.cloudfront.client');
         $this->client = AwsFacade::createClient('cloudfront', $this->cloudFrontClientConfig);
@@ -59,24 +58,25 @@ class AmazonCloudFrontService {
      * @param int    expires: UTC Unix timestamp used when signing with a canned policy. Not required when passing a custom 'policy' option.
      * @param string key_pair_id: The ID of the key pair used to sign CloudFront URLs for private distributions.
      * @param string private_key: The filepath ot the private key used to sign CloudFront URLs for private distributions.
-     *
      * @return array Key => value pairs of signed cookies to set
+     *
      * @throws \InvalidArgumentException if url, key_pair_id, or private_key
-     *     were not specified.
+     *                                   were not specified.
+     *
      * @link http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/WorkingWithStreamingDistributions.html
      */
-    public function getSignedCookie(string $url, int $expires = 0, string $policy = null)
+    public function getSignedCookie(string $url, int $expires = 0, ?string $policy = null)
     {
         $expires = $expires ? $expires : time() + config('aws.cloudfront.signed_cookie_expiry'); // current epoch time - time()
         $policy = $policy ? $policy : $this->getCloudFrontSignedCookiePolicy($url, $expires);
 
         try {
             return $this->client->getSignedCookie([
-                'url'           => $url,
-                'policy'        => $policy,
-                'expires'       => $expires, // epoch seconds
-                'key_pair_id'   => config('aws.cloudfront.key_pair_id'),
-                'private_key'   => config('aws.cloudfront.private_key_path'),
+                'url' => $url,
+                'policy' => $policy,
+                'expires' => $expires, // epoch seconds
+                'key_pair_id' => config('aws.cloudfront.key_pair_id'),
+                'private_key' => config('aws.cloudfront.private_key_path'),
             ]);
         } catch (\Exception $e) {
             Log::error('Exception: AmazonCloudFrontService@getSignedCookie', [$e->getMessage()]);

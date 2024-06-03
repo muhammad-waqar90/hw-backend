@@ -8,7 +8,6 @@ use App\Transformers\GU\Cart\GuCartCourseEbooksTransformer;
 
 class GuEbookController extends Controller
 {
-
     private GuEbookRepository $guEbookRepository;
 
     public function __construct(GuEbookRepository $guEbookRepository)
@@ -21,7 +20,7 @@ class GuEbookController extends Controller
         $data = $this->guEbookRepository->getEbookListPerLevel($courseId);
 
         $fractal = fractal($data, new GuCartCourseEbooksTransformer());
+
         return response()->json($fractal, 200);
     }
-
 }

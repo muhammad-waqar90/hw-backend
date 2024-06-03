@@ -11,7 +11,7 @@ class Lesson extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     protected static function boot()
@@ -19,27 +19,27 @@ class Lesson extends Model
         parent::boot();
 
         static::addGlobalScope('order', function ($query) {
-            $query->orderBy('order_id', 'asc');
+            $query->oldest('order_id');
         });
     }
 
     public function courseModule()
     {
-        return $this->belongsTo('App\Models\CourseModule');
+        return $this->belongsTo(CourseModule::class);
     }
 
     public function lessonFaqs()
     {
-        return $this->hasMany('App\Models\LessonFaq');
+        return $this->hasMany(LessonFaq::class);
     }
 
     public function publishLesson()
     {
-        return $this->hasOne('App\Models\PublishLesson');
+        return $this->hasOne(PublishLesson::class);
     }
 
     public function quiz()
     {
-        return $this->hasOne('App\Models\Quiz', 'entity_id', 'id')->where('entity_type', QuizData::ENTITY_LESSON);
+        return $this->hasOne(Quiz::class, 'entity_id', 'id')->where('entity_type', QuizData::ENTITY_LESSON);
     }
 }

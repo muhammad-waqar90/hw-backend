@@ -7,13 +7,14 @@ use Illuminate\Support\Facades\Lang;
 
 class IuAccountDeletedEmail extends AbstractMail
 {
-
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 
     /**
      * Build the message.

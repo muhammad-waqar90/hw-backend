@@ -12,16 +12,11 @@ class IuAccountRestored
 
     /**
      * IU Account Restored
-     *
-     * @var $userId
      */
     public $userId;
 
     /**
      * Create a new event instance.
-     *
-     * @param $userId
-     * @return void
      */
     public function __construct($userId)
     {

@@ -2,13 +2,10 @@
 
 namespace Tests\Feature\AF\Notification;
 
-use App\Models\User;
 use App\Models\GlobalNotification;
-
-use Illuminate\Support\Facades\Lang;
-
+use App\Models\User;
 use App\Traits\Tests\PermGroupUserTestTrait;
-
+use Illuminate\Support\Facades\Lang;
 use Tests\TestCase;
 
 class GlobalNotificationsTest extends TestCase
@@ -17,7 +14,7 @@ class GlobalNotificationsTest extends TestCase
 
     private $admin;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -28,7 +25,7 @@ class GlobalNotificationsTest extends TestCase
 
     public function testGlobalNotificationDefaultGetRoute()
     {
-        $response = $this->json('GET',  '/api/af/global-notifications');
+        $response = $this->json('GET', '/api/af/global-notifications');
 
         $response->assertStatus(200);
     }
@@ -37,29 +34,29 @@ class GlobalNotificationsTest extends TestCase
     {
         GlobalNotification::factory(5)->create();
 
-        $response = $this->json('GET',  '/api/af/global-notifications');
+        $response = $this->json('GET', '/api/af/global-notifications');
 
         $response->assertStatus(200);
-        $this->assertEquals(5,count(json_decode($response->content())->data));
+        $this->assertEquals(5, count(json_decode($response->content())->data));
     }
 
     public function testGlobalNotificationGetByIdRoute()
     {
         $globalNotification = GlobalNotification::factory()->create();
 
-        $response = $this->json('GET',  '/api/af/global-notifications/'.$globalNotification->id);
+        $response = $this->json('GET', '/api/af/global-notifications/'.$globalNotification->id);
 
         $response->assertStatus(200);
     }
 
     public function testGlobalNotificationPostRoute()
     {
-        $response = $this->json('POST',  '/api/af/global-notifications/', [
-            "title" => "title",
-            "short_description" => "description",
-            "description" => "<p>body is here </p>",
-            "archive_at" => date('Y-m-d', strtotime('+1 years')),
-            'show_modal' => 0
+        $response = $this->json('POST', '/api/af/global-notifications/', [
+            'title' => 'title',
+            'short_description' => 'description',
+            'description' => '<p>body is here </p>',
+            'archive_at' => date('Y-m-d', strtotime('+1 years')),
+            'show_modal' => 0,
         ]);
 
         $response->assertStatus(200);
@@ -70,12 +67,12 @@ class GlobalNotificationsTest extends TestCase
     {
         $globalNotification = GlobalNotification::factory()->create();
 
-        $response = $this->json('PUT',  '/api/af/global-notifications/'.$globalNotification->id , [
-            "title" => "title",
-            "short_description" => "description",
-            "description" => "<p> body is here </p>",
-            "archive_at" => date('Y-m-d', strtotime('+1 years')),
-            'show_modal' => 0
+        $response = $this->json('PUT', '/api/af/global-notifications/'.$globalNotification->id, [
+            'title' => 'title',
+            'short_description' => 'description',
+            'description' => '<p> body is here </p>',
+            'archive_at' => date('Y-m-d', strtotime('+1 years')),
+            'show_modal' => 0,
         ]);
 
         $response->assertStatus(200);
@@ -86,10 +83,9 @@ class GlobalNotificationsTest extends TestCase
     {
         $globalNotification = GlobalNotification::factory()->create();
 
-        $response = $this->json('DELETE',  '/api/af/global-notifications/'.$globalNotification->id);
+        $response = $this->json('DELETE', '/api/af/global-notifications/'.$globalNotification->id);
 
         $response->assertStatus(200);
         $this->assertEquals(Lang::get('global_notifications.success.deleted'), json_decode($response->content())->message);
     }
-
 }

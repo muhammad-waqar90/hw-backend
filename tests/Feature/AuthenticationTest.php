@@ -7,7 +7,7 @@ use App\DataObject\Tests\UserData;
 use App\Models\PasswordHistory;
 use App\Models\User;
 use App\Models\UserProfile;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
@@ -27,7 +27,7 @@ class AuthenticationTest extends TestCase
         'updated_at',
     ];
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,16 +36,16 @@ class AuthenticationTest extends TestCase
 
     public function testRegisterValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
@@ -53,16 +53,16 @@ class AuthenticationTest extends TestCase
 
     public function testFullRegisterValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
@@ -70,13 +70,13 @@ class AuthenticationTest extends TestCase
         $user = DB::table('users')->where('first_name', UserData::FIRST_NAME)->first();
         $verifyUser = DB::table('verify_users')->where('user_id', $user->id)->first();
 
-        $response = $this->json('POST',  '/api/auth/verify', [
+        $response = $this->json('POST', '/api/auth/verify', [
             'token' => $verifyUser->token,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $user->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -86,30 +86,30 @@ class AuthenticationTest extends TestCase
 
     public function testRegisterValidTwoUsersSameNameDifferentUsername()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => SecondUserData::FIRST_NAME,
             'last_name' => SecondUserData::LAST_NAME,
             'email' => SecondUserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
@@ -122,47 +122,46 @@ class AuthenticationTest extends TestCase
 
     public function testRegisterInvalidWrongCredentials()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => 'a',
             'password_confirmation' => 'a',
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(422);
     }
 
-
     public function testRegisterInvalidTwoUsersSameEmail()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => SecondUserData::FIRST_NAME,
             'last_name' => SecondUserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => SecondUserData::PASSWORD,
             'password_confirmation' => SecondUserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(422);
@@ -172,7 +171,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -184,7 +183,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => SecondUserData::PASSWORD,
         ]);
@@ -194,7 +193,7 @@ class AuthenticationTest extends TestCase
 
     public function testWebLoginInvalidNotRegistered()
     {
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
         ]);
@@ -206,7 +205,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $user->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -218,7 +217,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/mobile/login', [
+        $response = $this->json('POST', '/api/auth/mobile/login', [
             'username' => $verifiedUser->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -230,7 +229,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/mobile/login', [
+        $response = $this->json('POST', '/api/auth/mobile/login', [
             'username' => $verifiedUser->name,
             'password' => SecondUserData::PASSWORD,
         ]);
@@ -240,7 +239,7 @@ class AuthenticationTest extends TestCase
 
     public function testMobileLoginInvalidNotRegistered()
     {
-        $response = $this->json('POST',  '/api/auth/mobile/login', [
+        $response = $this->json('POST', '/api/auth/mobile/login', [
             'username' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
         ]);
@@ -252,7 +251,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->json('POST',  '/api/auth/mobile/login', [
+        $response = $this->json('POST', '/api/auth/mobile/login', [
             'username' => $user->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -265,7 +264,7 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
 
         UserProfile::factory()->withUser($verifiedUser->id)->create();
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
@@ -274,7 +273,7 @@ class AuthenticationTest extends TestCase
 
     public function testRequestPasswordResetInvalidUsername()
     {
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => 'nepostojim@',
         ]);
 
@@ -284,7 +283,7 @@ class AuthenticationTest extends TestCase
 
     public function testResendParentVerificationValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
@@ -292,16 +291,16 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => date('Y-m-d', strtotime('-1 years')),
             'parentEmailAddress' => 'parent@test.com',
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
 
         $user = DB::table('users')->where('first_name', UserData::FIRST_NAME)->first();
 
-        $response = $this->json('POST',  '/api/auth/verify/parent/resend', [
+        $response = $this->json('POST', '/api/auth/verify/parent/resend', [
             'parentEmailAddress' => 'testemail@test.com',
             'username' => $user->name,
         ]);
@@ -312,23 +311,23 @@ class AuthenticationTest extends TestCase
 
     public function testResendVerificationValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
 
         $user = DB::table('users')->where('first_name', UserData::FIRST_NAME)->first();
 
-        $response = $this->json('POST',  '/api/auth/verify/resend', [
+        $response = $this->json('POST', '/api/auth/verify/resend', [
             'username' => $user->name,
         ]);
 
@@ -338,7 +337,7 @@ class AuthenticationTest extends TestCase
 
     public function testAgeVerificationValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
@@ -346,9 +345,9 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => date('Y-m-d', strtotime('-1 years')),
             'parentEmailAddress' => 'parent@test.com',
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
@@ -356,7 +355,7 @@ class AuthenticationTest extends TestCase
         $user = DB::table('users')->where('first_name', UserData::FIRST_NAME)->first();
         $verifyUserAges = DB::table('verify_user_ages')->where('user_id', $user->id)->first();
 
-        $response = $this->json('POST',  '/api/auth/verify-age', [
+        $response = $this->json('POST', '/api/auth/verify-age', [
             'token' => $verifyUserAges->token,
         ]);
 
@@ -365,7 +364,7 @@ class AuthenticationTest extends TestCase
 
     public function testAgeVerificationInvalidToken()
     {
-        $response = $this->json('POST',  '/api/auth/verify-age', [
+        $response = $this->json('POST', '/api/auth/verify-age', [
             'token' => '11111111111111111111',
         ]);
 
@@ -374,16 +373,16 @@ class AuthenticationTest extends TestCase
 
     public function testVerificationValid()
     {
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => UserData::DATE_OF_BIRTH,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $response->assertStatus(200);
@@ -391,7 +390,7 @@ class AuthenticationTest extends TestCase
         $user = DB::table('users')->where('first_name', UserData::FIRST_NAME)->first();
         $verifyUser = DB::table('verify_users')->where('user_id', $user->id)->first();
 
-        $response = $this->json('POST',  '/api/auth/verify', [
+        $response = $this->json('POST', '/api/auth/verify', [
             'token' => $verifyUser->token,
         ]);
 
@@ -400,7 +399,7 @@ class AuthenticationTest extends TestCase
 
     public function testVerificationInvalidToken()
     {
-        $response = $this->json('POST',  '/api/auth/verify', [
+        $response = $this->json('POST', '/api/auth/verify', [
             'token' => '11111111111111111111',
         ]);
 
@@ -412,7 +411,7 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
         UserProfile::factory()->withUser($verifiedUser->id)->create();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
@@ -420,13 +419,13 @@ class AuthenticationTest extends TestCase
 
         $passwordReset = DB::table('password_resets')->where('name', $verifiedUser->name)->first();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/check', [
+        $response = $this->json('POST', '/api/auth/password-reset/check', [
             'token' => $passwordReset->token,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('PUT',  '/api/auth/password-reset', [
+        $response = $this->json('PUT', '/api/auth/password-reset', [
             'token' => $passwordReset->token,
             'password' => SecondUserData::PASSWORD,
             'password_confirmation' => SecondUserData::PASSWORD,
@@ -434,7 +433,7 @@ class AuthenticationTest extends TestCase
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => SecondUserData::PASSWORD,
         ]);
@@ -447,7 +446,7 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
         UserProfile::factory()->withUser($verifiedUser->id)->create();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
@@ -455,19 +454,19 @@ class AuthenticationTest extends TestCase
 
         $passwordReset = DB::table('password_resets')->where('name', $verifiedUser->name)->first();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/check', [
+        $response = $this->json('POST', '/api/auth/password-reset/check', [
             'token' => $passwordReset->token,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('POST',  '/api/auth/password-reset/check', [
+        $response = $this->json('POST', '/api/auth/password-reset/check', [
             'token' => $passwordReset->token,
         ]);
 
@@ -475,7 +474,7 @@ class AuthenticationTest extends TestCase
 
         $passwordReset = DB::table('password_resets')->where('name', $verifiedUser->name)->first();
 
-        $response = $this->json('PUT',  '/api/auth/password-reset', [
+        $response = $this->json('PUT', '/api/auth/password-reset', [
             'token' => $passwordReset->token,
             'password' => SecondUserData::PASSWORD,
             'password_confirmation' => SecondUserData::PASSWORD,
@@ -489,7 +488,7 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
         UserProfile::factory()->withUser($verifiedUser->id)->create();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
@@ -497,13 +496,13 @@ class AuthenticationTest extends TestCase
 
         $passwordReset = DB::table('password_resets')->where('name', $verifiedUser->name)->first();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/check', [
+        $response = $this->json('POST', '/api/auth/password-reset/check', [
             'token' => $passwordReset->token,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('PUT',  '/api/auth/password-reset', [
+        $response = $this->json('PUT', '/api/auth/password-reset', [
             'token' => $passwordReset->token,
             'password' => 'p',
             'password_confirmation' => 'p',
@@ -517,7 +516,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->create();
         UserProfile::factory()->withUser($user->id)->create();
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $user->name,
         ]);
 
@@ -528,7 +527,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('PUT',  '/api/auth/password-reset', [
+        $response = $this->json('PUT', '/api/auth/password-reset', [
             'token' => '11111111111111111111',
             'password' => SecondUserData::PASSWORD,
             'password_confirmation' => SecondUserData::PASSWORD,
@@ -536,14 +535,14 @@ class AuthenticationTest extends TestCase
 
         $response->assertStatus(400);
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => SecondUserData::PASSWORD,
         ]);
 
         $response->assertStatus(401);
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -556,11 +555,11 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
         UserProfile::factory()->withUser($verifiedUser->id)->create();
         PasswordHistory::query()->create([
-            'user_id'   => $verifiedUser->id,
-            'password'  => bcrypt(UserData::PASSWORD)
-        ]);;
+            'user_id' => $verifiedUser->id,
+            'password' => bcrypt(UserData::PASSWORD),
+        ]);
 
-        $response = $this->json('POST',  '/api/auth/password-reset/request', [
+        $response = $this->json('POST', '/api/auth/password-reset/request', [
             'username' => $verifiedUser->name,
         ]);
 
@@ -568,7 +567,7 @@ class AuthenticationTest extends TestCase
 
         $passwordReset = DB::table('password_resets')->where('name', $verifiedUser->name)->first();
 
-        $response = $this->json('PUT',  '/api/auth/password-reset', [
+        $response = $this->json('PUT', '/api/auth/password-reset', [
             'token' => $passwordReset->token,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
@@ -576,7 +575,7 @@ class AuthenticationTest extends TestCase
 
         $response->assertStatus(422);
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => UserData::PASSWORD,
         ]);
@@ -588,13 +587,13 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->actingAs($verifiedUser)->json('GET',  '/api/auth/me');
+        $response = $this->actingAs($verifiedUser)->json('GET', '/api/auth/me');
         $response->assertStatus(200);
     }
 
     public function testMeInvalid()
     {
-        $response = $this->json('GET',  '/api/auth/me');
+        $response = $this->json('GET', '/api/auth/me');
         $response->assertUnauthorized();
     }
 
@@ -602,24 +601,24 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/login', [
+        $response = $this->json('POST', '/api/auth/login', [
             'username' => $verifiedUser->name,
             'password' => UserData::PASSWORD,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('GET',  '/api/auth/me');
+        $response = $this->json('GET', '/api/auth/me');
         $response->assertOk();
         $response->assertJsonStructure($this->userStructure);
 
-        $response = $this->json('POST',  '/api/auth/logout', [
+        $response = $this->json('POST', '/api/auth/logout', [
             'username' => $verifiedUser->name,
         ]);
 
         $response->assertStatus(200);
 
-        $response = $this->json('GET',  '/api/auth/me');
+        $response = $this->json('GET', '/api/auth/me');
         $response->assertUnauthorized();
     }
 
@@ -627,7 +626,7 @@ class AuthenticationTest extends TestCase
     {
         $verifiedUser = User::factory()->verified()->create();
 
-        $response = $this->json('POST',  '/api/auth/logout', [
+        $response = $this->json('POST', '/api/auth/logout', [
             'email' => $verifiedUser->email,
         ]);
 
@@ -639,15 +638,15 @@ class AuthenticationTest extends TestCase
         $verifiedUser = User::factory()->verified()->create();
         $token = auth()->fromUser($verifiedUser);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('GET',  '/api/auth/me');
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)->json('GET', '/api/auth/me');
         $response->assertStatus(200);
 
-        $response = $this->withHeader('Authorization', 'Bearer ' . $token)->json('POST',  '/api/auth/refresh');
+        $response = $this->withHeader('Authorization', 'Bearer '.$token)->json('POST', '/api/auth/refresh');
         $response->assertStatus(200);
         $newToken = $response->getData()->access_token;
 
         //check that you are authenticated with the new token
-        $response = $this->withHeader('Authorization', 'Bearer ' . $newToken)->json('GET',  '/api/auth/me');
+        $response = $this->withHeader('Authorization', 'Bearer '.$newToken)->json('GET', '/api/auth/me');
         $response->assertStatus(200);
     }
 
@@ -657,7 +656,7 @@ class AuthenticationTest extends TestCase
     {
         $tenYearOld = Carbon::now()->subYears(10)->format('y-m-d');
 
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
@@ -665,9 +664,9 @@ class AuthenticationTest extends TestCase
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => $tenYearOld,
             'parentEmailAddress' => 'parent@test.com',
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $this->assertEquals(Lang::get('auth.successfullyCreatedAccount'), json_decode($response->content())->message);
@@ -678,16 +677,16 @@ class AuthenticationTest extends TestCase
         //register passes if age is formatted correctly
         $tenYearOld = Carbon::now()->subYears(10);
 
-        $response = $this->json('POST',  '/api/auth/register', [
+        $response = $this->json('POST', '/api/auth/register', [
             'first_name' => UserData::FIRST_NAME,
             'last_name' => UserData::LAST_NAME,
             'email' => UserData::EMAIL,
             'password' => UserData::PASSWORD,
             'password_confirmation' => UserData::PASSWORD,
             'dateOfBirth' => $tenYearOld,
-            'captchaToken' => "20000000-aaaa-bbbb-cccc-000000000002",
+            'captchaToken' => '20000000-aaaa-bbbb-cccc-000000000002',
             'communicationAccepted' => true,
-            'termsAndConditionsAccepted' => true
+            'termsAndConditionsAccepted' => true,
         ]);
 
         $this->assertEquals("Legal guardian's email address field is required.", json_decode($response->content())->errors->parentEmailAddress[0]);
@@ -698,7 +697,7 @@ class AuthenticationTest extends TestCase
         $user = User::factory()->verified()->create();
         UserProfile::factory()->withUser($user->id)->withEmail(UserData::EMAIL)->create();
 
-        $response = $this->json('POST',  '/api/auth/username/forgot/request', [
+        $response = $this->json('POST', '/api/auth/username/forgot/request', [
             'email' => UserData::EMAIL,
         ]);
 
@@ -708,10 +707,10 @@ class AuthenticationTest extends TestCase
     public function testRestoreUserValid()
     {
         $user = User::factory()->verified()->create();
-        DB::table('restore_users')->insert(['user_id' => $user->id, 'token' => Str::random(40), "created_at" => Date::now(), "updated_at" => Date::now()]);
+        DB::table('restore_users')->insert(['user_id' => $user->id, 'token' => Str::random(40), 'created_at' => Date::now(), 'updated_at' => Date::now()]);
         $restoreUser = DB::table('restore_users')->where('user_id', $user->id)->first();
 
-        $response = $this->json('POST',  '/api/auth/restore', [
+        $response = $this->json('POST', '/api/auth/restore', [
             'token' => $restoreUser->token,
         ]);
 

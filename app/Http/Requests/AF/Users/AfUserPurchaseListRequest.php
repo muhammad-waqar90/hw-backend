@@ -26,17 +26,37 @@ class AfUserPurchaseListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText' => 'string|nullable|max:100',
-            'searchId' => 'integer|nullable|min:1',
+            'searchText' => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
+            'searchId' => [
+                'integer',
+                'nullable',
+                'min:1',
+            ],
             'type' => [
                 'string',
                 'nullable',
-                Rule::in(array_values(PurchaseItemTypeData::getConstants()))
+                Rule::in(array_values(PurchaseItemTypeData::getConstants())),
             ],
-            'priceFrom' => 'numeric|min:0|max:999999',
-            'priceTo' => 'numeric|min:0|max:999999',
-            'dateFrom' => 'date',
-            'dateTo' => 'date'
+            'priceFrom' => [
+                'numeric',
+                'min:0',
+                'max:999999',
+            ],
+            'priceTo' => [
+                'numeric',
+                'min:0',
+                'max:999999',
+            ],
+            'dateFrom' => [
+                'date',
+            ],
+            'dateTo' => [
+                'date',
+            ],
         ];
     }
 }

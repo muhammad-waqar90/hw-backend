@@ -24,7 +24,11 @@ class UpdateLessonNoteRequest extends FormRequest
     public function rules()
     {
         return [
-            'text' => 'string|nullable|max:65535',
+            'text' => [
+                'string',
+                'nullable',
+                'max:65535',
+            ],
         ];
     }
 }

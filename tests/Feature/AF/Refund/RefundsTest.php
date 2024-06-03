@@ -3,10 +3,8 @@
 namespace Tests\Feature\AF\Refund;
 
 use App\Models\User;
-
 use App\Traits\Tests\PermGroupUserTestTrait;
 use App\Traits\Tests\RefundTestTrait;
-
 use Tests\TestCase;
 
 class RefundsTest extends TestCase
@@ -14,9 +12,13 @@ class RefundsTest extends TestCase
     use PermGroupUserTestTrait;
     use RefundTestTrait;
 
-    private $user, $admin, $data;
+    private $user;
 
-    public function setUp(): void
+    private $admin;
+
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -27,8 +29,9 @@ class RefundsTest extends TestCase
         $this->data = $this->RefundSeeder($this->user);
     }
 
-    public function testRefundsGetRoute(){
-        $response = $this->json('GET',  '/api/af/refunds');
+    public function testRefundsGetRoute()
+    {
+        $response = $this->json('GET', '/api/af/refunds');
 
         $response->assertStatus(200);
     }

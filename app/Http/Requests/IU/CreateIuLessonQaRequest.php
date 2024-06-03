@@ -24,7 +24,12 @@ class CreateIuLessonQaRequest extends FormRequest
     public function rules()
     {
         return [
-            'question'   => 'required|string|min:5|max:4000',
+            'question'   => [
+                'required',
+                'string',
+                'min:5',
+                'max:4000',
+            ],
         ];
     }
 }

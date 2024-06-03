@@ -7,8 +7,8 @@ use App\Models\FaqCategory;
 
 class IuFaqRepository
 {
-
     private Faq $faq;
+
     private FaqCategory $faqCategory;
 
     public function __construct(Faq $faq, FaqCategory $faqCategory)
@@ -63,5 +63,4 @@ class IuFaqRepository
             ->where('published', 1)
             ->first();
     }
-
 }

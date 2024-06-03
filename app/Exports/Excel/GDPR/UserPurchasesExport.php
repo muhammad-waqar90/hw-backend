@@ -21,7 +21,7 @@ class UserPurchasesExport implements FromQuery, WithHeadings, WithMapping, WithS
     public function query()
     {
         return PurchaseItem::select('purchase_items.*', 'ph.user_id')
-            ->leftJoin('purchase_histories as ph', function($query) {
+            ->leftJoin('purchase_histories as ph', function ($query) {
                 return $query->on('purchase_items.purchase_history_id', '=', 'ph.id');
             })
             ->where('ph.user_id', $this->userId);
@@ -36,7 +36,7 @@ class UserPurchasesExport implements FromQuery, WithHeadings, WithMapping, WithS
             'entity_name',
             'status',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -49,7 +49,7 @@ class UserPurchasesExport implements FromQuery, WithHeadings, WithMapping, WithS
             $row->entity_name,
             $row->status,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

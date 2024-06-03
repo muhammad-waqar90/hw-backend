@@ -11,13 +11,6 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 class UserSalaryScaleFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = UserSalaryScale::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -27,18 +20,19 @@ class UserSalaryScaleFactory extends Factory
         $user = User::factory()->verified()->create();
         $discountedCountry = DiscountedCountry::query()->first();
         $discountedCountryRange = DiscountedCountryRange::query()->first();
+
         return [
-            'user_id'                       =>  $user->id,
-            'discounted_country_id'         =>  $discountedCountry->id,
-            'discounted_country_range_id'   =>  $discountedCountryRange->id,
-            'declaration'                   =>  1
+            'user_id' => $user->id,
+            'discounted_country_id' => $discountedCountry->id,
+            'discounted_country_range_id' => $discountedCountryRange->id,
+            'declaration' => 1,
         ];
     }
 
     public function withUserId($userId)
     {
         return $this->state(fn () => [
-            'user_id'   =>  $userId,
+            'user_id' => $userId,
         ]);
     }
 }

@@ -10,13 +10,16 @@ use App\Models\UserFeedback;
 use App\Models\UserProfile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class IuUserRepository
 {
     private User $user;
+
     private UserProfile $userProfile;
+
     private UserFeedback $userFeedback;
+
     private RestoreUser $restoreUser;
 
     public function __construct(User $user, UserProfile $userProfile, UserFeedback $userFeedback, RestoreUser $restoreUser)
@@ -27,13 +30,6 @@ class IuUserRepository
         $this->restoreUser = $restoreUser;
     }
 
-    /**
-     * @param $name
-     * @param $email
-     * @param $password
-     * @param bool $isMinor
-     * @return User
-     */
     public function create(
         $name,
         $firstName,
@@ -43,21 +39,21 @@ class IuUserRepository
         bool $isMinor = false
     ) {
         return $this->user->create([
-            'name'            => $name,
-            'first_name'      => $firstName,
-            'last_name'       => $lastName,
-            'password'        => bcrypt($password),
-            'is_subscribed'   => $communicationAccepted,
-            'age_verified_at' => $isMinor ? null : Carbon::now()
+            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'password' => bcrypt($password),
+            'is_subscribed' => $communicationAccepted,
+            'age_verified_at' => $isMinor ? null : Carbon::now(),
         ]);
     }
 
     public function createUserProfile($userId, $email, $dateOfBirth = null)
     {
         return $this->userProfile->create([
-            'user_id'       => $userId,
-            'email'         => $email,
-            'date_of_birth' => $dateOfBirth
+            'user_id' => $userId,
+            'email' => $email,
+            'date_of_birth' => $dateOfBirth,
         ]);
     }
 
@@ -70,9 +66,7 @@ class IuUserRepository
 
     /**
      * get detail of a particular user.
-     * @param $role
-     * @param $id
-     * @param bool $userProfile
+     *
      * @return mixed
      */
     public function getUser($id, bool $userProfile = false, $role = RoleData::INDEPENDENT_USER, $trashed = false)
@@ -105,6 +99,7 @@ class IuUserRepository
         $userOwnsCourse = DB::table('course_user')->where('user_id', $userId)
             ->where('course_id', $courseId)
             ->count();
+
         return $userOwnsCourse ? true : false;
     }
 
@@ -121,7 +116,7 @@ class IuUserRepository
         return $this->user
             ->where('id', $userId)
             ->update([
-                'last_active' => Carbon::now()->toDateTimeString()
+                'last_active' => Carbon::now()->toDateTimeString(),
             ]);
     }
 
@@ -159,17 +154,19 @@ class IuUserRepository
     {
         return $this->restoreUser->create([
             'user_id' => $userId,
-            'token' => Str::random(40)
+            'token' => Str::random(40),
         ]);
     }
 
     public function deleteRestoreUser($token)
     {
         $restoreUser = $this->restoreUser->where('token', $token)->first();
-        if (!$restoreUser)
+        if (! $restoreUser) {
             throw new \Exception();
+        }
 
         $restoreUser->delete();
+
         return $restoreUser;
     }
 
@@ -180,7 +177,8 @@ class IuUserRepository
 
     public function spoofEmail($userId, $email)
     {
-        $spoofEmail = $userId . '_' . $email;
+        $spoofEmail = $userId.'_'.$email;
+
         return $this->userProfile
             ->where('user_id', $userId)
             ->update([
@@ -191,23 +189,23 @@ class IuUserRepository
     public function enableUser($user)
     {
         return $user->update([
-            'is_enabled' => 1
+            'is_enabled' => 1,
         ]);
     }
 
     public function disableUser($user)
     {
         return $user->update([
-            'is_enabled' => 0
+            'is_enabled' => 0,
         ]);
     }
 
     public function createUserFeedback($userId, $feedback, $type)
     {
         return $this->userFeedback->create([
-            'user_id'  => $userId,
+            'user_id' => $userId,
             'feedback' => $feedback,
-            'type'     => $type
+            'type' => $type,
         ]);
     }
 
@@ -217,6 +215,5 @@ class IuUserRepository
         $user = $this->findById($userId);
         $this->deleteUser($user);
         $this->deleteRestoreUser($token);
-        return;
     }
 }

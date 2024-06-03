@@ -1,18 +1,16 @@
 <?php
 
-
 namespace App\Repositories\HA;
-
 
 use App\Models\PermGroup;
 use App\Models\Permission;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class PermissionRepository
 {
-
     private PermGroup $permGroup;
+
     private Permission $permission;
 
     public function __construct(PermGroup $permGroup, Permission $permission)
@@ -27,15 +25,15 @@ class PermissionRepository
             ->when($searchText, function ($query, $searchText) {
                 return $query->where('display_name', 'LIKE', "%$searchText%");
             })
-            ->orderBy('name', 'ASC')
+            ->oldest('name')
             ->get();
     }
 
     public function createPermGroup($name, $description)
     {
         return $this->permGroup->create([
-            'name'          => $name,
-            'description'   => $description
+            'name' => $name,
+            'description' => $description,
         ]);
     }
 
@@ -56,7 +54,7 @@ class PermissionRepository
             ->when($searchText, function ($query, $searchText) {
                 return $query->where('name', 'LIKE', "%$searchText%");
             })
-            ->orderBy('id', 'DESC')
+            ->latest('id')
             ->withCount('users')
             ->withCount('permissions')
             ->paginate(20);
@@ -67,35 +65,35 @@ class PermissionRepository
         return $this->permGroup->where('id', $id)
             ->with('users', function ($query) {
                 $query
-                    ->select('users.id','users.name')
+                    ->select('users.id', 'users.name')
                     ->with('adminProfile');
             })
             ->with('permissions')
             ->first();
     }
 
-    public function updatePermGroupUsers($permGroupId, Array $users)
+    public function updatePermGroupUsers($permGroupId, array $users)
     {
         $this->clearPermGroupUsers($permGroupId);
-        foreach($users as $userId) {
+        foreach ($users as $userId) {
             DB::table('perm_group_user')->insert([
                 'perm_group_id' => $permGroupId,
-                'user_id'       => $userId,
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now()
+                'user_id' => $userId,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
         }
     }
 
-    public function updatePermGroupPermissions($permGroupId, Array $permissions)
+    public function updatePermGroupPermissions($permGroupId, array $permissions)
     {
         $this->clearPermGroupPermissions($permGroupId);
-        foreach($permissions as $permissionId) {
+        foreach ($permissions as $permissionId) {
             DB::table('perm_group_permission')->insert([
                 'perm_group_id' => $permGroupId,
                 'permission_id' => $permissionId,
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now()
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
         }
     }
@@ -134,8 +132,7 @@ class PermissionRepository
         return $this->permission
             ->select('permissions.id as id')
             ->join('perm_group_permission as pgp', 'pgp.permission_id', '=', 'permissions.id')
-            ->join('perm_group_user as pgu', function($query) use ($userId)
-            {
+            ->join('perm_group_user as pgu', function ($query) use ($userId) {
                 $query->on('pgu.perm_group_id', '=', 'pgp.perm_group_id')
                     ->where('pgu.user_id', $userId);
             });

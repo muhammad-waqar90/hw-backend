@@ -12,21 +12,15 @@ class IuTicketNotClaimed
 
     /**
      * IU Ticket Not Claimed for more than 48 hours
-     *
-     * @var $ticketId
-     * @var $userId
-     * @var $subject
      */
     public $ticketId;
+
     public $userId;
+
     public $subject;
 
     /**
      * Create a new event instance.
-     *
-     * @param $ticketId
-     * @param $userId
-     * @param $subject
      */
     public function __construct($ticketId, $userId, $subject)
     {

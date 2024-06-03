@@ -5,23 +5,23 @@
 @endsection
 
 @section('content')
-<table style="font-size:15px;">
+<table style="line-height: 21px;font-size:14px;font-weight: 400;font-family: 'Montserrat';color:#384860;">
   <tbody>
     <tr>
-      <td style="font-family: 'Montserrat';">
-        Your ticket regarding <span style="color: #2c86ee;font-family: 'Montserrat';">"{{ $ticketSubject }}"</span> has been claimed by <b style="color: #333333;">{{ $adminName }}</b>
+      <td>
+        Your ticket regarding <span style="color: #1982EF;">"{{ $ticketSubject }}"</span> has been claimed by <span style="font-weight:600;">{{ $adminName }}</span>
       </td>
     </tr>
     <tr>
-      <td height="25" style="height: 25px;line-height: 25px;"></td>
+      <td height="20" style="height: 20px;line-height: 20px;"></td>
     </tr>
     <tr>
-      <td style="font-family: 'Montserrat';">
+      <td>
         We wanted to let you know that our colleague is working on your query and will send you a response shortly.
       </td>
     </tr>
     <tr>
-        <td height="25" style="height: 25px;line-height: 25px;"></td>
+        <td height="20" style="height: 20px;line-height: 20px;"></td>
     </tr>
 
     @include('emails.IU.Ticket.iuTicketLink', ['ticketId' => $ticketId])

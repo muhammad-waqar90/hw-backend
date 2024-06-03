@@ -12,19 +12,18 @@ class IuHasCompletedProfile
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
-        if(!IuUserProfileRepository::getIsProfileCompleted($request->user()->userProfile))
+        if (! IuUserProfileRepository::getIsProfileCompleted($request->user()->userProfile)) {
             return response()->json([
                 'error' => [
                     'message' => Lang::get('iu.profile.incompleteProfile'),
-                    'profileIncomplete' => true
-                ]
+                    'profileIncomplete' => true,
+                ],
             ], 400);
+        }
 
         return $next($request);
     }

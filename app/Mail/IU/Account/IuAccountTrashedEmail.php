@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Lang;
 
 class IuAccountTrashedEmail extends AbstractMail
 {
-
     /**
      * Create a new message instance.
      *

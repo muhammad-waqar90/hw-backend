@@ -2,30 +2,33 @@
 
 namespace Tests\Feature\AF\User;
 
-use App\Models\User;
-use App\Models\Course;
 use App\Models\Category;
+use App\Models\Course;
 use App\Models\Ebook;
 use App\Models\PurchaseHistory;
 use App\Models\PurchaseItem;
+use App\Models\User;
 use App\Models\UserProfile;
-
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
-use App\Traits\Tests\PermGroupUserTestTrait;
 use App\Traits\Tests\CourseTestTrait;
+use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Tests\TestCase;
 
 class UsersTest extends TestCase
 {
-    use PermGroupUserTestTrait;
     use CourseTestTrait;
+    use PermGroupUserTestTrait;
 
-    private $user, $admin, $course, $data;
+    private $user;
 
-    public function setUp(): void
+    private $admin;
+
+    private $course;
+
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -37,12 +40,12 @@ class UsersTest extends TestCase
         $this->data = $this->CategoryCourseCourseModuleLessonSeeder();
 
         $category = Category::factory()->create();
-        $this->course = Course::factory()->withId($category->id)->withName("Search Course")->create();
+        $this->course = Course::factory()->withId($category->id)->withName('Search Course')->create();
 
         DB::table('course_user')->insert(
             [
-            'course_id' =>  $this->course->id,
-            'user_id'   =>    $this->user->id,
+                'course_id' => $this->course->id,
+                'user_id' => $this->user->id,
             ]
         );
     }
@@ -52,7 +55,7 @@ class UsersTest extends TestCase
         $response = $this->json('GET', '/api/af/users');
 
         $response->assertOk();
-        $this->assertEquals(1,count(json_decode($response->content())->data));
+        $this->assertEquals(1, count(json_decode($response->content())->data));
     }
 
     public function testUserGetByIdRoute()
@@ -68,7 +71,7 @@ class UsersTest extends TestCase
         $response = $this->json('GET', '/api/af/users/'.$this->user->id.'/courses');
 
         $response->assertOk();
-        $this->assertEquals(1,count(json_decode($response->content())->data));
+        $this->assertEquals(1, count(json_decode($response->content())->data));
     }
 
     public function testUserCourseSearchGetRoute()
@@ -76,7 +79,7 @@ class UsersTest extends TestCase
         $response = $this->json('GET', '/api/af/users/'.$this->user->id.'/courses?searchText='.$this->course->name);
 
         $response->assertOk();
-        $this->assertEquals(1,count(json_decode($response->content())->data));
+        $this->assertEquals(1, count(json_decode($response->content())->data));
     }
 
     public function testUserPurchasesGetRoute()
@@ -86,7 +89,7 @@ class UsersTest extends TestCase
         $response = $this->json('GET', '/api/af/users/'.$this->user->id.'/purchases');
 
         $response->assertOk();
-        $this->assertEquals(1,count(json_decode($response->content())->data));
+        $this->assertEquals(1, count(json_decode($response->content())->data));
     }
 
     public function testUserUnselectedEbooksForRefund()
@@ -142,9 +145,9 @@ class UsersTest extends TestCase
         UserProfile::factory()->withUser($this->user->id)->create();
 
         $response = $this->json('DELETE', '/api/af/users/'.$this->user->id);
-        
+
         $response->assertOk();
-        $this->assertEquals("Account has marked for deletion", json_decode($response->content())->message);
+        $this->assertEquals('Account has marked for deletion', json_decode($response->content())->message);
     }
 
     public function testUserGdprExportRoute()

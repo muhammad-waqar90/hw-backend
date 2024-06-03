@@ -2,7 +2,6 @@
 
 namespace App\Listeners;
 
-use App\Listeners\AbstractSubscriber;
 use App\DataObject\Notifications\NotificationTypeData;
 use App\Events\Notifications\Tickets\AfTicketClaimed;
 use App\Events\Notifications\Tickets\AfTicketReplied;
@@ -11,12 +10,13 @@ use App\Events\Notifications\Tickets\AfTicketUnclaimed;
 use App\Events\Notifications\Tickets\IuTicketNotClaimed;
 use App\Events\Notifications\Tickets\IuTicketReplied;
 use App\Events\Notifications\Tickets\IuTicketResolved;
-use App\Mail\IU\Ticket\IuTicketResponseEmail;
-use App\Mail\IU\Ticket\IuTicketResolveEmail;
+use App\Listeners\AbstractSubscriber;
 use App\Mail\IU\Ticket\IuTicketClaimedEmail;
+use App\Mail\IU\Ticket\IuTicketResolveEmail;
+use App\Mail\IU\Ticket\IuTicketResponseEmail;
 use App\Mail\IU\Ticket\IuTicketUnclaimedEmail;
-use App\Repositories\NotificationRepository;
 use App\Repositories\IU\IuUserRepository;
+use App\Repositories\NotificationRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -36,8 +36,6 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
 
     /**
      * TicketNotificationEventSubscriber constructor.
-     * @param IuUserRepository $iuUserRepository
-     * @param NotificationRepository $notificationRepository
      */
     public function __construct(NotificationRepository $notificationRepository, IuUserRepository $iuUserRepository)
     {
@@ -48,11 +46,12 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
     /**
      * Handle IU Ticket Replied
      */
-    public function handleIuTicketReplied($event) {
+    public function handleIuTicketReplied($event)
+    {
         $this->notificationRepository->createNotification(
             $event->userId,
             Lang::get('notifications.titles.ticket.reply'),
-            (strlen($event->description) > 50) ? substr($event->description,0,50).'...' : $event->description,
+            (strlen($event->description) > 50) ? substr($event->description, 0, 50).'...' : $event->description,
             NotificationTypeData::SUPPORT_TICKET,
             $this->generateAction($event->ticketId)
         );
@@ -61,17 +60,18 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
     /**
      * Handle AF Ticket Replied
      */
-    public function handleAfTicketReplied($event) {
+    public function handleAfTicketReplied($event)
+    {
         DB::beginTransaction();
         try {
             $title = Lang::get('notifications.titles.ticket.reply');
-            $description = (strlen($event->description) > 50) ? substr($event->description,0,50).'...' : $event->description;
+            $description = (strlen($event->description) > 50) ? substr($event->description, 0, 50).'...' : $event->description;
             $type = NotificationTypeData::SUPPORT_TICKET;
             $action = $this->generateAction($event->ticketId);
             $iuTicketLink = 'iu/tickets/'.$event->ticketId;
 
             // lesson Q&A ticket
-            if($event->iuTicketLinkIds !== null) {
+            if ($event->iuTicketLinkIds !== null) {
                 $title = Lang::get('notifications.qa.title', ['lesson' => $event->subject]);
                 $type = NotificationTypeData::LESSON_QA_TICKET;
                 $action = $this->generateActionQA($event->iuTicketLinkIds['lessonId'], $event->iuTicketLinkIds['courseId']);
@@ -94,6 +94,7 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
             DB::rollback();
 
             Log::error('Exception: TicketNotificationEventSubscriber@handleAfTicketReplied', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
 
@@ -102,7 +103,8 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
     /**
      * Handle IU Ticket Resolved
      */
-    public function handleIuTicketResolved($event) {
+    public function handleIuTicketResolved($event)
+    {
         $this->notificationRepository->createNotification(
             $event->userId,
             Lang::get('notifications.titles.ticket.status'),
@@ -115,7 +117,8 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
     /**
      * Handle AF Ticket Resolved
      */
-    public function handleAfTicketResolved($event) {
+    public function handleAfTicketResolved($event)
+    {
         DB::beginTransaction();
         try {
             $this->notificationRepository->createNotification(
@@ -134,6 +137,7 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
             DB::rollback();
 
             Log::error('Exception: TicketNotificationEventSubscriber@handleAfTicketResolved', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
 
@@ -162,6 +166,7 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
             DB::rollback();
 
             Log::error('Exception: TicketNotificationEventSubscriber@handleAfTicketClaimed', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
 
@@ -190,6 +195,7 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
             DB::rollback();
 
             Log::error('Exception: TicketNotificationEventSubscriber@handleAfTicketUnclaimed', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
 
@@ -255,28 +261,30 @@ class TicketNotificationEventSubscriber extends AbstractSubscriber
 
     /**
      * generate action for ticket notifications
-     * @param $id - ticket id
+     *
+     * @param  $id  - ticket id
      */
     private function generateAction($id)
     {
         return [
-            "redirect" => [
-                "id" => $id
-            ]
+            'redirect' => [
+                'id' => $id,
+            ],
         ];
     }
 
     /**
      * generate action for lesson Q&A ticket notifications
-     * @param $id - lesson id
+     *
+     * @param  $id  - lesson id
      */
     private function generateActionQA($lessonId, $courseId)
     {
         return [
-            "redirect" => [
-                "lessonId" => $lessonId,
-                "courseId" => $courseId
-            ]
+            'redirect' => [
+                'lessonId' => $lessonId,
+                'courseId' => $courseId,
+            ],
         ];
     }
 }

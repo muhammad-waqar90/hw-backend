@@ -34,8 +34,7 @@ class SupportTicketsExport implements FromQuery, WithHeadings, WithMapping
             'ticket_status',
             'subject',
             'created_at',
-            'updated_at'
-
+            'updated_at',
         ];
     }
 
@@ -51,14 +50,14 @@ class SupportTicketsExport implements FromQuery, WithHeadings, WithMapping
             $row->id,
             $row->subject,
             $row->created_at,
-        ))->store($this->tmpExportGdprDirectory . '/ticket_' . $row->id . '_chat_history.pdf');
+        ))->store($this->tmpExportGdprDirectory.'/ticket_'.$row->id.'_chat_history.pdf');
 
         return [
             $row->id,
             $row->status->name,
             $row->subject,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

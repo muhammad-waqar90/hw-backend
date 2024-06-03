@@ -1,13 +1,11 @@
 <?php
 
-
 namespace App\Repositories;
 
 use App\Models\Notification;
 
 class NotificationRepository
 {
-
     private Notification $notification;
 
     public function __construct(Notification $notification)
@@ -16,26 +14,20 @@ class NotificationRepository
     }
 
     /**
-     * @param $userId
-     * @param $title
-     * @param $description
-     * @param $type
-     * @param null $action
      * @return mixed
      */
-    public function createNotification($userId, $title, $description, $type, $action = NULL)
+    public function createNotification($userId, $title, $description, $type, $action = null)
     {
         return $this->notification->create([
-            'user_id'       => $userId, // any type of user IU | Admin
-            'title'         => $title,
-            'description'   => $description,
-            'type'          => $type,
-            'action'        => json_encode($action),
+            'user_id' => $userId, // any type of user IU | Admin
+            'title' => $title,
+            'description' => $description,
+            'type' => $type,
+            'action' => json_encode($action),
         ]);
     }
 
     /**
-     * @param $id
      * @return Notification
      */
     public function getNotification($id)

@@ -17,27 +17,27 @@ class AfCanReplyToTicket
 
     /**
      * AfCanReplyToTicket constructor.
-     * @param AfTicketRepository $afTicketRepository
      */
     public function __construct(AfTicketRepository $afTicketRepository)
     {
         $this->afTicketRepository = $afTicketRepository;
     }
+
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         $ticket = $this->afTicketRepository->getTicket($request->id);
-        if(!$ticket)
+        if (! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if (!$this->canReply($request->user()->id, $ticket))
+        if (! $this->canReply($request->user()->id, $ticket)) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }

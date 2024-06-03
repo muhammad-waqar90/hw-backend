@@ -15,7 +15,7 @@ class PurchaseHistory extends Model
 
     public function purchaseItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany('App\Models\PurchaseItem');
+        return $this->hasMany(PurchaseItem::class);
     }
 
     /**

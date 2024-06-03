@@ -12,21 +12,20 @@ class IuIdentityVerified
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
         $identityVerification = $request->user()->identityVerification;
-        if (!$identityVerification || $identityVerification->status !== IdentityVerificationStatusData::COMPLETED)
+        if (! $identityVerification || $identityVerification->status !== IdentityVerificationStatusData::COMPLETED) {
             return response()->json([
                 'error' => [
                     'message' => Lang::get('iu.identityVerification.incompleteIdentity'),
                     'identityUnverified' => true,
-                    'identityVerificationStatus' => $identityVerification ? $identityVerification->status : IdentityVerificationStatusData::PENDING
-                ]
+                    'identityVerificationStatus' => $identityVerification ? $identityVerification->status : IdentityVerificationStatusData::PENDING,
+                ],
             ], 400);
+        }
 
         return $next($request);
     }

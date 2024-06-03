@@ -8,12 +8,11 @@ use Illuminate\Support\Facades\Lang;
 class IuCertificateEmail extends AbstractMail
 {
     public $certificateId;
+
     public $entityType;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
      */
     public function __construct($userProfile, $certificateId, $entityType)
     {

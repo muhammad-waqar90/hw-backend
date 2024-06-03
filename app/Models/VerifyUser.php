@@ -13,11 +13,11 @@ class VerifyUser extends Model
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function userProfile()
     {
-        return $this->belongsTo('App\Models\UserProfile', 'user_id', 'user_id');
+        return $this->belongsTo(UserProfile::class, 'user_id', 'user_id');
     }
 }

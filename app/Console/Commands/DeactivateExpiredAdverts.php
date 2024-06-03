@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Repositories\AF\AfAdvertRepository;
+use Illuminate\Console\Command;
 
 class DeactivateExpiredAdverts extends Command
 {
@@ -33,7 +33,6 @@ class DeactivateExpiredAdverts extends Command
 
     /**
      * AfAdvertRepository constructor.
-     * @param AfAdvertRepository $afAdvertRepository
      */
     public function __construct(AfAdvertRepository $afAdvertRepository)
     {

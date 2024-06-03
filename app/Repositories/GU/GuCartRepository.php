@@ -9,10 +9,9 @@ use App\Models\Product;
 use App\Transformers\GU\Course\GuCourseTransformer;
 use App\Transformers\GU\Product\GuSingleProductTransformer;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use Lang;
+use Illuminate\Support\Facades\Lang;
 
 class GuCartRepository
 {
@@ -46,7 +45,7 @@ class GuCartRepository
         // Return response
         return response()->json([
             'success' => true,
-            'message' => Lang::get('general.successfullyCreated', ['model' => 'guest cart'])
+            'message' => Lang::get('general.successfullyCreated', ['model' => 'guest cart']),
         ], Response::HTTP_CREATED);
     }
 
@@ -59,10 +58,9 @@ class GuCartRepository
         // Return response
         return response()->json([
             'success' => true,
-            'guest-cart' => $guestCart
+            'guest-cart' => $guestCart,
         ], Response::HTTP_OK);
     }
-
 
     // Delete Guest Cart
     public function deleteGuestCart($cartId)
@@ -80,7 +78,7 @@ class GuCartRepository
         // Return response
         return response()->json([
             'success' => true,
-            'message' => Lang::get('general.successfullyDeleted', ['model' => 'guest cart'])
+            'message' => Lang::get('general.successfullyDeleted', ['model' => 'guest cart']),
         ]);
     }
 
@@ -94,27 +92,27 @@ class GuCartRepository
         $items = $request->items;
 
         // Iterate through $items
-        foreach ($items as $item) :
+        foreach ($items as $item) {
 
-            if ($item['type'] === 'course') :
+            if ($item['type'] === 'course') {
                 $course = $this->course->where('id', $item['id'])->first();
 
                 // Transform
                 $courseFractal = fractal($course, new GuCourseTransformer());
                 array_push($products, $courseFractal);
-            endif;
+            }
 
-            if ($item['type'] === 'physical_product') :
+            if ($item['type'] === 'physical_product') {
                 $physicalProduct = $this->product->where('id', $item['id'])->first();
                 $physicalProductFractal = fractal($physicalProduct, new GuSingleProductTransformer());
                 array_push($products, $physicalProductFractal);
-            endif;
-        endforeach;
+            }
+        }
 
         // Return response
         return response()->json([
             'success' => true,
-            'products' => $products
+            'products' => $products,
         ], Response::HTTP_OK);
     }
 }

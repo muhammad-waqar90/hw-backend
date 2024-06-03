@@ -11,7 +11,7 @@ class AfCourseLevelUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,10 +21,15 @@ class AfCourseLevelUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name' => 'required|string|min:5|max:50'
+            'name' => [
+                'required',
+                'string',
+                'min:5',
+                'max:15',
+            ],
         ];
     }
 }

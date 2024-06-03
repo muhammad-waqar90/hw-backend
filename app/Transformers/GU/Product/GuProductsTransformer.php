@@ -10,10 +10,9 @@ use League\Fractal\TransformerAbstract;
 class GuProductsTransformer extends TransformerAbstract
 {
     use FileSystemsCloudTrait;
+
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'productMetas',
@@ -21,11 +20,9 @@ class GuProductsTransformer extends TransformerAbstract
 
     /**
      * List of resources possible to include
-     *
-     * @var array
      */
     protected array $availableIncludes = [
-        'category'
+        'category',
     ];
 
     /**
@@ -39,7 +36,7 @@ class GuProductsTransformer extends TransformerAbstract
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
-            'img' => $this->generateS3Link('products/thumbnails/' . $product->img, 1),
+            'img' => $this->generateS3Link('products/thumbnails/'.$product->img, 1),
             'price' => $product->price,
             'is_available' => $product->is_available,
             'created_at' => $product->created_at,

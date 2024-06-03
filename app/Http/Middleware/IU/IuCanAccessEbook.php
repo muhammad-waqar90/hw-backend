@@ -12,8 +12,6 @@ class IuCanAccessEbook
     /**
      * Handle an incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, Closure $next)
@@ -21,8 +19,9 @@ class IuCanAccessEbook
         $canAccess = EbookAccess::where('user_id', $request->user()->id)
             ->where('course_module_id', $request->lesson->course_module_id)
             ->exists();
-        if (!$canAccess)
+        if (! $canAccess) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }

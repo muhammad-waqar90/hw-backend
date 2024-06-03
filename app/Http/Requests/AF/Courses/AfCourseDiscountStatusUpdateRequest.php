@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\AF\Courses;
 
-
 use Illuminate\Foundation\Http\FormRequest;
-
 
 class AfCourseDiscountStatusUpdateRequest extends FormRequest
 {
@@ -26,8 +24,15 @@ class AfCourseDiscountStatusUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'course_id'     => 'required|numeric|exists:courses,id',
-            'is_discounted' => 'required|boolean',
+            'course_id'     => [
+                'required',
+                'numeric',
+                'exists:courses,id',
+            ],
+            'is_discounted' => [
+                'required',
+                'boolean',
+            ],
         ];
     }
 }

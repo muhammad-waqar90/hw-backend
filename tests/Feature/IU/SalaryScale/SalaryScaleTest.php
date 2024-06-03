@@ -12,7 +12,7 @@ class SalaryScaleTest extends TestCase
 {
     private $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -32,11 +32,10 @@ class SalaryScaleTest extends TestCase
         $discountedCountryId = DiscountedCountry::query()->first()->id;
         $discountedCountryRangeId = DiscountedCountryRange::query()->first()->id;
 
-
         $response = $this->json('POST', '/api/iu/salary-scales', [
-            'discounted_country_id'         => $discountedCountryId,
-            'discounted_country_range_id'   => $discountedCountryRangeId,
-            'declaration'                   => true
+            'discounted_country_id' => $discountedCountryId,
+            'discounted_country_range_id' => $discountedCountryRangeId,
+            'declaration' => true,
         ]);
 
         $response->assertStatus(200);
@@ -49,8 +48,8 @@ class SalaryScaleTest extends TestCase
         $discountedCountryRange = DiscountedCountryRange::query()->latest()->first();
 
         $response = $this->json('PUT', '/api/iu/salary-scales', [
-            'discounted_country_id'         => $discountedCountry->id,
-            'discounted_country_range_id'   => $discountedCountryRange->id
+            'discounted_country_id' => $discountedCountry->id,
+            'discounted_country_range_id' => $discountedCountryRange->id,
         ]);
 
         $response->assertStatus(200);

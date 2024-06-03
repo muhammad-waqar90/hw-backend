@@ -24,7 +24,10 @@ class IuFetchProductsRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_id' => 'nullable|numeric',
+            'category_id' => [
+                'nullable',
+                'numeric',
+            ],
         ];
     }
 }

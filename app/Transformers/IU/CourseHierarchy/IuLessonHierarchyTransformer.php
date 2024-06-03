@@ -10,27 +10,24 @@ class IuLessonHierarchyTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'parent'
+        'parent',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Lesson $lesson
      * @return array
      */
     public function transform(Lesson $lesson)
     {
         return [
-            'id'    => $lesson->id,
-            'order_id'  => $lesson->order_id,
-            'hierarchy_name' => $lesson->name ? $lesson->name : Lang::get('iu.course.lesson') . ' ' . $lesson->order_id,
-            'name'  => $lesson->name,
-            'type' => 'lesson'
+            'id' => $lesson->id,
+            'order_id' => $lesson->order_id,
+            'hierarchy_name' => $lesson->name ? $lesson->name : Lang::get('iu.course.lesson').' '.$lesson->order_id,
+            'name' => $lesson->name,
+            'type' => 'lesson',
         ];
     }
 

@@ -10,14 +10,14 @@ class Certificate extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     /**
      * Get the parent entity model.
-        * Course
-        * CourseLevel
-        * CourseModule
+     * Course
+     * CourseLevel
+     * CourseModule
      */
     public function entity()
     {

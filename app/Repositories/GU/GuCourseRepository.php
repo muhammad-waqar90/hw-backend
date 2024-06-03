@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 class GuCourseRepository
 {
-
     private Course $course;
+
     private CourseLevel $courseLevel;
 
     public function __construct(Course $course, CourseLevel $courseLevel)
@@ -30,7 +30,7 @@ class GuCourseRepository
             ->when($categoryId, function ($query) use ($categoryId) {
                 $query->where('courses.category_id', $categoryId);
             })
-            ->when($order == CoursesData::AVAILABLE_COURSES_ORDER['popularity'], function($query) {
+            ->when($order == CoursesData::AVAILABLE_COURSES_ORDER['popularity'], function ($query) {
                 $query->selectRaw('count(cu.course_id) as popularity')
                     ->leftJoin('course_user as cu', 'courses.id', '=', 'cu.course_id')
                     ->groupBy('courses.id');
@@ -63,11 +63,13 @@ class GuCourseRepository
                     });
             })
             ->leftJoin('course_levels as cl', 'courses.id', '=', 'cl.course_id')
-            ->with('categoryWithRecursiveParents' . Category::minimalWithData())
+            ->with('categoryWithRecursiveParents'.Category::minimalWithData())
             ->groupBy('courses.id', 'cl.course_id')
             ->first();
-        if ($course)
+        if ($course) {
             $course->preview = true;
+        }
+
         return $course;
     }
 

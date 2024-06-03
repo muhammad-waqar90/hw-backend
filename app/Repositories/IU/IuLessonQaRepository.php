@@ -3,7 +3,7 @@
 namespace App\Repositories\IU;
 
 use App\Repositories\AF\AfLessonFaqRepository;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class IuLessonQaRepository
@@ -19,10 +19,10 @@ class IuLessonQaRepository
     {
         DB::table('lesson_ticket')->insert(
             [
-                'lesson_id'     =>  $lessonId,
-                'ticket_id'     =>  $ticketId,
-                'created_at'    =>  Carbon::now(),
-                'updated_at'    =>  Carbon::now()
+                'lesson_id' => $lessonId,
+                'ticket_id' => $ticketId,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         );
     }

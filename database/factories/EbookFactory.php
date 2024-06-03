@@ -10,13 +10,6 @@ use Illuminate\Support\Str;
 class EbookFactory extends Factory
 {
     /**
-     * The name of the ebook's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Ebook::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -24,16 +17,17 @@ class EbookFactory extends Factory
     public function definition()
     {
         $lesson_id = DB::table('lessons')->pluck('id');
+
         return [
-            'lesson_id' =>  $lesson_id->random(),
-            'content'   =>  Str::random(10),
+            'lesson_id' => $lesson_id->random(),
+            'content' => Str::random(10),
         ];
     }
 
     public function withlessonId($id)
     {
         return $this->state(fn () => [
-            'lesson_id' =>  $id,
+            'lesson_id' => $id,
         ]);
     }
 }

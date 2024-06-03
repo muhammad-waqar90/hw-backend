@@ -27,14 +27,18 @@ class AfTicketListRequest extends FormRequest
     public function rules()
     {
         return [
-            'subject' => 'string|nullable|max:100',
-            'category'        => [
-                'integer',
-                Rule::in(array_values(TicketCategoryData::getConstants()))
+            'subject' => [
+                'string',
+                'nullable',
+                'max:100',
             ],
-            'status'        => [
+            'category' => [
                 'integer',
-                Rule::in(array_values(TicketStatusData::getConstants()))
+                Rule::in(array_values(TicketCategoryData::getConstants())),
+            ],
+            'status' => [
+                'integer',
+                Rule::in(array_values(TicketStatusData::getConstants())),
             ],
         ];
     }

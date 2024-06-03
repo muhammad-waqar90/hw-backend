@@ -15,9 +15,9 @@ class IuTierTransformer extends TransformerAbstract
     public function transform(Tier $tier)
     {
         return [
-            'id'    => $tier->id,
-            'tier'  => $tier->label,
-            'value' => $tier->value
+            'id' => $tier->id,
+            'tier' => $tier->label,
+            'value' => $tier->value,
         ];
     }
 }

@@ -10,11 +10,11 @@ class Faq extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function faqCategory()
     {
-        return $this->belongsTo('App\Models\FaqCategory');
+        return $this->belongsTo(FaqCategory::class);
     }
 }

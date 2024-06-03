@@ -12,19 +12,20 @@ use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\isCourseStatus;
 use App\Http\Middleware\IsUserDeleted;
+use App\Http\Middleware\IU\CheckIfGdprDataIsProcessing;
 use App\Http\Middleware\IU\IuCanAccessEbook;
 use App\Http\Middleware\IU\IuCanAccessLevelEbookList;
 use App\Http\Middleware\IU\IuCanAccessModule;
 use App\Http\Middleware\IU\IuCanAccessTicket;
 use App\Http\Middleware\IU\IuCanReplyToTicket;
 use App\Http\Middleware\IU\IuHasCompletedProfile;
-use App\Http\Middleware\IU\CheckIfGdprDataIsProcessing;
 use App\Http\Middleware\IU\IuHasEntityExamAccess;
 use App\Http\Middleware\IU\IuIdentityVerified;
 use App\Http\Middleware\IU\IuUserCanAccessEntityQuiz;
 use App\Http\Middleware\IU\IuUserCanAccessLesson;
-use App\Http\Middleware\IU\IuUserOwnsCourse;
+use App\Http\Middleware\IU\IuUserCanUpdatePaymentMethod;
 use App\Http\Middleware\IU\IuUserOwnsCertificate;
+use App\Http\Middleware\IU\IuUserOwnsCourse;
 use App\Http\Middleware\PasswordProtected;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
@@ -65,26 +66,27 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            'throttle:api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\ResponseWithHeaders::class
+            \App\Http\Middleware\ResponseWithHeaders::class,
         ],
     ];
 
     /**
-     * The application's route middleware.
+     * The application's middleware aliases.
      *
-     * These middleware may be assigned to groups or used individually.
+     * Aliases may be used instead of class names to conveniently assign middleware to routes and groups.
      *
-     * @var array
+     * @var array<string, class-string|string>
      */
-    protected $routeMiddleware = [
+    protected $middlewareAliases = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
+        'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
@@ -105,7 +107,8 @@ class Kernel extends HttpKernel
         'IuCanAccessModule' => IuCanAccessModule::class,
         'IuCanAccessLevelEbookList' => IuCanAccessLevelEbookList::class,
         'IuUserOwnsCertificate' => IuUserOwnsCertificate::class,
-        'IuIdentityVerified'=> IuIdentityVerified::class,
+        'IuUserCanUpdatePaymentMethod' => IuUserCanUpdatePaymentMethod::class,
+        'IuIdentityVerified' => IuIdentityVerified::class,
         'IuHasCompletedProfile' => IuHasCompletedProfile::class,
         'CheckIfGdprDataIsProcessing' => CheckIfGdprDataIsProcessing::class,
         'isCourseStatus' => isCourseStatus::class,

@@ -15,31 +15,34 @@
     </noscript>
     <![endif]-->
 </head>
-<body style="margin:0;padding:0;">
-  <table role="presentation" width="100%" height="100%" style="border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;font-family: 'Montserrat';" border="0" cellspacing="0" cellpadding="0">
+<body>
+  <table role="presentation" width="100%" height="100%" style="border-collapse:collapse;border:0;border-spacing:0;background:#ffffff;font-family: 'Montserrat';letter-spacing:0.2px;" border="0" cellspacing="0" cellpadding="0">
     <tbody>
       <tr height="32" style="height:32px"><td></td></tr>
 
       <tr align="center">
         <td>
-          <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:0;border-spacing:0;padding-bottom:20px;max-width: 450px;">
+          <table role="presentation" border="0" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:0;border-spacing:0;padding-bottom:20px;max-width: 544px;">
             <tbody>
               <tr>
-                <td style="color: #2c86ee;font-size: 20px;font-weight: 600;padding:0 10px 20px 10px;font-family: 'Montserrat';">Dear {{ $userProfile ? "$userProfile->first_name $userProfile->last_name": 'User' }},</td>
+                <td style="width:640px">
+                  @include('emails.partials.header')
+                </td>
               </tr>
+              <tr height="30" style="height:30px"><td></td></tr>
               <tr>
-                <td style="padding:0 10px 0 10px;">
+                <td style="color: #121A26;font-size: 24px;font-weight: 700;padding:0;font-family: 'Montserrat';">Dear {{ $userProfile ? "$userProfile->first_name $userProfile->last_name": 'User' }},</td>
+              </tr>
+              <tr height="24" style="height:24px"><td></td></tr>
+              <tr>
+                <td>
                   @yield('content')
                 </td>
               </tr>
-              <tr>
-                <td style="padding:0 10px 0 10px;">
-                  @include('emails.partials.signature')
-                </td>
-              </tr>
+              <tr height="30" style="height:30px"><td></td></tr>
               <tr>
                 <td>
-                  @include('emails.partials.footer')
+                  @include('emails.partials.signature')
                 </td>
               </tr>
             </tbody>

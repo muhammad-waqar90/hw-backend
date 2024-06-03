@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class StripePaymentFactory extends Factory
 {
-      /**
+    /**
      * The name of the StripePayment's corresponding model.
      *
      * @var string
@@ -23,8 +23,8 @@ class StripePaymentFactory extends Factory
     public function definition()
     {
         return [
-            'stripe_id'     =>  Str::random(30),
-            'stripe_object' =>  Str::random(10),
+            'stripe_id' => Str::random(30),
+            'stripe_object' => Str::random(10),
         ];
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Transformers\AF;
 
 use App\DataObject\CurrencyData;
-use App\DataObject\Purchases\PurchaseHistoryEntityData;
 use App\Models\Tier;
 use League\Fractal\TransformerAbstract;
 
@@ -17,8 +16,8 @@ class AfInAppTiersAllTransformer extends TransformerAbstract
     public function transform(Tier $tier)
     {
         return [
-            'id'   => $tier->id,
-            'name' => CurrencyData::POUND . $tier->value . ' (' . $tier->label . ')'
+            'id' => $tier->id,
+            'name' => CurrencyData::POUND.$tier->value.' ('.$tier->label.')',
         ];
     }
 }

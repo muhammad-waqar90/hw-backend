@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\DB;
 class EbookAccessFactory extends Factory
 {
     /**
-     * The name of the ebook's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = EbookAccess::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -24,23 +17,24 @@ class EbookAccessFactory extends Factory
     {
         $userId = DB::table('users')->pluck('id');
         $courseModuleId = DB::table('course_modules')->pluck('id');
+
         return [
-            'user_id'           =>  $userId->random(),
-            'course_module_id'  =>  $courseModuleId->random(),
+            'user_id' => $userId->random(),
+            'course_module_id' => $courseModuleId->random(),
         ];
     }
 
     public function withCourseModuleId($id)
     {
         return $this->state(fn () => [
-            'course_module_id'  =>   $id,
+            'course_module_id' => $id,
         ]);
     }
 
     public function withUserId($id)
     {
         return $this->state(fn () => [
-            'user_id'   =>    $id,
+            'user_id' => $id,
         ]);
     }
 }

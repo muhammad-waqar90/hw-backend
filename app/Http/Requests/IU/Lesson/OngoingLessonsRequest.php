@@ -24,7 +24,11 @@ class OngoingLessonsRequest extends FormRequest
     public function rules()
     {
         return [
-            'progress' => 'string|min:0|max:100',
+            'progress' => [
+                'string',
+                'min:0',
+                'max:100',
+            ],
         ];
     }
 }

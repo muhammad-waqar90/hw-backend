@@ -35,7 +35,7 @@ class UserPlatformProgress implements FromQuery, WithHeadings, WithMapping
             'name',
             'progress',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -56,24 +56,25 @@ class UserPlatformProgress implements FromQuery, WithHeadings, WithMapping
             $row->entity_name,
             $row->progress,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 
     public function getEntityName($userProgress)
     {
         $hierarchy = [];
-        if($userProgress->entity_type == UserProgressData::ENTITY_LESSON) {
+        if ($userProgress->entity_type == UserProgressData::ENTITY_LESSON) {
             $userProgress->with('lesson');
             $hierarchy = collect(fractal($userProgress->lesson, new IuLessonHierarchyTransformer()))->toArray();
-        } elseif($userProgress->entity_type == UserProgressData::ENTITY_COURSE_MODULE) {
+        } elseif ($userProgress->entity_type == UserProgressData::ENTITY_COURSE_MODULE) {
             $userProgress->with('courseModule');
             $hierarchy = collect(fractal($userProgress->courseModule, new IuCourseModuleHierarchyTransformer()))->toArray();
-        } elseif($userProgress->entity_type == UserProgressData::ENTITY_COURSE_LEVEL) {
+        } elseif ($userProgress->entity_type == UserProgressData::ENTITY_COURSE_LEVEL) {
             $userProgress->with('courseLevel');
             $hierarchy = collect(fractal($userProgress->courseLevel, new IuCourseLevelHierarchyTransformer()))->toArray();
-        } elseif($userProgress->entity_type == UserProgressData::ENTITY_COURSE) {
+        } elseif ($userProgress->entity_type == UserProgressData::ENTITY_COURSE) {
             $userProgress->with('course');
+
             return $userProgress->course->name;
         }
 

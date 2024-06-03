@@ -8,6 +8,7 @@
  *
  * which ultimately update product meta as well to store the relation rather than hard-coded eye-closed meta keys from frontend
  */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -17,11 +17,11 @@ class AfQuizRepository
     {
         return $this->quiz
             ->updateOrCreate([
-                'entity_id'     => $entityId,
-                'entity_type'   => $entityType
+                'entity_id' => $entityId,
+                'entity_type' => $entityType,
             ], [
-                'duration'          => 0,
-                'num_of_questions'  => 0
+                'duration' => 0,
+                'num_of_questions' => 0,
             ]);
     }
 
@@ -30,7 +30,7 @@ class AfQuizRepository
         return $this->quiz
             ->where([
                 ['entity_id', $entityId],
-                ['entity_type', $entityType]
+                ['entity_type', $entityType],
             ])->delete();
     }
 }

@@ -17,13 +17,14 @@ use Illuminate\Support\Facades\Lang;
 
 class IuLessonQaController extends Controller
 {
-
     private IuLessonQaRepository $iuLessonQaRepository;
+
     private LessonRepository $lessonRepository;
+
     private TicketRepository $ticketRepository;
 
     public function __construct(IuLessonQaRepository $iuLessonQaRepository, LessonRepository $lessonRepository,
-                                    TicketRepository $ticketRepository)
+        TicketRepository $ticketRepository)
     {
         $this->iuLessonQaRepository = $iuLessonQaRepository;
         $this->lessonRepository = $lessonRepository;
@@ -34,8 +35,9 @@ class IuLessonQaController extends Controller
     {
         $userId = $request->user()->id;
         $lesson = $this->lessonRepository->get($courseId, $lessonId);
-        if(!$lesson)
+        if (! $lesson) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $data = $this->ticketRepository
             ->getLessonQaTicketsQuery($userId, $lessonId, [TicketStatusData::RESOLVED])
@@ -51,22 +53,24 @@ class IuLessonQaController extends Controller
     {
         $userId = $request->user()->id;
         $lesson = $this->lessonRepository->get($courseId, $lessonId);
-        if(!$lesson)
+        if (! $lesson) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $searchStatuses = array_values(TicketStatusData::getConstants());
         $ticket = $this->ticketRepository
             ->getLessonQaTicketsQuery($userId, $lessonId, $searchStatuses)
             ->first();
 
-        if(!$ticket)
-            return response()->json(['question' =>  null, 'answer' => null], 200);
+        if (! $ticket) {
+            return response()->json(['question' => null, 'answer' => null], 200);
+        }
 
         $question = $ticket->ticketMessages[array_key_first($ticket->ticketMessages->toArray())]?->message;
         $answer = $ticket->ticket_status_id == TicketStatusData::RESOLVED ? $ticket->ticketMessages[array_key_last($ticket->ticketMessages->toArray())]?->message : null;
 
         return response()->json([
-            'question' =>  $question ?: null,
+            'question' => $question ?: null,
             'answer' => $answer ?: null,
         ], 200);
     }
@@ -76,11 +80,13 @@ class IuLessonQaController extends Controller
         $userId = $request->user()->id;
 
         $lesson = $this->lessonRepository->get($courseId, $lessonId);
-        if(!$lesson)
+        if (! $lesson) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if($this->ticketRepository->isTicketMessageExist($userId, $request->question, $lessonId))
+        if ($this->ticketRepository->isTicketMessageExist($userId, $request->question, $lessonId)) {
             return response()->json(['errors' => Lang::get('tickets.questionAlreadyExist')], 422);
+        }
 
         $ticket = $this->ticketRepository->createIuTicket(TicketCategoryData::LESSON_QA, $userId, $lesson->name, null);
         $this->ticketRepository->createMessage($userId, $ticket->id, $request->question, TicketMessageTypeData::USER_MESSAGE);
@@ -88,8 +94,7 @@ class IuLessonQaController extends Controller
 
         // handle auto system reply
         $lessonFaq = $this->iuLessonQaRepository->getSystemIntelligentAnswer($lessonId, $request->question);
-        if($lessonFaq)
-        {
+        if ($lessonFaq) {
             $this->ticketRepository->createMessage($userId, $ticket->id, $lessonFaq->answer, TicketMessageTypeData::SYSTEM_MESSAGE);
             $this->ticketRepository->markAsResolved($ticket->id);
 

@@ -26,12 +26,20 @@ class IuGetOwnCoursesRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'        => 'string|nullable|max:100',
-            'categoryId'        => 'integer|nullable|exists:categories,id',
+            'searchText'        => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
+            'categoryId'        => [
+                'integer',
+                'nullable',
+                'exists:categories,id',
+            ],
             'order'             => [
                 Rule::in(array_keys(CoursesData::OWNED_COURSES_ORDER)),
             ],
-            'orderDirection'    => [
+            'orderDirection' => [
                 Rule::in(array_keys(CoursesData::ORDER_DIRECTION)),
             ],
         ];

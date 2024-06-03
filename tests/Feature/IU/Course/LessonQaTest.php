@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\IU\Course;
 
-use App\Models\User;
-use App\Models\Ticket;
-use App\Models\TicketMessage;
 use App\DataObject\Tickets\TicketCategoryData;
 use App\DataObject\Tickets\TicketStatusData;
+use App\Models\Ticket;
+use App\Models\TicketMessage;
+use App\Models\User;
 use App\Models\UserProfile;
 use App\Traits\Tests\CourseTestTrait;
 use Illuminate\Support\Facades\DB;
@@ -16,9 +16,13 @@ class LessonQaTest extends TestCase
 {
     use CourseTestTrait;
 
-    private $user, $data, $admin;
+    private $user;
 
-    public function setUp(): void
+    private $data;
+
+    private $admin;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -31,10 +35,10 @@ class LessonQaTest extends TestCase
 
     public function testLessonQaGetRouteDefault()
     {
-        $response = $this->json('GET', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/qas/me');
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/qas/me');
 
         $response->assertStatus(200);
-        
+
         $this->assertEmpty(json_decode($response->content())->data);
     }
 
@@ -45,12 +49,12 @@ class LessonQaTest extends TestCase
 
         DB::table('lesson_ticket')->insert(
             [
-                'lesson_id'     =>  $this->data->lesson->id,
-                'ticket_id'     =>  $ticket->id,
+                'lesson_id' => $this->data->lesson->id,
+                'ticket_id' => $ticket->id,
             ]
         );
 
-        $response = $this->json('GET', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/qas/me/latest');
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/qas/me/latest');
 
         $response->assertOk();
         $this->assertNull(json_decode($response->content())->answer);
@@ -61,7 +65,7 @@ class LessonQaTest extends TestCase
     {
         $ticket = Ticket::factory()->withCategoryId(TicketCategoryData::LESSON_QA)->withTicketStatus(TicketStatusData::RESOLVED)->withAdmin($this->admin)->withUser($this->user)->create();
         TicketMessage::factory()->withUserId($this->user->id)->withTicketId($ticket->id)->create();
-        TicketMessage::factory()->withAdminId($this->admin->id)->withTicketId($ticket->id)->withMessage("admin message")->create();
+        TicketMessage::factory()->withAdminId($this->admin->id)->withTicketId($ticket->id)->withMessage('admin message')->create();
 
         DB::table('lesson_ticket')->insert(
             [
@@ -69,8 +73,8 @@ class LessonQaTest extends TestCase
                 'ticket_id' => $ticket->id,
             ]
         );
-        
-        $response = $this->json('GET', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/qas/me');
+
+        $response = $this->json('GET', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/qas/me');
 
         $response->assertOk();
         $this->assertNotNull(json_decode($response->content())->data[0]->answer);
@@ -79,12 +83,12 @@ class LessonQaTest extends TestCase
 
     public function testLessonQaPostRoute()
     {
-        $response = $this->json('POST', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/qas', [
-            'question' => "dummy question"
+        $response = $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/qas', [
+            'question' => 'dummy question',
         ]);
 
         $response->assertOk();
-        
+
         $this->assertNull(json_decode($response->content())->data->answer);
         $this->assertNotNull(json_decode($response->content())->data->question);
     }
@@ -94,18 +98,17 @@ class LessonQaTest extends TestCase
         DB::table('lesson_faqs')->insert(
             [
                 'lesson_id' => $this->data->lesson->id,
-                'question' => "dummy question",
-                'answer' => "dummy answer",
+                'question' => 'dummy question',
+                'answer' => 'dummy answer',
             ]
         );
 
-        $response = $this->json('POST', '/api/iu/courses/'. $this->data->course->id .'/lessons/' . $this->data->lesson->id . '/qas', [
-            'question' => "dummy question"
+        $response = $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/qas', [
+            'question' => 'dummy question',
         ]);
 
         $response->assertOk();
         $this->assertNotNull(json_decode($response->content())->data->answer);
         $this->assertNotNull(json_decode($response->content())->data->question);
     }
-
 }

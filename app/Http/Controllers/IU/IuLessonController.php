@@ -24,7 +24,9 @@ use Illuminate\Support\Facades\Log;
 class IuLessonController extends Controller
 {
     private LessonRepository $lessonRepository;
+
     private VideoRepository $videoRepository;
+
     private IuCourseRepository $iuCourseRepository;
 
     public function __construct(LessonRepository $lessonRepository, VideoRepository $videoRepository, IuCourseRepository $iuCourseRepository)
@@ -60,16 +62,18 @@ class IuLessonController extends Controller
     public function getLessonNote(Request $request, $courseId, $lessonId)
     {
         $data = $this->lessonRepository->getLessonNote($request->user()->id, $lessonId);
+
         return response()->json($data, 200);
     }
 
     public function updateLessonNote(UpdateLessonNoteRequest $request, $courseId, $lessonId)
     {
         $lessonNote = $this->lessonRepository->updateLessonNote($request->user()->id, $lessonId, $request->text ?: '');
+
         return response()->json([
             'message' => Lang::get('iu.successfullyUpdatedNote'),
             'notes_text' => $lessonNote->content,
-            'notes_updated_at' => $lessonNote->updated_at
+            'notes_updated_at' => $lessonNote->updated_at,
         ], 201);
     }
 
@@ -78,22 +82,24 @@ class IuLessonController extends Controller
         try {
             $userId = $request->user()->id;
             $this->lessonRepository->updateVideoProgress($userId, $lessonId, $request->timestamp);
-            if (!$request->updateLessonProgress)
+            if (! $request->updateLessonProgress) {
                 return response()->json(['message' => Lang::get('iu.successfullyUpdatedVideoProgress')], 201);
+            }
 
             $updatedProgress = $this->lessonRepository->updateLessonProgressOnVideoView($userId, $lessonId);
 
             return response()->json([
                 'message' => Lang::get('iu.successfullyUpdatedVideoProgress'),
-                'updatedLessonProgress' => $updatedProgress
+                'updatedLessonProgress' => $updatedProgress,
             ], 201);
         } catch (Exception $e) {
             Log::error('Exception: IuLessonController@updateVideoProgress', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
 
-    public function getOngoingLessons(OngoingLessonsRequest $request, Int $courseId)
+    public function getOngoingLessons(OngoingLessonsRequest $request, int $courseId)
     {
         $firstModuleId = $request->progress === '0' ? $this->iuCourseRepository->getFirstModuleIdOfCourse($courseId) : null;
 

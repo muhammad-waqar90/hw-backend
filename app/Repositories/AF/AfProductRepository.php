@@ -13,6 +13,7 @@ class AfProductRepository
     use FileSystemsCloudTrait;
 
     private Product $product;
+
     private ProductMeta $productMeta;
 
     public function __construct(Product $product, ProductMeta $productMeta)
@@ -29,13 +30,13 @@ class AfProductRepository
     public function createProduct($categoryId, $name, $description, $thumbnail, $price)
     {
         return $this->product->create([
-            'category_id'   => $categoryId,
-            'name'          => $name,
-            'description'   => $description,
-            'img'           => $thumbnail,
-            'price'         => $price,
-            'is_available'  => 1, // TODO: product availability should be dynamic
-            'type'          => PurchaseItemTypeData::PHYSICAL_PRODUCT
+            'category_id' => $categoryId,
+            'name' => $name,
+            'description' => $description,
+            'img' => $thumbnail,
+            'price' => $price,
+            'is_available' => 1, // TODO: product availability should be dynamic
+            'type' => PurchaseItemTypeData::PHYSICAL_PRODUCT,
         ]);
     }
 
@@ -44,11 +45,11 @@ class AfProductRepository
         $productMetaData = [];
         foreach ($productMetas as $metaKey => $metaValue) {
             $productMeta = [
-                'product_id'    => $productId,
-                'meta_key'      => $metaKey,
-                'meta_value'    => $metaValue,
-                'created_at'    => Carbon::now(),
-                'updated_at'    => Carbon::now()
+                'product_id' => $productId,
+                'meta_key' => $metaKey,
+                'meta_value' => $metaValue,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ];
 
             array_push($productMetaData, $productMeta);
@@ -106,24 +107,24 @@ class AfProductRepository
     public function updateProduct($id, $categoryId, $name, $description, $thumbnail, $price, $isAvailable)
     {
         return $this->product->where('id', $id)->update([
-            'category_id'   => $categoryId,
-            'name'          => $name,
-            'description'   => $description,
-            'img'           => $thumbnail,
-            'price'         => $price,
-            'is_available'  => $isAvailable,
+            'category_id' => $categoryId,
+            'name' => $name,
+            'description' => $description,
+            'img' => $thumbnail,
+            'price' => $price,
+            'is_available' => $isAvailable,
         ]);
     }
 
     public function updateAuthor($product, $author)
     {
         $productMetas = $product->productMetas;
-        foreach ($productMetas as $productMeta) :
-            if ($productMeta['meta_key'] === 'author') :
+        foreach ($productMetas as $productMeta) {
+            if ($productMeta['meta_key'] === 'author') {
                 $productMeta['meta_value'] = $author;
                 $productMeta->save();
-            endif;
-        endforeach;
+            }
+        }
     }
 
     public function bindPhysicalBookWithCourseModule($bookId, $courseModuleId)

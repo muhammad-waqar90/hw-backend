@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-
     private CategoryRepository $categoryRepository;
 
     public function __construct(CategoryRepository $categoryRepository)
@@ -18,6 +17,7 @@ class CategoryController extends Controller
     public function test(Request $request)
     {
         $data = $this->categoryRepository->test();
+
         return response()->json($data, 200);
     }
 }

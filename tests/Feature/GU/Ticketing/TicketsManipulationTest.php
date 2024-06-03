@@ -2,25 +2,29 @@
 
 namespace Tests\Feature\GU\Ticketing;
 
-use App\Models\User;
-
 use App\Models\Ticket;
 use App\Models\TicketMessage;
 use App\Models\TicketSubject;
-
-use Illuminate\Support\Facades\Lang;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\Lang;
+use Tests\TestCase;
 
 class TicketsManipulationTest extends TestCase
 {
     use PermGroupUserTestTrait;
 
-    private $user, $ticketSubjects, $ticketSubjectsGuest, $tickets, $messages;
+    private $user;
 
-    public function setUp(): void
+    private $ticketSubjects;
+
+    private $ticketSubjectsGuest;
+
+    private $tickets;
+
+    private $messages;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -33,7 +37,7 @@ class TicketsManipulationTest extends TestCase
 
     public function testGUTicketsSubjectsGetAllRouteValid()
     {
-        $response = $this->json('GET',  'api/gu/tickets/subjects');
+        $response = $this->json('GET', 'api/gu/tickets/subjects');
 
         $response->assertStatus(200);
 
@@ -42,27 +46,27 @@ class TicketsManipulationTest extends TestCase
 
     public function testGUTicketsSubjectsGetRouteInvalid()
     {
-        $response = $this->json('GET',  'api/gu/tickets/subjects/' . $this->ticketSubjects[0]->id);
+        $response = $this->json('GET', 'api/gu/tickets/subjects/'.$this->ticketSubjects[0]->id);
 
         $response->assertStatus(404);
     }
 
     public function testGUTicketsSubjectsGetSingleNotGuestRouteValid()
     {
-        $response = $this->json('GET',  'api/gu/tickets/subjects/' . $this->ticketSubjectsGuest[0]->id);
+        $response = $this->json('GET', 'api/gu/tickets/subjects/'.$this->ticketSubjectsGuest[0]->id);
 
         $response->assertStatus(200);
     }
 
     public function testGUTicketsSubjectsPostRouteValid()
     {
-        $response = $this->json('POST',  'api/gu/tickets', array(
+        $response = $this->json('POST', 'api/gu/tickets', [
             'subjectId' => $this->ticketSubjectsGuest[0]->id,
             'message' => 'I haba issue boss',
             'assets' => [],
             'email' => 'gueest@email.com',
-            'log' => array('url', 'url2')
-        ));
+            'log' => ['url', 'url2'],
+        ]);
 
         $response->assertStatus(200);
 
@@ -71,13 +75,13 @@ class TicketsManipulationTest extends TestCase
 
     public function testGUTicketsSubjectsPostRouteInvalid()
     {
-        $response = $this->json('POST',  'api/gu/tickets', array(
+        $response = $this->json('POST', 'api/gu/tickets', [
             'subjectId' => -5,
             'message' => 'I haba issue boss',
             'assets' => [],
             'email' => 'gueest@email.com',
-            'log' => array('url', 'url2')
-        ));
+            'log' => ['url', 'url2'],
+        ]);
 
         $response->assertStatus(422);
 
@@ -86,13 +90,13 @@ class TicketsManipulationTest extends TestCase
 
     public function testGUTicketsSubjectIdPostAlreadyExistsValid()
     {
-        $response = $this->json('POST',  'api/gu/tickets', array(
+        $response = $this->json('POST', 'api/gu/tickets', [
             'subjectId' => $this->ticketSubjectsGuest[0]->id,
             'message' => 'I haba issue boss',
             'assets' => [],
             'email' => 'gueest@email.com',
-            'log' => array('url', 'url2')
-        ));
+            'log' => ['url', 'url2'],
+        ]);
 
         $response->assertStatus(200);
     }

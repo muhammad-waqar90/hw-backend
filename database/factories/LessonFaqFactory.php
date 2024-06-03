@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\DB;
 class LessonFaqFactory extends Factory
 {
     /**
-     * The name of the lessonFaq's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = LessonFaq::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -23,17 +16,18 @@ class LessonFaqFactory extends Factory
     public function definition()
     {
         $lesson_id = DB::table('lessons')->pluck('id');
+
         return [
-            'lesson_id' =>  $lesson_id->random(),
-            'question'  =>  fake()->sentence,
-            'answer'    =>  fake()->sentence,
+            'lesson_id' => $lesson_id->random(),
+            'question' => fake()->sentence,
+            'answer' => fake()->sentence,
         ];
     }
 
     public function withlessonId($id)
     {
         return $this->state(fn () => [
-            'lesson_id' =>  $id,
+            'lesson_id' => $id,
         ]);
     }
 }

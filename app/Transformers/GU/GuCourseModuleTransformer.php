@@ -9,28 +9,25 @@ class GuCourseModuleTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'lessons'
+        'lessons',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param CourseModule $courseModule
      * @return array
      */
     public function transform(CourseModule $courseModule)
     {
         return [
-            'id'    => $courseModule->id,
-            'name'  => $courseModule->name,
-            'description'   => $courseModule->description,
-            'order_id'  => $courseModule->order_id,
-            'progress'  => 0,
-            'has_quiz' => false
+            'id' => $courseModule->id,
+            'name' => $courseModule->name,
+            'description' => $courseModule->description,
+            'order_id' => $courseModule->order_id,
+            'progress' => 0,
+            'has_quiz' => false,
         ];
     }
 
@@ -38,5 +35,4 @@ class GuCourseModuleTransformer extends TransformerAbstract
     {
         return $this->collection($courseModule->lessons, new GuLessonTransformer($courseModule->lessons));
     }
-
 }

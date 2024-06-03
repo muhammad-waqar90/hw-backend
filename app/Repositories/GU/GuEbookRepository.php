@@ -1,14 +1,11 @@
 <?php
 
-
 namespace App\Repositories\GU;
-
 
 use App\Models\Course;
 
 class GuEbookRepository
 {
-
     private Course $course;
 
     public function __construct(Course $course)
@@ -19,7 +16,7 @@ class GuEbookRepository
     public function getEbookListPerLevel($courseId)
     {
         return $this->course
-            ->select('id', 'name', 'img')
+            ->select('id', 'name', 'img', 'price')
             ->where('id', $courseId)
             ->with('courseLevel', function ($query) {
                 $query->where('value', 1)

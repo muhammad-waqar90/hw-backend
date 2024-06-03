@@ -14,7 +14,9 @@ class IuEbookRepository
     use FileSystemsCloudTrait, UrlTrait;
 
     private Ebook $ebook;
+
     private Course $course;
+
     private EbookAccess $ebookAccess;
 
     public function __construct(Ebook $ebook, Course $course, EbookAccess $ebookAccess)
@@ -34,7 +36,7 @@ class IuEbookRepository
     public function getEbookListPerLevel($courseId, $level, $userId)
     {
         return $this->course
-            ->select('id', 'name', 'img')
+            ->select('id', 'name', 'img', 'price')
             ->where('id', $courseId)
             ->with('courseLevel', function ($query) use ($level, $userId) {
                 $query->where('value', $level)
@@ -53,8 +55,8 @@ class IuEbookRepository
     public function assignEbookToUser($userId, $courseModuleId)
     {
         return $this->ebookAccess->create([
-            'user_id'       => $userId,
-            'course_module_id'     => $courseModuleId
+            'user_id' => $userId,
+            'course_module_id' => $courseModuleId,
         ]);
     }
 
@@ -67,34 +69,38 @@ class IuEbookRepository
     }
 
     /**
-     * @param string $directory | path of ebook directory
-     * - $directory may hold PDF or series of images
-     *
+     * @param  string  $directory  | path of ebook directory
+     *                             - $directory may hold PDF or series of images
      * @return array
-     * - signed temporary URL
-     * - type
+     *               - signed temporary URL
+     *               - type
      */
     public function generateS3SignedEbook($directory)
     {
-        $singedEbook = array();
+        $singedEbook = [];
 
         $files = $this->getFiles($directory);
-        if (empty($files)) return $singedEbook;
+        if (empty($files)) {
+            return $singedEbook;
+        }
 
         $ebookType = $this->getUrlExtension($files[0]);
 
         $ebookMeta = $this->getEbookMeta($ebookType);
-        if (empty($ebookMeta)) return $singedEbook;
+        if (empty($ebookMeta)) {
+            return $singedEbook;
+        }
 
         $expiration = $this->addTimeToCurrentDate($ebookMeta['expiry_time'], $ebookMeta['expiry_time_unit']);
 
-        $signedTemporaryUrls = array();
-        foreach ($files as $file)
+        $signedTemporaryUrls = [];
+        foreach ($files as $file) {
             $signedTemporaryUrls[] = $this->signedTemporaryUrl($file, $expiration);
+        }
 
-        $singedEbook = (object)[
-            "path"  => $signedTemporaryUrls,
-            "type"  => $ebookType == EbookData::PDF ? EbookData::PDF : EbookData::IMAGE
+        $singedEbook = (object) [
+            'path' => $signedTemporaryUrls,
+            'type' => $ebookType == EbookData::PDF ? EbookData::PDF : EbookData::IMAGE,
         ];
 
         return $singedEbook;
@@ -102,8 +108,9 @@ class IuEbookRepository
 
     public function getEbookMeta($ebookType)
     {
-        if (!array_key_exists($ebookType, EbookData::getMeta()))
+        if (! array_key_exists($ebookType, EbookData::getMeta())) {
             return [];
+        }
 
         return EbookData::getMeta()[$ebookType];
     }

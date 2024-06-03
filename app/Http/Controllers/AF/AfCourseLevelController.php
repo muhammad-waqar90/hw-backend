@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Lang;
 class AfCourseLevelController extends Controller
 {
     private AfCourseRepository $afCourseRepository;
+
     private AfCourseLevelRepository $afCourseLevelRepository;
 
     public function __construct(AfCourseRepository $afCourseRepository, AfCourseLevelRepository $afCourseLevelRepository)
@@ -22,8 +23,9 @@ class AfCourseLevelController extends Controller
     public function createLevel(int $courseId)
     {
         $course = $this->afCourseRepository->getCourse($courseId);
-        if(!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $courseLevels = $this->afCourseLevelRepository->getCourseLevels($courseId);
         // compute value for new level
@@ -36,26 +38,31 @@ class AfCourseLevelController extends Controller
     public function updateLevel(AfCourseLevelUpdateRequest $request, int $courseId, int $levelId)
     {
         $course = $this->afCourseRepository->getCourse($courseId);
-        if(!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $level = $this->afCourseLevelRepository->getLevel($levelId);
-        if(!$level)
+        if (! $level) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afCourseLevelRepository->updateCourseLevel($request->name, $levelId);
+
         return response()->json(['message' => Lang::get('general.successfullyUpdated', ['model' => 'level'])], 200);
     }
 
     public function deleteLevel(int $courseId, int $levelId)
     {
         $course = $this->afCourseRepository->getCourse($courseId);
-        if(!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $level = $this->afCourseLevelRepository->getLevel($levelId);
-        if(!$level)
+        if (! $level) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afCourseLevelRepository->deleteLevel($courseId, $levelId);
 
@@ -64,7 +71,9 @@ class AfCourseLevelController extends Controller
 
         if ($level->value === 1) {
             $level = $this->afCourseLevelRepository->getCourseLevelByValue($courseId, $level->value);
-            if($level) $this->afCourseRepository->updateCourseHasLevel1Ebook($courseId, $level->id);
+            if ($level) {
+                $this->afCourseRepository->updateCourseHasLevel1Ebook($courseId, $level->id);
+            }
         }
 
         return response()->json(['message' => Lang::get('general.successfullyDeleted', ['model' => 'level'])], 200);

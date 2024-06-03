@@ -9,26 +9,23 @@ class IuCourseModulesTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'courseModules'
+        'courseModules',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Course $course
      * @return array
      */
     public function transform(Course $course)
     {
         return [
-            'id'         => $course->id,
-            'name'       => $course->name,
-            'img'        => $course->img,
-            'level_name' => $course->courseLevel->name
+            'id' => $course->id,
+            'name' => $course->name,
+            'img' => $course->img,
+            'level_name' => $course->courseLevel->name,
         ];
     }
 

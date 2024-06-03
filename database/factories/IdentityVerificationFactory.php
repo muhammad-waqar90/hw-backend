@@ -10,13 +10,6 @@ use Illuminate\Support\Facades\DB;
 class IdentityVerificationFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = IdentityVerification::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -24,10 +17,11 @@ class IdentityVerificationFactory extends Factory
     public function definition()
     {
         $users_id = DB::table('users')->pluck('id');
+
         return [
-            'user_id'       =>  $users_id->random(),
-            'identity_file' =>  fake()->imageUrl(),
-            'status'        =>  IdentityVerificationStatusData::COMPLETED,
+            'user_id' => $users_id->random(),
+            'identity_file' => fake()->imageUrl(),
+            'status' => IdentityVerificationStatusData::COMPLETED,
         ];
     }
 
@@ -39,14 +33,14 @@ class IdentityVerificationFactory extends Factory
     public function withUser($userId)
     {
         return $this->state(fn () => [
-            'user_id'   =>  $userId,
+            'user_id' => $userId,
         ]);
     }
 
     public function withStatus($status)
     {
         return $this->state(fn () => [
-            'status'   =>  $status,
+            'status' => $status,
         ]);
     }
 }

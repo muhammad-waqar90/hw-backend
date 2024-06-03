@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\DataObject\GDPRStatusData;
 use App\Models\UserGdprRequest;
 use App\Repositories\GdprRepository;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class CleanExpiredUserGdprExports extends Command
@@ -22,14 +22,13 @@ class CleanExpiredUserGdprExports extends Command
      *
      * @var string
      */
-    protected $description = "Clean expired GDPR exports";
+    protected $description = 'Clean expired GDPR exports';
 
     /**
      * Create a new command instance.
      *
      * @return void
      */
-
     protected $gdprRepository;
 
     public function __construct(UserGdprRequest $userGdprRequest, GdprRepository $gdprRepository)
@@ -47,11 +46,12 @@ class CleanExpiredUserGdprExports extends Command
     public function handle()
     {
         $expiredGdprRequests = $this->getExpiredGdprRequests();
-        if ($expiredGdprRequests->isEmpty())
+        if ($expiredGdprRequests->isEmpty()) {
             return;
+        }
 
         $this->gdprRepository->removeExpiredGdprExports($expiredGdprRequests);
-        $this->info("Expired GDPR exports cleaned");
+        $this->info('Expired GDPR exports cleaned');
     }
 
     public function getExpiredGdprRequests()

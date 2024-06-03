@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 class GuCourseController extends Controller
 {
     private GuCourseRepository $guCourseRepository;
+
     private VideoRepository $videoRepository;
 
     public function __construct(GuCourseRepository $guCourseRepository, VideoRepository $videoRepository)
@@ -42,14 +43,17 @@ class GuCourseController extends Controller
     {
         try {
             $data = $this->guCourseRepository->getCoursePreview($id);
-            if (!$data)
+            if (! $data) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $data->video_preview = $data->video_preview ? $this->videoRepository->generateLinkForLesson($data->video_preview, true) : '';
             $fractal = fractal($data, new IuCoursePreviewTransformer());
+
             return response()->json($fractal, 200);
         } catch (\Exception $e) {
             Log::error('Exception: GuCourseController@getCourse', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
         }
     }
@@ -59,11 +63,13 @@ class GuCourseController extends Controller
         try {
             $data = $this->guCourseRepository->getCourseLevel($courseId, $value);
 
-            if ($data->courseModules->count() == 0)
+            if ($data->courseModules->count() == 0) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
-            if ($data->value !== 1)
+            if ($data->value !== 1) {
                 $data->previousLevel = null;
+            }
 
             $fractal = fractal($data, new GuCourseLevelTransformer());
 

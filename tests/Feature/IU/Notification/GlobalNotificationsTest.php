@@ -2,18 +2,16 @@
 
 namespace Tests\Feature\IU\Notification;
 
-use App\Models\User;
 use App\Models\GlobalNotification;
-
+use App\Models\User;
 use Illuminate\Support\Facades\Lang;
-
 use Tests\TestCase;
 
 class GlobalNotificationsTest extends TestCase
 {
     private $user;
-    
-    public function setUp(): void
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -25,7 +23,7 @@ class GlobalNotificationsTest extends TestCase
     {
         $globalNotification = GlobalNotification::factory()->create();
 
-        $response = $this->json('GET',  '/api/iu/global-notifications/'.$globalNotification->id);
+        $response = $this->json('GET', '/api/iu/global-notifications/'.$globalNotification->id);
 
         $response->assertStatus(200);
     }
@@ -34,7 +32,7 @@ class GlobalNotificationsTest extends TestCase
     {
         $globalNotification = GlobalNotification::factory()->create();
 
-        $response = $this->json('PUT',  '/api/iu/global-notifications/'.$globalNotification->id.'/read');
+        $response = $this->json('PUT', '/api/iu/global-notifications/'.$globalNotification->id.'/read');
 
         $response->assertStatus(200);
 
@@ -45,7 +43,7 @@ class GlobalNotificationsTest extends TestCase
     {
         GlobalNotification::factory(5)->create();
 
-        $response = $this->json('PUT',  '/api/iu/global-notifications/modal/read');
+        $response = $this->json('PUT', '/api/iu/global-notifications/modal/read');
 
         $response->assertStatus(200);
 

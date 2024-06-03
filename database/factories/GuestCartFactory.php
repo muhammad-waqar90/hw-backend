@@ -10,13 +10,6 @@ use Illuminate\Support\Str;
 class GuestCartFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = GuestCart::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -24,23 +17,23 @@ class GuestCartFactory extends Factory
     public function definition()
     {
         return [
-            'cart_id'       =>  Str::random(5),
-            'items'         =>  null,
-            'is_completed'  =>  GuestData::GUEST_CART_INCOMPLETE
+            'cart_id' => Str::random(5),
+            'items' => null,
+            'is_completed' => GuestData::GUEST_CART_INCOMPLETE,
         ];
     }
 
     public function withCartId($cart_id)
     {
         return $this->state(fn () => [
-            'cart_id'   =>  $cart_id
+            'cart_id' => $cart_id,
         ]);
     }
 
     public function withItem($items)
     {
         return $this->state(fn () => [
-            'items'   =>  $items
+            'items' => $items,
         ]);
     }
 }

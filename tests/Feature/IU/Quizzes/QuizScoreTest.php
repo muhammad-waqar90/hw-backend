@@ -4,26 +4,25 @@ namespace Tests\Feature\IU\Quizzes;
 
 use App\Models\User;
 use App\Models\UserQuiz;
-
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
 use App\Traits\Tests\CourseTestTrait;
+use App\Traits\Tests\FinishedLessonTrait;
 use App\Traits\Tests\JSONResponseTestTrait;
 use App\Traits\Tests\QuizQATrait;
-use App\Traits\Tests\FinishedLessonTrait;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class QuizScoreTest extends TestCase
 {
     use CourseTestTrait;
+    use FinishedLessonTrait;
     use JSONResponseTestTrait;
     use QuizQATrait;
-    use FinishedLessonTrait;
 
-    private $user, $data;
+    private $user;
 
-    public function setUp(): void
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -38,7 +37,7 @@ class QuizScoreTest extends TestCase
 
     public function testAllCorrect()
     {
-        $this->json('POST',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id . '/quiz', array('answers' => json_decode($this->QuizAnswersGenerator(1, 1, 1, 1)->answers)));
+        $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/quiz', ['answers' => json_decode($this->QuizAnswersGenerator(1, 1, 1, 1)->answers)]);
 
         $userQuiz = DB::table('user_quizzes')->where('user_id', $this->user->id)->first();
         $this->assertEquals(100, $userQuiz->score);
@@ -46,7 +45,7 @@ class QuizScoreTest extends TestCase
 
     public function testSingleFailed()
     {
-        $this->json('POST',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id . '/quiz', array('answers' => json_decode($this->QuizAnswersGenerator(-1, 1, 1, 1)->answers)));
+        $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/quiz', ['answers' => json_decode($this->QuizAnswersGenerator(-1, 1, 1, 1)->answers)]);
 
         $userQuiz = DB::table('user_quizzes')->where('user_id', $this->user->id)->first();
         $this->assertEquals(75, $userQuiz->score);
@@ -54,7 +53,7 @@ class QuizScoreTest extends TestCase
 
     public function testAllMultipleFailed()
     {
-        $this->json('POST',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id . '/quiz', array('answers' => json_decode($this->QuizAnswersGenerator(1, -1, 1, 1)->answers)));
+        $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/quiz', ['answers' => json_decode($this->QuizAnswersGenerator(1, -1, 1, 1)->answers)]);
 
         $userQuiz = DB::table('user_quizzes')->where('user_id', $this->user->id)->first();
 
@@ -63,7 +62,7 @@ class QuizScoreTest extends TestCase
 
     public function testOneMultipleFailed()
     {
-        $this->json('POST',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id . '/quiz', array('answers' => json_decode($this->QuizAnswersGenerator(1, 1, 1, 1, true)->answers)));
+        $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/quiz', ['answers' => json_decode($this->QuizAnswersGenerator(1, 1, 1, 1, true)->answers)]);
 
         $userQuiz = DB::table('user_quizzes')->where('user_id', $this->user->id)->first();
 
@@ -72,7 +71,7 @@ class QuizScoreTest extends TestCase
 
     public function testAllFailed()
     {
-        $this->json('POST',  '/api/iu/courses/' . $this->data->course->id . '/lessons/' . $this->data->lesson->id . '/quiz', array('answers' => json_decode($this->QuizAnswersGenerator(-1, -1, -1, -1)->answers)));
+        $this->json('POST', '/api/iu/courses/'.$this->data->course->id.'/lessons/'.$this->data->lesson->id.'/quiz', ['answers' => json_decode($this->QuizAnswersGenerator(-1, -1, -1, -1)->answers)]);
 
         $userQuiz = DB::table('user_quizzes')->where('user_id', $this->user->id)->first();
         $this->assertEquals(0, $userQuiz->score);

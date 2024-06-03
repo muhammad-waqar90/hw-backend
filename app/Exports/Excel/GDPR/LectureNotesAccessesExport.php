@@ -29,15 +29,15 @@ class LectureNotesAccessesExport implements FromQuery, WithHeadings, WithMapping
             'id',
             'name',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
     public function prepareRows($rows)
     {
         return $rows->transform(function ($ebookAccess) {
-            $ebookAccess->name = $ebookAccess->courseModule->course->name . ' ' .
-                Lang::get('iu.course.level') . ' ' . $ebookAccess->courseModule->courseLevel->value . ' ' .
+            $ebookAccess->name = $ebookAccess->courseModule->course->name.' '.
+                Lang::get('iu.course.level').' '.$ebookAccess->courseModule->courseLevel->value.' '.
                 $ebookAccess->courseModule->name;
 
             return $ebookAccess;
@@ -50,7 +50,7 @@ class LectureNotesAccessesExport implements FromQuery, WithHeadings, WithMapping
             $row->id,
             $row->name,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

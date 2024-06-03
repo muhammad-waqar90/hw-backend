@@ -8,16 +8,13 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
             $table->unsignedBigInteger('tier_id')
                 ->after('price')
                 ->nullable();
-
 
             $table->foreign('tier_id')
                 ->references('id')
@@ -28,10 +25,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('courses', function (Blueprint $table) {
             $table->dropForeign('courses_tier_id_foreign');

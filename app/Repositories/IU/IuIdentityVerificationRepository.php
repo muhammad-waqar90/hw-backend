@@ -8,7 +8,6 @@ use App\Models\ImageVerificationDetail;
 
 class IuIdentityVerificationRepository
 {
-
     private IdentityVerification $identityVerification;
 
     public function __construct(IdentityVerification $identityVerification)
@@ -18,13 +17,15 @@ class IuIdentityVerificationRepository
 
     public function init($userId, $fullPath)
     {
-        $this->identityVerification->updateOrCreate([
-            'user_id'   => $userId
-        ],
-        [
-           'status'     => IdentityVerificationStatusData::COMPLETED, //need to refactor when document verification is implemented
-           'identity_file' => $fullPath
-        ]);
+        $this->identityVerification->updateOrCreate(
+            [
+                'user_id' => $userId,
+            ],
+            [
+                'status' => IdentityVerificationStatusData::COMPLETED, //need to refactor when document verification is implemented
+                'identity_file' => $fullPath,
+            ]
+        );
     }
 
     public static function getByUserId($userId)
@@ -34,9 +35,7 @@ class IuIdentityVerificationRepository
 
     /**
      * Detected Face
-     * @param int $identityVerificationId
-     * @param array $faceDetails
-    */
+     */
     public static function storeDetectFacesDetail(int $identityVerificationId, array $faceDetails)
     {
         return ImageVerificationDetail::create(
@@ -63,15 +62,14 @@ class IuIdentityVerificationRepository
         );
     }
 
-     /**
+    /**
      * Detected Face
-     * @param object $identityVerification
-    */
+     */
     public function identityVerificationResponse($identityVerification)
     {
         return [
-            'verified'  => $identityVerification && $identityVerification->status === IdentityVerificationStatusData::COMPLETED,
-            'status'    => $identityVerification ? $identityVerification->status : IdentityVerificationStatusData::PENDING
+            'verified' => $identityVerification && $identityVerification->status === IdentityVerificationStatusData::COMPLETED,
+            'status' => $identityVerification ? $identityVerification->status : IdentityVerificationStatusData::PENDING,
         ];
     }
 }

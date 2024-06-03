@@ -24,8 +24,16 @@ class GuCreateCartRequest extends FormRequest
     public function rules()
     {
         return [
-            'cart_id' => 'required|string|min:1|max:5',
-            'items' => 'array|required',
+            'cart_id' => [
+                'required',
+                'string',
+                'min:1',
+                'max:5',
+            ],
+            'items' => [
+                'array',
+                'required',
+            ],
         ];
     }
 }

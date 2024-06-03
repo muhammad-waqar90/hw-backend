@@ -8,18 +8,14 @@ use Illuminate\Support\Facades\Lang;
 class IuTicketUnclaimedEmail extends AbstractMail
 {
     public $adminName;
+
     public $ticketSubject;
+
     public $ticketId;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $ticketSubject
-     * @param $adminName
-     * @param $ticketId
      */
-
     public function __construct($userProfile, $ticketSubject, $adminName, $ticketId)
     {
         parent::__construct($userProfile);
@@ -33,7 +29,6 @@ class IuTicketUnclaimedEmail extends AbstractMail
      *
      * @return $this
      */
-
     public function build()
     {
         return $this->subject(Lang::get('email.subjects.ticketUnclaimed'))->view('emails.IU.Ticket.iuTicketUnclaimedEmail');

@@ -20,14 +20,11 @@ class Kernel extends ConsoleKernel
 
     /**
      * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
-    protected function schedule(Schedule $schedule)
+    protected function schedule(Schedule $schedule): void
     {
-         //$schedule->command('inspire')->hourly();
-         //$schedule->command('send:testEmail')->cron('* * * * *');
+        //$schedule->command('inspire')->hourly();
+        //$schedule->command('send:testEmail')->cron('* * * * *');
         $schedule->command('clean:verification_codes')->hourly();
         $schedule->command('clean:age_verification_codes')->hourly();
         $schedule->command('clean:password_resets')->hourly();
@@ -47,10 +44,8 @@ class Kernel extends ConsoleKernel
 
     /**
      * Register the commands for the application.
-     *
-     * @return void
      */
-    protected function commands()
+    protected function commands(): void
     {
         $this->load(__DIR__.'/Commands');
 

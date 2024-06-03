@@ -26,7 +26,11 @@ class AfRefundRequest extends FormRequest
     public function rules()
     {
         return [
-            '*.id' => 'required|integer|min:1',
+            '*.id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
             '*.entity_type' => ['required', 'string', Rule::in([PaymentGatewaysData::STRIPE])],
         ];
     }

@@ -2,17 +2,17 @@
 
 namespace Tests\Feature\IU\Ticketing;
 
-use App\Models\User;
 use App\Models\TicketSubject;
-
+use App\Models\User;
 use Tests\TestCase;
 
 class TicketsManipulationTest extends TestCase
 {
     private $user;
+
     private $ticketSubjects;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -23,7 +23,7 @@ class TicketsManipulationTest extends TestCase
 
     public function testTicketsSubjectsGetRouteValid()
     {
-        $response = $this->json('GET',  'api/iu/tickets/subjects');
+        $response = $this->json('GET', 'api/iu/tickets/subjects');
 
         $response->assertStatus(200);
 
@@ -32,7 +32,7 @@ class TicketsManipulationTest extends TestCase
 
     public function testTicketsSubjectsGetRouteByIdValid()
     {
-        $response = $this->json('GET',  '/api/iu/tickets/subjects/' . $this->ticketSubjects[0]->id);
+        $response = $this->json('GET', '/api/iu/tickets/subjects/'.$this->ticketSubjects[0]->id);
 
         $response->assertStatus(200);
 

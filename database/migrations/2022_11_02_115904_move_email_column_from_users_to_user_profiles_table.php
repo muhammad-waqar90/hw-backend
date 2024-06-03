@@ -15,10 +15,8 @@ return new class extends Migration
      * - add email column to user_profiles
      * - dump data from users to user_profiles
      * - remove email column from users table
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('user_profiles', function (Blueprint $table) {
             $table->string('email')->after('user_id');
@@ -42,10 +40,8 @@ return new class extends Migration
      * - add email column to users
      * - dump data from user_profiles to users
      * - remove email column from user_profiles table
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('email')->after('name');

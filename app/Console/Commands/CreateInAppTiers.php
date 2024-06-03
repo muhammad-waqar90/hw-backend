@@ -139,7 +139,7 @@ class CreateInAppTiers extends Command
             ['label' => 'Tier 97', 'value' => 97],
             ['label' => 'Tier 98', 'value' => 98],
             ['label' => 'Tier 99', 'value' => 99],
-            ['label' => 'Tier 100', 'value' => 100]
+            ['label' => 'Tier 100', 'value' => 100],
         ];
 
         Tier::insert($tiers);

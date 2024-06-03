@@ -3,11 +3,9 @@
 namespace Tests\Feature\IU\Faq;
 
 use App\Models\User;
-
-use Tests\TestCase;
-
 use App\Traits\Tests\FaqCategoryTestTrait;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Tests\TestCase;
 
 class FaqsPublishedTest extends TestCase
 {
@@ -16,7 +14,7 @@ class FaqsPublishedTest extends TestCase
 
     private $data;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -34,7 +32,7 @@ class FaqsPublishedTest extends TestCase
 
     public function testAdminSearchByIdFaqsGetValid()
     {
-        $response = $this->json('GET', '/api/iu/faqs/' . $this->data->faq[0]->id);
+        $response = $this->json('GET', '/api/iu/faqs/'.$this->data->faq[0]->id);
 
         $this->assertEquals($this->data->faq[0]->id, json_decode($response->content())->id);
     }

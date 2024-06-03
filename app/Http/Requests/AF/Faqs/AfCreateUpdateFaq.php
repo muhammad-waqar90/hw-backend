@@ -24,10 +24,28 @@ class AfCreateUpdateFaq extends FormRequest
     public function rules()
     {
         return [
-            'faq_category_id' => 'required|integer',
-            'question'   => 'required|string|min:4|max:255',
-            'short_answer'   => 'required|string|min:4|max:255',
-            'answer'   => 'required|string|min:4|max:10000'
+            'faq_category_id' => [
+                'required',
+                'integer',
+            ],
+            'question'   => [
+                'required',
+                'string',
+                'min:4',
+                'max:255',
+            ],
+            'short_answer'   => [
+                'required',
+                'string',
+                'min:4',
+                'max:255',
+            ],
+            'answer'   => [
+                'required',
+                'string',
+                'min:4',
+                'max:10000',
+            ],
         ];
     }
 }

@@ -1,14 +1,14 @@
 @extends('emails.layouts.emailTemplate')
 
 @section('title')
-    <title>Username</title>
+    <title>Forgot Username</title>
 @endsection
 
 @section('content')
-<table style="font-size:15px;font-family: 'Montserrat';">
+<table style="line-height: 21px;font-size:14px;font-weight: 400;font-family: 'Montserrat';color:#384860">
   <tbody>
     <tr>
-      <td style="font-size:15px;font-family: 'Montserrat';">
+      <td>
         Please find your username (Login ID) below
       </td>
     </tr>
@@ -17,7 +17,7 @@
     </tr>
     <tr>
       <td>
-        <table style="background:#f2f4fb;border-radius: 20px;">
+        <table style="background:#E9F2FD;border-radius: 4px;">
           <tbody>
             <tr><td colspan="3" style="line-height:4px;height:4px;mso-line-height-rule:exactly;">&nbsp;</td></tr>
             <tr>

@@ -24,14 +24,19 @@ class AfCreateUpdateLessonEbookRequest extends FormRequest
     public function rules()
     {
         return [
-            'content' => 'required|string|min:5|max:250'
+            'content' => [
+                'required',
+                'string',
+                'min:5',
+                'max:250',
+            ],
         ];
     }
 
     public function attributes()
     {
         return [
-            'content'  => 'Lecture E-Notes'
+            'content' => 'Lecture E-Notes',
         ];
     }
 }

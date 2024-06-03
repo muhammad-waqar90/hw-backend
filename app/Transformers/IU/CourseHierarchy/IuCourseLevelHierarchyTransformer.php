@@ -9,26 +9,23 @@ class IuCourseLevelHierarchyTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'parent'
+        'parent',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param CourseLevel $courseLevel
      * @return array
      */
     public function transform(CourseLevel $courseLevel)
     {
         return [
-            'id'             => $courseLevel->id,
+            'id' => $courseLevel->id,
             'hierarchy_name' => $courseLevel->name,
-            'name'           => $courseLevel->name,
-            'type'           => 'course_level'
+            'name' => $courseLevel->name,
+            'type' => 'course_level',
         ];
     }
 

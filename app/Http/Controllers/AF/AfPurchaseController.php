@@ -22,11 +22,17 @@ use Illuminate\Support\Facades\Mail;
 class AfPurchaseController extends Controller
 {
     private IuUserRepository $iuUserRepository;
+
     private AfNotificationRepository $afNotificationRepository;
+
     private AfPurchaseRepository $afPurchaseRepository;
+
     private IuPurchaseRepository $iuPurchaseRepository;
+
     private AfCourseRepository $afCourseRepository;
+
     private IuEbookRepository $iuEbookRepository;
+
     private IuQuizRepository $iuQuizRepository;
 
     public function __construct(
@@ -52,14 +58,16 @@ class AfPurchaseController extends Controller
         $adminId = $request->user()->id;
         $user = $this->iuUserRepository->getUser($id, true);
         $customer = $user->customer;
-        if (!$customer)
+        if (! $customer) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $items = array_column($request->toArray(), 'id');
         $validPurchaseItems = $this->afPurchaseRepository->getUserPurchaseItems($id, $items);
         $unselectedEbooks = $this->afPurchaseRepository->getUnselectedEbooks($id, $items);
-        if ($validPurchaseItems->isEmpty() || !$unselectedEbooks->isEmpty() || count($items) !== count($validPurchaseItems))
+        if ($validPurchaseItems->isEmpty() || ! $unselectedEbooks->isEmpty() || count($items) !== count($validPurchaseItems)) {
             return response()->json(['errors' => Lang::get('general.invalidData')], 400);
+        }
 
         $purchaseHistoryItems = $validPurchaseItems->groupBy('purchase_history_id');
         $refunds = $purchaseHistoryItems->map(function ($item) {
@@ -84,6 +92,7 @@ class AfPurchaseController extends Controller
             return response()->json(['message' => 'Successfully refunded'], 200);
         } catch (\Exception $e) {
             Log::error('Exception: AfPurchaseController@refund', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -100,10 +109,12 @@ class AfPurchaseController extends Controller
     {
         foreach ($items as $item) {
             $this->iuPurchaseRepository->updatePurchaseItemStatus($item->id, PurchaseItemStatusData::REFUNDED);
-            if ($item->entity_type === PurchaseItemTypeData::COURSE)
+            if ($item->entity_type === PurchaseItemTypeData::COURSE) {
                 $this->afCourseRepository->revokeCourseAccessFromUser($userId, $item->entity_id);
-            if ($item->entity_type === PurchaseItemTypeData::EBOOK)
+            }
+            if ($item->entity_type === PurchaseItemTypeData::EBOOK) {
                 $this->iuEbookRepository->revokeEbookAccessFromUser($userId, $item->entity_id);
+            }
             if (
                 $item->entity_type === PurchaseItemTypeData::EXAM
             ) {
@@ -133,6 +144,7 @@ class AfPurchaseController extends Controller
     public function getRefundedItems()
     {
         $data = $this->afPurchaseRepository->getRefundedItems();
+
         return response()->json($data, 200);
     }
 }

@@ -27,18 +27,23 @@ class CreateHeadAdmin extends Command
      * @var string
      */
     protected $description = 'Create head admin for the system';
+
     /**
      * @var AuthenticationRepository
      */
     private $authenticationRepository;
+
     /**
      * @var IuUserRepository
      */
     private $iuUserRepository;
 
     private $email;
+
     private $firstName;
+
     private $lastName;
+
     /**
      * @var AdminManipulationRepository
      */
@@ -46,12 +51,7 @@ class CreateHeadAdmin extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param AuthenticationRepository $authenticationRepository
-     * @param IuUserRepository $iuUserRepository
-     * @param AdminManipulationRepository $adminManipulationRepository
      */
-
     public function __construct(AuthenticationRepository $authenticationRepository, IuUserRepository $iuUserRepository,
         AdminManipulationRepository $adminManipulationRepository)
     {
@@ -65,24 +65,27 @@ class CreateHeadAdmin extends Command
      * Execute the console command.
      *
      * @return mixed
+     *
      * @throws \Exception
      */
     public function handle()
     {
-            $this->email = $this->ask('Input email');
-            $this->firstName = $this->ask('Input first name');
-            $this->lastName = $this->ask('Input last name');
+        $this->email = $this->ask('Input email');
+        $this->firstName = $this->ask('Input first name');
+        $this->lastName = $this->ask('Input last name');
 
-            $this->displaySelectedValues();
+        $this->displaySelectedValues();
 
-            if (!$this->confirm('Do you wish to proceed?'))
-                return;
+        if (! $this->confirm('Do you wish to proceed?')) {
+            return;
+        }
 
-            if(!$this->isValidInput())
-                return $this->error('Invalid input!');
+        if (! $this->isValidInput()) {
+            return $this->error('Invalid input!');
+        }
 
-            $this->createHeadAdmin();
-            $this->info('Successfully created head admin');
+        $this->createHeadAdmin();
+        $this->info('Successfully created head admin');
     }
 
     private function displaySelectedValues()
@@ -106,7 +109,7 @@ class CreateHeadAdmin extends Command
 
             Mail::to($this->email)->queue(new AdminAccountCreatedEmail($user, $passwordReset->token, $userName));
             DB::commit();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             throw $e;
         }
@@ -115,9 +118,9 @@ class CreateHeadAdmin extends Command
     private function isValidInput()
     {
         $values = [
-            'email'     => $this->email,
-            'firstName' => $this-> firstName,
-            'lastName'  => $this->lastName
+            'email' => $this->email,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
         ];
 
         $validator = Validator::make($values, [
@@ -126,8 +129,9 @@ class CreateHeadAdmin extends Command
             'email' => 'required|email|max:255',
         ]);
 
-        if($validator->fails())
+        if ($validator->fails()) {
             return false;
+        }
 
         return true;
     }

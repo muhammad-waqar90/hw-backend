@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Jobs\IU;
-
 
 use App\DataObject\IdentityVerificationStatusData;
 use App\Repositories\IU\IuIdentityVerificationRepository;
@@ -20,7 +18,9 @@ class IuIdentityVerificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $userId;
+
     private $identityVerification;
+
     private $imageVerificationDetail;
 
     public function __construct($userId)
@@ -32,11 +32,13 @@ class IuIdentityVerificationJob implements ShouldQueue
     public function handle(IuIdentityVerificationRepository $identityVerificationRepository)
     {
         $this->identityVerification = $identityVerificationRepository->getByUserId($this->userId);
-        if(!$this->identityVerification && $this->identityVerification->status !== IdentityVerificationStatusData::PROCESSING)
+        if (! $this->identityVerification && $this->identityVerification->status !== IdentityVerificationStatusData::PROCESSING) {
             return false;
+        }
 
-        if(!$this->isValid())
+        if (! $this->isValid()) {
             return $this->failed();
+        }
 
         $this->handleSuccess();
     }
@@ -46,7 +48,7 @@ class IuIdentityVerificationJob implements ShouldQueue
         $amazonRekognitionService = new AmazonRekognitionService();
         $this->imageVerificationDetail = $amazonRekognitionService->detectFaces($this->identityVerification->identity_file);
 
-        return !!$this->imageVerificationDetail;
+        return (bool) $this->imageVerificationDetail;
     }
 
     public function handleSuccess()
@@ -61,7 +63,7 @@ class IuIdentityVerificationJob implements ShouldQueue
         IuIdentityVerificationRepository::storeDetectFacesDetail($this->identityVerification->id, $this->imageVerificationDetail);
     }
 
-    public function failed(Throwable $exception = null)
+    public function failed(?Throwable $exception = null)
     {
         $this->identityVerification->status = IdentityVerificationStatusData::FAILED;
         $this->identityVerification->save();

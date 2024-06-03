@@ -12,20 +12,19 @@ class IuUserCreated
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public User $user;
-    public $email, $dateOfBirth, $password, $parentEmail;
+
+    public string $email;
+
+    public string $dateOfBirth;
+
+    public string $password;
+
+    public ?string $parentEmail;
 
     /**
      * Create a new event instance.
-     *
-     * @param User $user
-     * @param string $email
-     * @param string $dateOfBirth
-     * @param string $password
-     * @param string|null $parentEmail
-     * 
-     * @return void
      */
-    public function __construct(User $user, $email, $dateOfBirth, $password, $parentEmail)
+    public function __construct(User $user, string $email, string $dateOfBirth, string $password, ?string $parentEmail)
     {
         $this->user = $user;
         $this->email = $email;

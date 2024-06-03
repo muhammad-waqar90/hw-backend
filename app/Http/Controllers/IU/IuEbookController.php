@@ -22,8 +22,9 @@ class IuEbookController extends Controller
     public function get(Request $request, $courseId, $lessonId)
     {
         $ebook = $this->iuEbookRepository->getByLessonId($lessonId);
-        if (!$ebook)
+        if (! $ebook) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $ebook->src = $this->iuEbookRepository->generateS3SignedEbook($ebook->content);
 
@@ -36,8 +37,8 @@ class IuEbookController extends Controller
     {
         EbookDisablePrompt::updateOrCreate(
             [
-                'user_id'           => $request->user()->id,
-                'course_module_id'  => $request->lesson->course_module_id
+                'user_id' => $request->user()->id,
+                'course_module_id' => $request->lesson->course_module_id,
             ],
         );
 
@@ -50,6 +51,7 @@ class IuEbookController extends Controller
         $data = $this->iuEbookRepository->getEbookListPerLevel($courseId, $level, $userId);
 
         $fractal = fractal($data, new IuCartCourseEbooksTransformer());
+
         return response()->json($fractal, 200);
     }
 }

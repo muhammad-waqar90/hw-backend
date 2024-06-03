@@ -25,15 +25,15 @@ class AfLessonRepository
         $published
     ) {
         return $this->lesson->create([
-            'course_id'         => $courseId,
-            'course_module_id'  => $moduleId,
-            'order_id'          => $orderId,
-            'name'              => $name,
-            'img'               => $thumbnail,
-            'description'       => $description,
-            'video'             => $video,
-            'published'         => $published,
-            'content'           => ''
+            'course_id' => $courseId,
+            'course_module_id' => $moduleId,
+            'order_id' => $orderId,
+            'name' => $name,
+            'img' => $thumbnail,
+            'description' => $description,
+            'video' => $video,
+            'published' => $published,
+            'content' => '',
         ]);
     }
 
@@ -58,12 +58,12 @@ class AfLessonRepository
         return $this->lesson
             ->where('id', $id)
             ->update([
-                'order_id'      => $orderId,
-                'name'          => $name,
-                'img'           => $thumbnail,
-                'description'   => $description,
-                'video'         => $video,
-                'published'     => $published,
+                'order_id' => $orderId,
+                'name' => $name,
+                'img' => $thumbnail,
+                'description' => $description,
+                'video' => $video,
+                'published' => $published,
             ]);
     }
 
@@ -119,7 +119,7 @@ class AfLessonRepository
         return $this->lesson
             ->whereIn('id', $lessonIds)
             ->update([
-                'published' => 1
+                'published' => 1,
             ]);
     }
 
@@ -127,7 +127,7 @@ class AfLessonRepository
     {
         return $this->lesson
             ->where('course_module_id', $moduleId)
-            ->orderBy('order_id', 'DESC')
+            ->latest('order_id')
             ->first();
     }
 
@@ -140,8 +140,8 @@ class AfLessonRepository
             ->with('courseModule', function ($query) {
                 $query->addSelect('id', 'name');
             })
-            ->orderBy('course_module_id', 'ASC')
-            ->orderBy('id', 'ASC')
+            ->oldest('course_module_id')
+            ->oldest('id')
             ->get();
     }
 

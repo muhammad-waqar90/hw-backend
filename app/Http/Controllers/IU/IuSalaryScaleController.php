@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\IU;
 
-use Exception;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IU\SalaryScale\IuCreateUserSalaryScaleRequest;
 use App\Http\Requests\IU\SalaryScale\IuUpdateUserSalaryScaleRequest;
 use App\Repositories\IU\IuSalaryScaleRepository;
+use Exception;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 
@@ -22,6 +22,7 @@ class IuSalaryScaleController extends Controller
     public function getDiscountedCountryList()
     {
         $data = $this->iuSalaryScaleRepository->getDiscountedCountryList();
+
         return response()->json($data, 200);
     }
 
@@ -39,6 +40,7 @@ class IuSalaryScaleController extends Controller
             return response()->json(['message' => Lang::get('general.successfullyCreated', ['model' => 'user salary scale'])], 200);
         } catch (Exception $e) {
             Log::error('Exception: IuSalaryScaleController@createSalaryScale', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -46,8 +48,9 @@ class IuSalaryScaleController extends Controller
     public function updateSalaryScale(IuUpdateUserSalaryScaleRequest $request)
     {
         $userId = $request->user()->id;
-        if(!$request->user()->salaryScale)
+        if (! $request->user()->salaryScale) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         try {
             $this->iuSalaryScaleRepository->updateUserSalaryScale($userId, $request->discounted_country_id, $request->discounted_country_range_id);
@@ -55,6 +58,7 @@ class IuSalaryScaleController extends Controller
             return response()->json(['message' => Lang::get('general.successfullyUpdated', ['model' => 'user salary scale'])], 200);
         } catch (Exception $e) {
             Log::error('Exception: IuSalaryScaleController@updateSalaryScale', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }

@@ -8,9 +8,6 @@ class ForgotUsernameEmail extends AbstractMail
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $username
      */
     public function __construct($userProfile, $username)
     {

@@ -24,10 +24,28 @@ class QuizImportRequest extends FormRequest
     public function rules()
     {
         return [
-            'duration'      => 'required|integer|min:10', // quiz | exam seconds
-            'file'          => 'required|max:5120|mimes:xlsx,xls', // 5MB
-            'sample_size'   => 'required|integer|min:4|is_divisible_by:4', // quiz | exam number of questions to attempt
-            'price'         => 'present|nullable|numeric|between:0,99.99' // exam price
+            'duration'      => [
+                'required',
+                'integer',
+                'min:10',
+            ], // quiz | exam seconds
+            'file'          => [
+                'required',
+                'max:5120',
+                'mimes:xlsx,xls',
+            ], // 5MB
+            'sample_size'   => [
+                'required',
+                'integer',
+                'min:4',
+                'is_divisible_by:4',
+            ], // quiz | exam number of questions to attempt
+            'price'         => [
+                'present',
+                'nullable',
+                'numeric',
+                'between:0,99.99',
+            ], // exam price
         ];
     }
 }

@@ -18,8 +18,8 @@ class RestoreUserException extends Exception
     public function getErrors(): array
     {
         return [
-            'errors'    => Lang::get('auth.accountTrashed'),
-            'token'     => $this->token
+            'errors' => Lang::get('auth.accountTrashed'),
+            'token' => $this->token,
         ];
     }
 }

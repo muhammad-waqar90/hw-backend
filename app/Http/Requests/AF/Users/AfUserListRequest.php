@@ -26,13 +26,20 @@ class AfUserListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'    => 'string|nullable|max:100',
+            'searchText'    => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
             'activeStatus'  => [
                 'nullable',
                 'integer',
-                Rule::in(array_values(ActivityStatusData::getConstants()))
+                Rule::in(array_values(ActivityStatusData::getConstants())),
             ],
-            'courseId'      => 'nullable|integer',
+            'courseId'      => [
+                'nullable',
+                'integer',
+            ],
         ];
     }
 }

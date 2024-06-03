@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers\IU;
 
-use Exception;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Storage;
-use App\Transformers\IU\IuProfileTransformer;
-use App\Http\Requests\IU\IuUpdateProfileRequest;
-use App\Repositories\IU\IuUserProfileRepository;
-// use App\Jobs\IU\IuIdentityVerificationJob;
 use App\DataObject\IdentityVerificationStatusData;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\IU\IuCreateUpdateIdentityRequest;
+use App\Http\Requests\IU\IuUpdateProfileRequest;
 use App\Http\Requests\IU\IuUpdateUserAddressRequest;
 use App\Http\Requests\IU\SalaryScale\IuUpdateEnableSalaryScaleFlagRequest;
 use App\Repositories\IU\IuIdentityVerificationRepository;
+use App\Repositories\IU\IuUserProfileRepository;
+// use App\Jobs\IU\IuIdentityVerificationJob;
+use App\Transformers\IU\IuProfileTransformer;
+use Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class IuUserProfileController extends Controller
 {
-
     private IuUserProfileRepository $iuUserProfileRepository;
+
     private IuIdentityVerificationRepository $identityVerificationRepository;
 
     public function __construct(IuUserProfileRepository $iuUserProfileRepository, IuIdentityVerificationRepository $identityVerificationRepository)
@@ -39,6 +39,7 @@ class IuUserProfileController extends Controller
         $userProfile->last_name = $user->last_name;
 
         $fractal = fractal($userProfile, new IuProfileTransformer());
+
         return response()->json($fractal, 200);
     }
 
@@ -46,6 +47,7 @@ class IuUserProfileController extends Controller
     {
         $user = $request->user();
         $this->iuUserProfileRepository->update($user->userProfile->id, $request);
+
         return response()->json(['message' => Lang::get('iu.profile.successUpdate')], 200);
     }
 
@@ -64,6 +66,7 @@ class IuUserProfileController extends Controller
         $user = $request->user();
 
         $identityVerification = $this->identityVerificationRepository->identityVerificationResponse($user->identityVerification);
+
         return response()->json($identityVerification, 200);
     }
 
@@ -74,17 +77,21 @@ class IuUserProfileController extends Controller
         $identityVerification = $this->identityVerificationRepository->getByUserId($user->id);
         $identityVerificationStatus = $identityVerification ? $identityVerification->status : IdentityVerificationStatusData::PENDING;
 
-        if ($identityFile && $identityVerificationStatus === IdentityVerificationStatusData::COMPLETED)
+        if ($identityFile && $identityVerificationStatus === IdentityVerificationStatusData::COMPLETED) {
             return response()->json(['message' => Lang::get('iu.identityVerification.alreadyVerified')], 400);
+        }
 
-        if ($identityFile && $identityVerificationStatus === IdentityVerificationStatusData::PROCESSING)
+        if ($identityFile && $identityVerificationStatus === IdentityVerificationStatusData::PROCESSING) {
             return response()->json(['message' => Lang::get('iu.identityVerification.previouslyProcessing')], 400);
+        }
 
-        if (!$identityFile && ($identityVerificationStatus === IdentityVerificationStatusData::FAILED || $identityVerificationStatus === IdentityVerificationStatusData::PENDING))
+        if (! $identityFile && ($identityVerificationStatus === IdentityVerificationStatusData::FAILED || $identityVerificationStatus === IdentityVerificationStatusData::PENDING)) {
             return response()->json(['message' => Lang::get('iu.identityVerification.required')], 400);
+        }
 
-        if ($identityFile && ($identityVerificationStatus === IdentityVerificationStatusData::FAILED || $identityVerificationStatus === IdentityVerificationStatusData::PENDING))
+        if ($identityFile && ($identityVerificationStatus === IdentityVerificationStatusData::FAILED || $identityVerificationStatus === IdentityVerificationStatusData::PENDING)) {
             $this->initIdentityVerification($identityFile, $user);
+        }
 
         return response()->json(['message' => Lang::get('iu.identityVerification.successfullyUploaded')], 200);
     }
@@ -117,6 +124,7 @@ class IuUserProfileController extends Controller
             return response()->json(['message' => Lang::get('iu.profile.successUpdate')], 200);
         } catch (Exception $e) {
             Log::error('Exception: IuUserProfileController@updateAddress', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }

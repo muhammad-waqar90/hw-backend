@@ -27,7 +27,9 @@ class CleanExpiredRestoreUserJob implements ShouldQueue
      * @return void
      */
     private $userId;
+
     private $email;
+
     private $token;
 
     public function __construct($userId, $email, $token)

@@ -3,19 +3,25 @@
 namespace App\Imports\Excel\Quizzes;
 
 use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromArray;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class MakeIndexImportFile implements FromArray, WithHeadings
 {
     use Exportable;
 
     private $lessonId;
+
     private $moduleId;
+
     private $levelId;
+
     private $questions;
+
     private $noOfQuestions;
+
     private $duration;
+
     private $price;
 
     public function __construct(
@@ -46,8 +52,8 @@ class MakeIndexImportFile implements FromArray, WithHeadings
                 $this->questions,
                 $this->noOfQuestions,
                 $this->duration,
-                $this->price
-            ]
+                $this->price,
+            ],
         ];
     }
 

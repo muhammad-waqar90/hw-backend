@@ -7,7 +7,6 @@ use League\Fractal\TransformerAbstract;
 
 class IuLessonQaListTransformer extends TransformerAbstract
 {
-
     /**
      * A Fractal transformer.
      *
@@ -23,7 +22,7 @@ class IuLessonQaListTransformer extends TransformerAbstract
             'question' => $question ?: null,
             'answer' => $answer ?: null,
             'created_at' => $ticket->created_at,
-            'updated_at' => $ticket->updated_at
+            'updated_at' => $ticket->updated_at,
         ];
     }
 }

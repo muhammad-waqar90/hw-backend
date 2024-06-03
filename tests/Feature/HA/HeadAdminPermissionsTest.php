@@ -2,22 +2,21 @@
 
 namespace Tests\Feature\HA;
 
-use App\Models\User;
 use App\Models\PermGroup;
-
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class HeadAdminPermissionsTest extends TestCase
 {
     use PermGroupUserTestTrait;
 
-    private $wrongUser, $data;
+    private $wrongUser;
 
-    public function setUp(): void
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -193,7 +192,7 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGetRouteValid()
     {
-        $response = $this->json('GET',  '/api/ha/permissions/');
+        $response = $this->json('GET', '/api/ha/permissions/');
 
         $response->assertStatus(200);
 
@@ -202,7 +201,7 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGetRouteValidSearch()
     {
-        $response = $this->json('GET',  '/api/ha/permissions?searchText='.$this->data->searchPermissions[0]->display_name);
+        $response = $this->json('GET', '/api/ha/permissions?searchText='.$this->data->searchPermissions[0]->display_name);
 
         $response->assertStatus(200);
 
@@ -211,7 +210,7 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGetRouteValidSearchNoResults()
     {
-        $response = $this->json('GET',  '/api/ha/permissions?searchText=PermissionWrongDoesntExists');
+        $response = $this->json('GET', '/api/ha/permissions?searchText=PermissionWrongDoesntExists');
 
         $response->assertStatus(200);
 
@@ -220,14 +219,14 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGetRouteInvalidUser()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/ha/permissions/');
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/ha/permissions/');
 
         $response->assertStatus(403);
     }
 
     public function testPermissionsGroupsGetRouteValid()
     {
-        $response = $this->json('GET',  '/api/ha/permissions/groups');
+        $response = $this->json('GET', '/api/ha/permissions/groups');
 
         $response->assertStatus(200);
 
@@ -236,14 +235,14 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGroupsGetRouteInvalidUser()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/ha/permissions/groups');
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/ha/permissions/groups');
 
         $response->assertStatus(403);
     }
 
     public function testPermissionsGroupsGetRouteValidSearch()
     {
-        $response = $this->json('GET',  '/api/ha/permissions/groups?searchText=' . $this->data->permGroups[0]->name);
+        $response = $this->json('GET', '/api/ha/permissions/groups?searchText='.$this->data->permGroups[0]->name);
 
         $response->assertStatus(200);
 
@@ -255,7 +254,7 @@ class HeadAdminPermissionsTest extends TestCase
         PermGroup::factory()->withName('PermGroup1')->create();
         PermGroup::factory()->withName('PermGroup2')->create();
 
-        $response = $this->json('GET',  '/api/ha/permissions/groups?searchText=PermGroup');
+        $response = $this->json('GET', '/api/ha/permissions/groups?searchText=PermGroup');
 
         $response->assertStatus(200);
 
@@ -264,7 +263,7 @@ class HeadAdminPermissionsTest extends TestCase
 
     public function testPermissionsGroupsGetRouteValidSearchNoResults()
     {
-        $response = $this->json('GET',  '/api/ha/permissions/groups?searchText=PermGroupWrongDoesntExists');
+        $response = $this->json('GET', '/api/ha/permissions/groups?searchText=PermGroupWrongDoesntExists');
 
         $response->assertStatus(200);
 
@@ -275,43 +274,43 @@ class HeadAdminPermissionsTest extends TestCase
     {
         $permissionGroup = PermGroup::factory()->withName('PermGroup1')->create();
 
-        $response = $this->json('GET',  '/api/ha/permissions/groups/'.$permissionGroup->id);
+        $response = $this->json('GET', '/api/ha/permissions/groups/'.$permissionGroup->id);
 
         $response->assertStatus(200);
     }
 
     public function testPermissionsGroupsPostRouteValid()
     {
-        $response = $this->json('POST', '/api/ha/permissions/groups/', array('name' => 'GroupName', 'users' => array(), 'permissions' => array($this->data->permissions[0], $this->data->permissions[1]), 'description' => 'desc'));
+        $response = $this->json('POST', '/api/ha/permissions/groups/', ['name' => 'GroupName', 'users' => [], 'permissions' => [$this->data->permissions[0], $this->data->permissions[1]], 'description' => 'desc']);
 
         $response->assertStatus(201);
     }
 
     public function testPermissionsGroupsPostRouteInvalidUserAlreadyExists()
     {
-        $response = $this->json('POST', '/api/ha/permissions/groups/', array('name' => $this->data->permGroups[0]->name, 'users' => array(), 'permissions' => array($this->data->permissions[0], $this->data->permissions[1]), 'description' => 'desc'));
+        $response = $this->json('POST', '/api/ha/permissions/groups/', ['name' => $this->data->permGroups[0]->name, 'users' => [], 'permissions' => [$this->data->permissions[0], $this->data->permissions[1]], 'description' => 'desc']);
 
         $response->assertStatus(422);
     }
 
     public function testPermissionsGroupsDelRouteValid()
     {
-        $response = $this->json('DELETE', '/api/ha/permissions/groups/' . $this->data->users[0]->id);
+        $response = $this->json('DELETE', '/api/ha/permissions/groups/'.$this->data->users[0]->id);
 
         $response->assertStatus(200);
     }
 
     public function testPermissionsGroupsDelNGetRouteValidUpdatedInGetRoute()
     {
-        $response = $this->json('DELETE', '/api/ha/permissions/groups/' . $this->data->permGroups[0]->id);
+        $response = $this->json('DELETE', '/api/ha/permissions/groups/'.$this->data->permGroups[0]->id);
 
-        $response = $this->json('GET',  '/api/ha/permissions/groups/');
+        $response = $this->json('GET', '/api/ha/permissions/groups/');
         $this->assertEquals(14, count(json_decode($response->content())->data->data));
     }
 
     public function testPermissionsGroupsPutRouteValid()
     {
-        $response = $this->json('PUT', '/api/ha/permissions/groups/' . $this->data->permGroups[0]->id, array('name' => 'GroupName', 'users' => array(), 'permissions' => array($this->data->permissions[0], $this->data->permissions[1]), 'description' => 'desc'));
+        $response = $this->json('PUT', '/api/ha/permissions/groups/'.$this->data->permGroups[0]->id, ['name' => 'GroupName', 'users' => [], 'permissions' => [$this->data->permissions[0], $this->data->permissions[1]], 'description' => 'desc']);
 
         $response->assertStatus(200);
     }

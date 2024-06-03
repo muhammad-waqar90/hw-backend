@@ -3,24 +3,21 @@
 namespace Tests\Feature\IU\Notification;
 
 use App\DataObject\Notifications\NotificationTypeData;
-use App\Models\User;
 use App\Models\Notification;
-
-use Illuminate\Support\Facades\Lang;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\CertificateTestTrait;
 use App\Traits\Tests\JSONResponseTestTrait;
+use Illuminate\Support\Facades\Lang;
+use Tests\TestCase;
 
 class NotificationsTest extends TestCase
 {
-    use JSONResponseTestTrait;
     use CertificateTestTrait;
+    use JSONResponseTestTrait;
 
     private $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -30,7 +27,7 @@ class NotificationsTest extends TestCase
 
     public function testNoNotificationsAvailability()
     {
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         $response->assertStatus(200);
     }
@@ -39,42 +36,42 @@ class NotificationsTest extends TestCase
     {
         Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::SUPPORT_TICKET)->create();
 
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         $response->assertStatus(200);
 
         //check count & type of notification
         $notification = $response['data'];
         $this->assertEquals(count($notification), 1);
-        $this->assertEquals($notification[0]['type'],  NotificationTypeData::SUPPORT_TICKET);
+        $this->assertEquals($notification[0]['type'], NotificationTypeData::SUPPORT_TICKET);
     }
 
     public function testGlobalNotificationsAvailability()
     {
         Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::GLOBAL)->create();
 
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         $response->assertStatus(200);
 
         //check count & type of notification
         $notification = $response['data'];
         $this->assertEquals(count($notification), 1);
-        $this->assertEquals($notification[0]['type'],  NotificationTypeData::GLOBAL);
+        $this->assertEquals($notification[0]['type'], NotificationTypeData::GLOBAL);
     }
 
     public function testCertificateNotificationsAvailability()
     {
         Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::CERTIFICATE)->create();
 
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         $response->assertStatus(200);
 
         //check count & type of notification
         $notification = $response['data'];
         $this->assertEquals(count($notification), 1);
-        $this->assertEquals($notification[0]['type'],  NotificationTypeData::CERTIFICATE);
+        $this->assertEquals($notification[0]['type'], NotificationTypeData::CERTIFICATE);
     }
 
     public function testAllTypesNotificationsAvailability()
@@ -83,7 +80,7 @@ class NotificationsTest extends TestCase
         $globalNotification = Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::GLOBAL)->create();
         $certificateNotification = Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::CERTIFICATE)->create();
 
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         //check type of notification
         $notifications = $response['data'];
@@ -100,7 +97,7 @@ class NotificationsTest extends TestCase
     {
         Notification::factory(20)->withUserId($this->user->id)->withType(NotificationTypeData::SUPPORT_TICKET)->create();
 
-        $response = $this->json('GET',  '/api/iu/notifications/me');
+        $response = $this->json('GET', '/api/iu/notifications/me');
 
         $nextPageUrl = $response['next_page_url'];
         $this->assertNotNull($nextPageUrl);
@@ -110,7 +107,7 @@ class NotificationsTest extends TestCase
     {
         $notification = Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::CERTIFICATE)->create();
 
-        $response = $this->json('PUT',  '/api/notifications/' . $notification->id . '/read');
+        $response = $this->json('PUT', '/api/notifications/'.$notification->id.'/read');
 
         $this->assertEquals($response['message'], Lang::get('notifications.success.read'));
 
@@ -123,7 +120,7 @@ class NotificationsTest extends TestCase
     {
         $notification = Notification::factory()->withUserId($this->user->id)->withType(NotificationTypeData::CERTIFICATE)->read()->create();
 
-        $response = $this->json('PUT',  '/api/notifications/' . $notification->id . '/read');
+        $response = $this->json('PUT', '/api/notifications/'.$notification->id.'/read');
 
         $this->assertEquals($response['errors'], Lang::get('notifications.errors.alreadyRead'));
     }
@@ -134,7 +131,7 @@ class NotificationsTest extends TestCase
         Notification::factory(10)->withUserId($this->user->id)->withType(NotificationTypeData::GLOBAL)->create();
         Notification::factory(5)->withUserId($this->user->id)->withType(NotificationTypeData::CERTIFICATE)->create();
 
-        $response = $this->json('PUT',  '/api/iu/notifications/all/read');
+        $response = $this->json('PUT', '/api/iu/notifications/all/read');
 
         $response->assertStatus(200);
         $this->assertEquals($response['message'], Lang::get('notifications.success.bulkRead'));

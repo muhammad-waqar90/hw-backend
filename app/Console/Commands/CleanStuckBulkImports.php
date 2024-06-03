@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\DataObject\AF\BulkImportStatusData;
 use App\Exceptions\Quizzes\Imports\IndexImportException;
 use App\Models\BulkImportStatus;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class CleanStuckBulkImports extends Command
@@ -23,6 +23,7 @@ class CleanStuckBulkImports extends Command
      * @var string
      */
     protected $description = 'Clean stuck bulk imports';
+
     private BulkImportStatus $bulkImportStatus;
 
     /**
@@ -30,7 +31,6 @@ class CleanStuckBulkImports extends Command
      *
      * @return void
      */
-
     public function __construct(BulkImportStatus $bulkImportStatus)
     {
         parent::__construct();
@@ -45,8 +45,9 @@ class CleanStuckBulkImports extends Command
     public function handle()
     {
         $stuckBimCount = $this->stuckBimQuery()->count();
-        if($stuckBimCount === 0)
+        if ($stuckBimCount === 0) {
             return $this->info('No bulk imports stuck');
+        }
 
         $this->handleBimFailing();
         $this->info("Failed $stuckBimCount bulk imports");
@@ -59,14 +60,14 @@ class CleanStuckBulkImports extends Command
         );
         $this->stuckBimQuery()->update([
             'errors' => $error->formatError(),
-            'status' => BulkImportStatusData::FAILED
+            'status' => BulkImportStatusData::FAILED,
         ]);
     }
 
     public function stuckBimQuery()
     {
         return $this->bulkImportStatus
-            ->where('updated_at', '<',Carbon::now()->subHours(1))
+            ->where('updated_at', '<', Carbon::now()->subHours(1))
             ->where('status', BulkImportStatusData::PROCESSING);
     }
 }

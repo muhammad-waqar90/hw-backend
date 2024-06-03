@@ -5,16 +5,16 @@ namespace App\Http\Controllers\IU;
 use App\DataObject\Tickets\TicketMessageTypeData;
 use App\DataObject\Tickets\TicketStatusData;
 use App\DataObject\Tickets\TicketSubjectData;
+use App\Events\Notifications\Tickets\IuTicketReplied;
+use App\Events\Notifications\Tickets\IuTicketResolved;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\IU\CreateIuTicketRequest;
 use App\Http\Requests\IU\IuReplyToTicketRequest;
 use App\Mail\IU\Ticket\IuTicketCreatedEmail;
 use App\Repositories\TicketRepository;
 use App\Transformers\IU\IuMyTicketListTransformer;
-use App\Transformers\IU\IuTicketTransformer;
-use App\Events\Notifications\Tickets\IuTicketReplied;
-use App\Events\Notifications\Tickets\IuTicketResolved;
 use App\Transformers\IU\IuTicketMessageTransformer;
+use App\Transformers\IU\IuTicketTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
@@ -33,14 +33,16 @@ class IuTicketController extends Controller
     public function getTicketSubjectList()
     {
         $data = $this->ticketRepository->getFullTicketSubjectList();
+
         return response()->json($data, 200);
     }
 
     public function getTicketSubject($id)
     {
         $data = $this->ticketRepository->getTicketSubject($id);
-        if(!$data)
+        if (! $data) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json($data, 200);
     }
@@ -50,13 +52,15 @@ class IuTicketController extends Controller
         $userId = $request->user()->id;
         DB::beginTransaction();
         try {
-            if($request->subjectId == 0)
+            if ($request->subjectId == 0) {
                 $ticketSubject = (object) TicketSubjectData::OTHER;
-            else
+            } else {
                 $ticketSubject = $this->ticketRepository->getTicketSubject($request->subjectId);
+            }
 
-            if(!$ticketSubject)
+            if (! $ticketSubject) {
                 return response()->json(['errors' => Lang::get('tickets.invalidSubjectId')], 422);
+            }
 
             $ticket = $this->ticketRepository->createIuTicket($ticketSubject->ticket_category_id, $userId, $ticketSubject->name, $request->log);
             $message = $this->ticketRepository->createMessage(
@@ -66,8 +70,9 @@ class IuTicketController extends Controller
                 TicketMessageTypeData::USER_MESSAGE
             );
 
-            if($request->assets)
+            if ($request->assets) {
                 $this->ticketRepository->handleTicketAssets($userId, $request->assets, $ticket->id, TicketMessageTypeData::USER_ASSET_MESSAGE);
+            }
 
             DB::commit();
 
@@ -78,10 +83,11 @@ class IuTicketController extends Controller
                 'message' => Lang::get('tickets.successfullySubmittedTicket'),
                 'data' => $ticket,
             ], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: IuTicketController@submitTicket', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -90,13 +96,14 @@ class IuTicketController extends Controller
     {
         $userId = $request->user()->id;
         $searchStatus = $this->ticketRepository->parseSearchStatus($request->status);
-        if(!$searchStatus)
+        if (! $searchStatus) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         $data = $this->ticketRepository->getMyTicketList($userId, $searchStatus, $request->subject)
             ->appends([
                 'subject' => $request->subject,
-                'status' => $request->status
+                'status' => $request->status,
             ]);
 
         $fractal = fractal($data->getCollection(), new IuMyTicketListTransformer());
@@ -108,8 +115,9 @@ class IuTicketController extends Controller
     public function getTicket($id, Request $request)
     {
         $ticket = $request->page == null ? $this->ticketRepository->getTicketDetails($id) : null;
-        if($request->page == null && !$ticket)
+        if ($request->page == null && ! $ticket) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $messages = $this->ticketRepository->getTicketMessagesList($id);
 
@@ -117,13 +125,15 @@ class IuTicketController extends Controller
         $messages->setCollection(collect($fractal));
 
         $data = (object) [
-            'messages' => $messages
+            'messages' => $messages,
         ];
-        if($request->page == null)
+        if ($request->page == null) {
             $data->ticket = fractal($ticket, new IuTicketTransformer());
+        }
 
-        if($ticket)
+        if ($ticket) {
             $this->ticketRepository->ticketSeenByUser($ticket->id, true);
+        }
 
         return response()->json($data, 200);
     }
@@ -144,12 +154,12 @@ class IuTicketController extends Controller
 
             $ticketMessages = [$message];
 
-            if($request->assets) {
+            if ($request->assets) {
                 $assets = $this->ticketRepository->handleTicketAssets($userId, $request->assets, $ticket->id, TicketMessageTypeData::USER_ASSET_MESSAGE);
                 $ticketMessages = [...$ticketMessages, ...$assets];
             }
 
-            foreach($ticketMessages as $key => $message) {
+            foreach ($ticketMessages as $key => $message) {
                 $ticketMessages[$key] = fractal($message, new IuTicketMessageTransformer());
             }
 
@@ -161,8 +171,9 @@ class IuTicketController extends Controller
 
             DB::commit();
 
-            if($ticket->admin_id)
+            if ($ticket->admin_id) {
                 IuTicketReplied::dispatch($ticket->id, $ticket->admin_id, $request->message);
+            }
 
             return response()->json(['message' => Lang::get('tickets.successfullyRepliedToTicket'), 'data' => $data], 200);
         } catch (\Exception $e) {
@@ -182,7 +193,7 @@ class IuTicketController extends Controller
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $id,
-                '"' . $userName . '" marked the ticket as resolved',
+                '"'.$userName.'" marked the ticket as resolved',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             $ticket->ticket_status_id = TicketStatusData::RESOLVED;
@@ -191,8 +202,9 @@ class IuTicketController extends Controller
 
             DB::commit();
 
-            if($ticket->admin_id)
+            if ($ticket->admin_id) {
                 IuTicketResolved::dispatch($ticket->id, $ticket->admin_id, $userName);
+            }
 
             return response()->json(['message' => Lang::get('tickets.successfullyResolvedTicket'), 'data' => $message], 200);
         } catch (\Exception $e) {
@@ -207,15 +219,16 @@ class IuTicketController extends Controller
         $userName = $request->user()->name;
         $ticket = $this->ticketRepository->getTicket($id);
 
-        if($ticket->ticket_status_id != TicketStatusData::RESOLVED)
+        if ($ticket->ticket_status_id != TicketStatusData::RESOLVED) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         DB::beginTransaction();
         try {
             $message = $this->ticketRepository->createMessage(
                 $userId,
                 $id,
-                '"' . $userName . '" marked the ticket as reopened',
+                '"'.$userName.'" marked the ticket as reopened',
                 TicketMessageTypeData::SYSTEM_MESSAGE
             );
             $ticket->ticket_status_id = TicketStatusData::REOPENED;
@@ -224,6 +237,7 @@ class IuTicketController extends Controller
             $ticket->save();
 
             DB::commit();
+
             return response()->json(['message' => Lang::get('tickets.successfullyReopenedTicket'), 'data' => $message], 200);
         } catch (\Exception $e) {
             DB::rollback();

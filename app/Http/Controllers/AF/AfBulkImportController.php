@@ -14,14 +14,8 @@ use Illuminate\Support\Facades\Storage;
 
 class AfBulkImportController extends Controller
 {
-    /**
-     * @var AfBulkImportQuizzesRepository
-     */
     private AfBulkImportQuizzesRepository $afBulkImportQuizzesRepository;
 
-    /**
-     * @param AfBulkImportQuizzesRepository $afBulkImportQuizzesRepository
-     */
     public function __construct(AfBulkImportQuizzesRepository $afBulkImportQuizzesRepository)
     {
         $this->afBulkImportQuizzesRepository = $afBulkImportQuizzesRepository;
@@ -30,8 +24,9 @@ class AfBulkImportController extends Controller
     public function importCourseQuizzes(BulkImportRequest $request, $id)
     {
         $isBulkImportProcessing = $this->isBulkImportProcessing($id, BulkImportEntityTypeData::COURSE);
-        if ($isBulkImportProcessing)
+        if ($isBulkImportProcessing) {
             return response()->json(['errors' => $isBulkImportProcessing], 400);
+        }
 
         $userId = $request->user()->id;
 
@@ -56,8 +51,9 @@ class AfBulkImportController extends Controller
     public function importLessonQuizzes(QuizImportRequest $request, int $courseId, int $levelId, int $courseModuleId, int $lessonId)
     {
         $isBulkImportProcessing = $this->isBulkImportProcessing($lessonId, BulkImportEntityTypeData::LESSON);
-        if ($isBulkImportProcessing)
+        if ($isBulkImportProcessing) {
             return response()->json(['errors' => $isBulkImportProcessing], 400);
+        }
 
         $userId = $request->user()->id;
         $bis = $this->afBulkImportQuizzesRepository->initImport($userId, $courseId, $lessonId, BulkImportEntityTypeData::LESSON);
@@ -75,7 +71,7 @@ class AfBulkImportController extends Controller
 
         $this->afBulkImportQuizzesRepository->makeImportReady($tmpImportQuizzesDirPath, $tmpImportQuizFileName, $request->file('file'));
 
-        Storage::disk('s3')->putFileAs(AfBulkImportQuizzesRepository::getStoragePath($bis->id), storage_path('app/' . $tmpImportQuizzesDirPath . '.zip'), "$bis->id.zip");
+        Storage::disk('s3')->putFileAs(AfBulkImportQuizzesRepository::getStoragePath($bis->id), storage_path('app/'.$tmpImportQuizzesDirPath.'.zip'), "$bis->id.zip");
 
         $this->afBulkImportQuizzesRepository->cleanup($tmpImportQuizzesDirPath);
         AfBulkImportQuizzesJob::dispatch($bis->id)->onQueue('bulk-import');
@@ -96,8 +92,9 @@ class AfBulkImportController extends Controller
     public function importModuleQuizzes(QuizImportRequest $request, int $courseId, int $levelId, int $courseModuleId)
     {
         $isBulkImportProcessing = $this->isBulkImportProcessing($courseModuleId, BulkImportEntityTypeData::MODULE);
-        if ($isBulkImportProcessing)
+        if ($isBulkImportProcessing) {
             return response()->json(['errors' => $isBulkImportProcessing], 400);
+        }
 
         $userId = $request->user()->id;
         $bis = $this->afBulkImportQuizzesRepository->initImport($userId, $courseId, $courseModuleId, BulkImportEntityTypeData::MODULE);
@@ -116,7 +113,7 @@ class AfBulkImportController extends Controller
 
         $this->afBulkImportQuizzesRepository->makeImportReady($tmpImportQuizzesDirPath, $tmpImportQuizFileName, $request->file('file'));
 
-        Storage::disk('s3')->putFileAs(AfBulkImportQuizzesRepository::getStoragePath($bis->id), storage_path('app/' . $tmpImportQuizzesDirPath . '.zip'), "$bis->id.zip");
+        Storage::disk('s3')->putFileAs(AfBulkImportQuizzesRepository::getStoragePath($bis->id), storage_path('app/'.$tmpImportQuizzesDirPath.'.zip'), "$bis->id.zip");
 
         $this->afBulkImportQuizzesRepository->cleanup($tmpImportQuizzesDirPath);
         AfBulkImportQuizzesJob::dispatch($bis->id)->onQueue('bulk-import');
@@ -139,10 +136,12 @@ class AfBulkImportController extends Controller
         $isBulkImportProcessing = null;
         $bis = $this->afBulkImportQuizzesRepository->getLatestBulkImport($entityId, $entityType);
 
-        if ($bis && $bis->status == BulkImportStatusData::PENDING)
+        if ($bis && $bis->status == BulkImportStatusData::PENDING) {
             $isBulkImportProcessing = 'Already initiated, pending processing';
-        if ($bis && $bis->status == BulkImportStatusData::PROCESSING)
+        }
+        if ($bis && $bis->status == BulkImportStatusData::PROCESSING) {
             $isBulkImportProcessing = 'Import is being processed';
+        }
 
         return $isBulkImportProcessing;
     }

@@ -33,7 +33,7 @@ class IdentityVerificationsExport implements FromQuery, WithHeadings, WithMappin
             'identity_file',
             'status',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 

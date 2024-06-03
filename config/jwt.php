@@ -331,6 +331,6 @@ return [
         */
 
         'year' => env('CUSTOM_TTL_YEAR', Carbon::now()->addYear()->diffInMinutes()),
-    ]
+    ],
 
 ];

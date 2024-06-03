@@ -12,10 +12,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('admin_profiles', function (Blueprint $table) {
             $table->id();
@@ -34,10 +32,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         // $admins = AdminProfile::select('user_id', 'email')->get()->toArray();
         // UserProfile::insert($admins);
@@ -56,7 +52,7 @@ return new class extends Migration
         foreach ($admins as $admin) {
             $payload = [
                 'user_id' => $admin->userProfile->user_id,
-                'email' => $admin->userProfile->email
+                'email' => $admin->userProfile->email,
             ];
 
             array_push($data, $payload);

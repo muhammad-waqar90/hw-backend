@@ -11,7 +11,7 @@ class AfCourseCreateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,17 +21,51 @@ class AfCourseCreateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            'name' => 'required|string|min:4|max:50',
-            'category_id' => 'required|integer|min:1',
-            'description' => 'required|string|min:10|max:5000',
-            'price' => 'required|gte:0|lte:5000',
-            'tier_id' => 'required|integer|min:1',
-            'number_of_levels' => 'required|integer|min:1|max:100',
-            'img' => 'required|mimes:jpg,jpeg|max_mb:10',
-            'video_preview' => 'nullable|string'
+            'name' => [
+                'required',
+                'string',
+                'min:4',
+                'max:60',
+            ],
+            'category_id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+            'description' => [
+                'required',
+                'string',
+                'min:10',
+                'max:5000',
+            ],
+            'price' => [
+                'required',
+                'gte:0',
+                'lte:5000',
+            ],
+            'tier_id' => [
+                'required',
+                'integer',
+                'min:1',
+            ],
+            'number_of_levels' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:100',
+            ],
+            'img' => [
+                'required',
+                'mimes:jpg,jpeg',
+                'max_mb:10',
+            ],
+            'video_preview' => [
+                'nullable',
+                'string',
+            ],
         ];
     }
 }

@@ -13,18 +13,13 @@ class CourseModuleUpdated
 
     /**
      * Course module updated
-     *
-     * @var int $moduleId
-     * @var bool $moduleHasExam
      */
-    public $moduleId;
-    public $moduleHasExam;
+    public int $moduleId;
+
+    public bool $moduleHasExam;
 
     /**
      * Create a new event instance.
-     *
-     * @param CourseModule $courseModule
-     * @return void
      */
     public function __construct(int $courseModuleId, bool $moduleHasExam)
     {

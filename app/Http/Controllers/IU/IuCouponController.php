@@ -22,19 +22,22 @@ class IuCouponController extends Controller
     public function canRedeem(IuCouponCanRedeemRequest $request)
     {
         $coupon = $this->iuCouponRepository->getCoupon($request->code, CouponData::ACTIVE, true);
-        if(!$coupon || ($coupon->redeem_count >= $coupon->redeem_limit))
+        if (! $coupon || ($coupon->redeem_count >= $coupon->redeem_limit)) {
             return response()->json(['errors' => Lang::get('iu.coupon.canNotRedeem')], 404);
+        }
 
-        if($this->iuCouponRepository->validateCartItems($request->cart))
+        if ($this->iuCouponRepository->validateCartItems($request->cart)) {
             return response()->json(['errors' => Lang::get('iu.purchases.cart.invalidData')], 422);
+        }
 
         $cartItemsCanRedeemCoupon = $this->iuCouponRepository->getCartItemsCanRedeemCoupon($coupon->restrictions, $request->cart);
-        if(!count($cartItemsCanRedeemCoupon))
+        if (! count($cartItemsCanRedeemCoupon)) {
             return response()->json(['errors' => Lang::get('iu.coupon.notApplicable')], 422);
+        }
 
         return response()->json([
-            'coupon'        => fractal($coupon, new IuCouponTransformer()),
-            'can_redeem'    => fractal($cartItemsCanRedeemCoupon, new IuCouponCanRedeemTransformer())
+            'coupon' => fractal($coupon, new IuCouponTransformer()),
+            'can_redeem' => fractal($cartItemsCanRedeemCoupon, new IuCouponCanRedeemTransformer()),
         ], 200);
     }
 }

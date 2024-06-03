@@ -13,18 +13,15 @@ class IuCourseAvailableListTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'category',
-        'tier'
+        'tier',
     ];
 
     /**
      * A Fractal transformer.
      *
-     * @param Course $course
      * @return array
      */
     public function transform(Course $course)
@@ -34,7 +31,7 @@ class IuCourseAvailableListTransformer extends TransformerAbstract
             'category_id' => $course->category_id,
             'name' => $course->name,
             'description' => $course->description,
-            'img' => $this->generateS3Link(IuCourseRepository::getCourseThumbnailS3StoragePath() . $course->img, 1),
+            'img' => $this->generateS3Link(IuCourseRepository::getCourseThumbnailS3StoragePath().$course->img, 1),
             'video_preview' => $course->video_preview ? $this->generateS3Link($course->video_preview, 1) : '',
             'price' => $course->price,
             'has_level_1_ebook' => $course->has_level_1_ebook,

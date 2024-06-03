@@ -2,11 +2,11 @@
 
 namespace App\Traits\Tests;
 
-use App\Models\PurchaseHistory;
-use App\Models\Refund;
-use App\Models\PurchaseItem;
-use App\Models\Course;
 use App\Models\Category;
+use App\Models\Course;
+use App\Models\PurchaseHistory;
+use App\Models\PurchaseItem;
+use App\Models\Refund;
 
 trait RefundTestTrait
 {

@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'pagination' => env('PRODUCT_PAGINATION', 15)
+    'pagination' => env('PRODUCT_PAGINATION', 15),
 ];

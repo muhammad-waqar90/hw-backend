@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Repositories\AF;
-
 
 use App\DataObject\PermissionData;
 use App\DataObject\Tickets\TicketCategoryData;
@@ -13,8 +11,8 @@ use App\Models\TicketMessage;
 
 class AfTicketRepository
 {
-
     private Ticket $ticket;
+
     private TicketMessage $ticketMessage;
 
     public function __construct(Ticket $ticket, TicketMessage $ticketMessage)
@@ -40,14 +38,15 @@ class AfTicketRepository
     {
         $possibleCategories = $this->userTicketCategoriesFromPermissions($userPermissions);
 
-        if(!$category)
-        {
+        if (! $category) {
             unset($possibleCategories[TicketCategoryData::LESSON_QA - 1]);
+
             return $possibleCategories;
         }
 
-        if(in_array($category, $possibleCategories))
+        if (in_array($category, $possibleCategories)) {
             return [$category];
+        }
 
         return false;
     }
@@ -56,12 +55,15 @@ class AfTicketRepository
     {
         $allStatuses = array_values(TicketStatusData::getConstants());
 
-        if(!$status)
+        if (! $status) {
             return $allStatuses;
-        if(!in_array($status, $allStatuses))
+        }
+        if (! in_array($status, $allStatuses)) {
             return false;
-        if($status == TicketStatusData::UNCLAIMED)
+        }
+        if ($status == TicketStatusData::UNCLAIMED) {
             return [TicketStatusData::UNCLAIMED, TicketStatusData::REOPENED];
+        }
 
         return [(int) $status];
     }
@@ -69,16 +71,21 @@ class AfTicketRepository
     public function userTicketCategoriesFromPermissions($userPermissions)
     {
         $possibleCategories = [];
-        if(in_array(PermissionData::TICKET_SYSTEM_MANAGEMENT, $userPermissions))
+        if (in_array(PermissionData::TICKET_SYSTEM_MANAGEMENT, $userPermissions)) {
             $possibleCategories[] = TicketCategoryData::SYSTEM;
-        if(in_array(PermissionData::TICKET_CONTENT_MANAGEMENT, $userPermissions))
+        }
+        if (in_array(PermissionData::TICKET_CONTENT_MANAGEMENT, $userPermissions)) {
             $possibleCategories[] = TicketCategoryData::CONTENT;
-        if(in_array(PermissionData::TICKET_REFUND_MANAGEMENT, $userPermissions))
+        }
+        if (in_array(PermissionData::TICKET_REFUND_MANAGEMENT, $userPermissions)) {
             $possibleCategories[] = TicketCategoryData::REFUND;
-        if(in_array(PermissionData::TICKET_GDPR_MANAGEMENT, $userPermissions))
+        }
+        if (in_array(PermissionData::TICKET_GDPR_MANAGEMENT, $userPermissions)) {
             $possibleCategories[] = TicketCategoryData::GDPR;
-        if(in_array(PermissionData::TICKET_LESSON_QA_MANAGEMENT, $userPermissions))
+        }
+        if (in_array(PermissionData::TICKET_LESSON_QA_MANAGEMENT, $userPermissions)) {
             $possibleCategories[] = TicketCategoryData::LESSON_QA;
+        }
 
         return $possibleCategories;
     }
@@ -93,7 +100,7 @@ class AfTicketRepository
         return $this->ticketMessage->select('ticket_messages.*', 'us.name as username')
             ->where('ticket_messages.ticket_id', $id)
             ->leftJoin('users as us', 'us.id', '=', 'ticket_messages.user_id')
-            ->orderBy('updated_at', 'DESC')
+            ->latest('updated_at')
             ->simplePaginate(15);
     }
 
@@ -109,11 +116,12 @@ class AfTicketRepository
     public function getMyTicketList($userId, $searchStatus, $searchText = '')
     {
         $searchCategories = array_values(TicketCategoryData::getConstants());
+
         return $this->getTicketQuery($searchCategories, $searchStatus, $searchText)
             ->where('admin_id', $userId)
-            ->where('ticket_category_id', '!=',  TicketCategoryData::LESSON_QA)
+            ->where('ticket_category_id', '!=', TicketCategoryData::LESSON_QA)
             ->with('latestTicketMessage')
-            ->orderBy('updated_at', 'DESC')
+            ->latest('updated_at')
             ->simplePaginate(15);
     }
 
@@ -122,20 +130,22 @@ class AfTicketRepository
         $activeTickets = $this->ticket->where('admin_id', $id)
             ->where('ticket_status_id', TicketStatusData::IN_PROGRESS)
             ->get();
-        if($activeTickets->isEmpty())
+        if ($activeTickets->isEmpty()) {
             return;
+        }
 
-        foreach($activeTickets as $ticket)
+        foreach ($activeTickets as $ticket) {
             $this->unclaimTicket($ticket, $id, $adminName);
+        }
     }
 
     public function createMessage($userId, $ticketId, $message, $type)
     {
         return $this->ticketMessage->create([
-            'user_id'       => $userId,
-            'ticket_id'     => $ticketId,
-            'message'       => $message,
-            'type'          => $type
+            'user_id' => $userId,
+            'ticket_id' => $ticketId,
+            'message' => $message,
+            'type' => $type,
         ]);
     }
 
@@ -149,7 +159,7 @@ class AfTicketRepository
         $this->createMessage(
             $adminId,
             $ticket->id,
-            'Admin "'. $adminName.'" has unclaimed your ticket',
+            'Admin "'.$adminName.'" has unclaimed your ticket',
             TicketMessageTypeData::SYSTEM_MESSAGE
         );
     }

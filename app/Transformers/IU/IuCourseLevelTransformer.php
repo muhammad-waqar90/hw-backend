@@ -9,11 +9,9 @@ class IuCourseLevelTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'course_modules'
+        'course_modules',
     ];
 
     protected $passedPreviousLevel;
@@ -26,18 +24,17 @@ class IuCourseLevelTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param CourseLevel $courseLevel
      * @return array
      */
     public function transform(CourseLevel $courseLevel)
     {
         return [
-            'id'          => $courseLevel->id,
-            'value'       => $courseLevel->value,
-            'name'        => $courseLevel->name,
-            'progress'    => $courseLevel->progress ?: 0,
-            'has_quiz'    => $courseLevel->quiz_id ? true : false,
-            'failed_quiz' => !!$courseLevel->user_quiz_failed_id
+            'id' => $courseLevel->id,
+            'value' => $courseLevel->value,
+            'name' => $courseLevel->name,
+            'progress' => $courseLevel->progress ?: 0,
+            'has_quiz' => $courseLevel->quiz_id ? true : false,
+            'failed_quiz' => (bool) $courseLevel->user_quiz_failed_id,
         ];
     }
 

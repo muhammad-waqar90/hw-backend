@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class AfGlobalNotificationsController extends Controller
 {
-
     private AfGlobalNotificationRepository $afGlobalNotificationRepository;
 
     public function __construct(AfGlobalNotificationRepository $afGlobalNotificationRepository)
@@ -22,11 +21,11 @@ class AfGlobalNotificationsController extends Controller
     public function getGlobalNotificationList(AfGlobalNotificationsSearchRequest $request)
     {
         $data = $this->afGlobalNotificationRepository->getNotificationList($request->searchText, $request->archiveStatus)
-                ->paginate(20)
-                ->appends([
-                    'searchText'  => $request->searchText,
-                    'archiveStatus' => $request->archiveStatus
-                ]);
+            ->paginate(20)
+            ->appends([
+                'searchText' => $request->searchText,
+                'archiveStatus' => $request->archiveStatus,
+            ]);
 
         return response()->json($data, 200);
     }
@@ -49,8 +48,9 @@ class AfGlobalNotificationsController extends Controller
     {
         $notification = $this->afGlobalNotificationRepository->getNotification($id);
 
-        if(!$notification)
+        if (! $notification) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json($notification, 200);
     }
@@ -60,8 +60,9 @@ class AfGlobalNotificationsController extends Controller
         try {
             $notification = $this->afGlobalNotificationRepository->getNotification($id);
 
-            if(!$notification)
+            if (! $notification) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $this->afGlobalNotificationRepository->updateGlobalNotification(
                 $id,
@@ -74,10 +75,11 @@ class AfGlobalNotificationsController extends Controller
             );
 
             return response()->json(['message' => Lang::get('global_notifications.success.updated')], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Exception: AfGlobalNotificationsController@updateGlobalNotification', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => Lang::get('global_notifications.error.invalid')], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -86,10 +88,12 @@ class AfGlobalNotificationsController extends Controller
     public function deleteGlobalNotification(int $id)
     {
         $notification = $this->afGlobalNotificationRepository->getNotification($id);
-        if(!$notification)
+        if (! $notification) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $notification->delete();
+
         return response()->json(['message' => Lang::get('global_notifications.success.deleted')], 200);
     }
 }

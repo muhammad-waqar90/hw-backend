@@ -2,8 +2,8 @@
 
 namespace App\Traits\Tests;
 
-trait QuizQATrait {
-
+trait QuizQATrait
+{
     private $singleQ = '{
         "id": 1,
         "type": "mcqSingle",
@@ -27,7 +27,6 @@ trait QuizQATrait {
         ],
         "question": "What time is it? (hint its 5:00)"
     }';
-
 
     private $multipleQ = '{
         "id": 2,
@@ -54,7 +53,7 @@ trait QuizQATrait {
         "maxChoices": 3
     }';
 
-    private $missingQ =   '{
+    private $missingQ = '{
         "id": 3,
         "type": "missingWord",
         "options": [
@@ -78,7 +77,7 @@ trait QuizQATrait {
         "question": "Time now is ___? (hint its 8:00)"
     }';
 
-    private $linkingQ   =   '{
+    private $linkingQ = '{
         "id": 4,
         "type": "linking",
         "options": {
@@ -211,9 +210,10 @@ trait QuizQATrait {
         "answerId": {}
     }';
 
-    public function RefreshId($array){
+    public function RefreshId($array)
+    {
 
-        foreach ($array as $id=>&$item) {
+        foreach ($array as $id => &$item) {
             $item['id'] = ++$id;
         }
         unset($item);
@@ -221,48 +221,48 @@ trait QuizQATrait {
         return $array;
     }
 
-    public function QuizQuestionGenerator($singleNum=null, $multipleNum=null, $missingNum=null, $linkingNum=null, $wrong=false) {
+    public function QuizQuestionGenerator($singleNum = null, $multipleNum = null, $missingNum = null, $linkingNum = null, $wrong = false)
+    {
 
         $json2[] = 0;
         $json3[] = 0;
-        if ( !is_null($singleNum) ){
+        if (! is_null($singleNum)) {
             for ($x = 0; $x < $singleNum; $x++) {
                 $json[] = json_decode($this->singleQ, true);
                 $json2[] = json_decode($this->singleA, true);
                 $json3[] = json_decode($this->singleAt, true);
-              }
+            }
         }
 
-        if ( !is_null($multipleNum) ){
+        if (! is_null($multipleNum)) {
             for ($x = 0; $x < $multipleNum; $x++) {
                 $json[] = json_decode($this->multipleQ, true);
-                if ($wrong == false){
+                if ($wrong == false) {
                     $json2[] = json_decode($this->multipleA, true);
                     $json3[] = json_decode($this->multipleAt, true);
-                }   else {
+                } else {
                     $json2[] = json_decode($this->wrongMultipleA1, true);
                     $json3[] = json_decode($this->multipleAt, true);
                 }
 
-              }
+            }
         }
 
-        if ( !is_null($missingNum) ){
+        if (! is_null($missingNum)) {
             for ($x = 0; $x < $missingNum; $x++) {
                 $json[] = json_decode($this->missingQ, true);
                 $json2[] = json_decode($this->missingA, true);
                 $json3[] = json_decode($this->missingAt, true);
-              }
+            }
         }
 
-        if ( !is_null($linkingNum) ){
+        if (! is_null($linkingNum)) {
             for ($x = 0; $x < $linkingNum; $x++) {
                 $json[] = json_decode($this->linkingQ, true);
                 $json2[] = json_decode($this->linkingA, true);
                 $json3[] = json_decode($this->linkingAt, true);
-              }
+            }
         }
-
 
         $json = $this->RefreshId($json);
         $json = json_encode($json);
@@ -277,72 +277,75 @@ trait QuizQATrait {
         $data->questions = $json;
         $data->answers = $json3;
         $data->answers2 = $json2;
+
         return $data;
     }
 
-    public function QuizItemEntryGenerator() {
+    public function QuizItemEntryGenerator()
+    {
 
-        $singleQ= json_decode($this->singleQ, true);
+        $singleQ = json_decode($this->singleQ, true);
         $answer = json_decode($this->singleA, true);
-        
+
         $data = new \stdClass();
-        $data->question = $singleQ["question"];
-        $data->options = json_encode($singleQ["options"], JSON_FORCE_OBJECT);
+        $data->question = $singleQ['question'];
+        $data->options = json_encode($singleQ['options'], JSON_FORCE_OBJECT);
         $data->answer = json_encode($answer, JSON_FORCE_OBJECT);
+
         return $data;
     }
 
-    public function QuizAnswersGenerator($singleNum=0, $multipleNum=0, $missingNum=0, $linkingNum=0, $wrongMultiple=false) {
+    public function QuizAnswersGenerator($singleNum = 0, $multipleNum = 0, $missingNum = 0, $linkingNum = 0, $wrongMultiple = false)
+    {
 
         $json2[] = 0;
 
-        if ( $singleNum > 0 ){
+        if ($singleNum > 0) {
             for ($x = 0; $x < $singleNum; $x++) {
                 $json2[] = json_decode($this->singleA, true);
-              }
+            }
         }
 
-        if ( $singleNum < 0 ){
+        if ($singleNum < 0) {
             for ($x = 0; $x > $singleNum; $x--) {
                 $json2[] = json_decode($this->emptySingleMissing, true);
-              }
+            }
         }
 
-        if ( $multipleNum > 0 ){
+        if ($multipleNum > 0) {
             for ($x = 0; $x < $multipleNum; $x++) {
                 $wrongMultiple ? $json2[] = json_decode($this->wrongMultipleA2, true) : $json2[] = json_decode($this->multipleA, true);
-              }
+            }
         }
 
-        if ( $multipleNum < 0 ){
+        if ($multipleNum < 0) {
             for ($x = 0; $x > $multipleNum; $x--) {
                 $json2[] = json_decode($this->emptyMultiple, true);
-              }
+            }
         }
 
-
-        if ( $missingNum > 0 ){
+        if ($missingNum > 0) {
             for ($x = 0; $x < $missingNum; $x++) {
                 $json2[] = json_decode($this->missingA, true);
-              }
+            }
         }
 
-        if ( $missingNum < 0 ){
+        if ($missingNum < 0) {
             for ($x = 0; $x > $missingNum; $x--) {
                 $json2[] = json_decode($this->emptySingleMissing, true);
-              }
+            }
         }
 
-        if ( $linkingNum > 0 ){
+        if ($linkingNum > 0) {
             for ($x = 0; $x < $linkingNum; $x++) {
                 $json2[] = json_decode($this->linkingA, true);
-              }
+            }
         }
 
-        if ( $linkingNum < 0 ){
+        if ($linkingNum < 0) {
             for ($x = 0; $x > $linkingNum; $x--) {
                 $json2[] = json_decode($this->emptyLinking, true);
-              }
+            }
         }
 
         $json2 = json_encode($json2, JSON_FORCE_OBJECT);
@@ -350,6 +353,7 @@ trait QuizQATrait {
 
         $data = new \stdClass();
         $data->answers = $json2;
+
         return $data;
     }
 }

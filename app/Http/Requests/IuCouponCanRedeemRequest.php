@@ -24,9 +24,19 @@ class IuCouponCanRedeemRequest extends FormRequest
     public function rules()
     {
         return [
-            'code'          => 'required|string|min:6|max:20',
-            'cart'          => 'required',
-            'cart.course'   => 'array|max:100'
+            'code'          => [
+                'required',
+                'string',
+                'min:6',
+                'max:20',
+            ],
+            'cart'          => [
+                'required',
+            ],
+            'cart.course'   => [
+                'array',
+                'max:100',
+            ],
         ];
     }
 }

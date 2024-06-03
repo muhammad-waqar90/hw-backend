@@ -12,26 +12,19 @@ class AfTicketResolved
 
     /**
      * AF ticket resolved
-     *
-     * @var $userId
-     * @var $subject
-     * @var $userName
-     * @var $message
      */
     public $userId;
+
     public $subject;
+
     public $userName;
+
     public $message;
+
     public $ticketId;
 
     /**
      * Create a new event instance.
-     *
-     * @param $ticketId
-     * @param $userId
-     * @param $subject
-     * @param $userName
-     * @param $message
      */
     public function __construct($ticketId, $userId, $subject, $userName, $message)
     {

@@ -10,8 +10,6 @@ class IuPurchaseHistoryTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'shippingDetails',
@@ -19,8 +17,6 @@ class IuPurchaseHistoryTransformer extends TransformerAbstract
 
     /**
      * List of resources possible to include
-     *
-     * @var array
      */
     protected array $availableIncludes = [
         'purchaseItems',
@@ -29,7 +25,6 @@ class IuPurchaseHistoryTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param PurchaseHistory $purchaseHistory
      * @return array
      */
     public function transform(PurchaseHistory $purchaseHistory)

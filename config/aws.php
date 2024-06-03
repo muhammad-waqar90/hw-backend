@@ -17,7 +17,7 @@ return [
     |
     */
     'credentials' => [
-        'key'    => env('AWS_ACCESS_KEY_ID', ''),
+        'key' => env('AWS_ACCESS_KEY_ID', ''),
         'secret' => env('AWS_SECRET_ACCESS_KEY', ''),
     ],
     'region' => env('AWS_DEFAULT_REGION'),
@@ -45,10 +45,10 @@ return [
     'rekognition' => [
         'client' => [
             'region' => env('AWS_DEFAULT_REGION'),
-            'version' => 'latest'
+            'version' => 'latest',
         ],
         'bucket' => env('AWS_BUCKET'),
-        'minConfidence' => 95
+        'minConfidence' => 95,
     ],
 
     // aws cloudfront service
@@ -63,7 +63,7 @@ return [
     'cloudfront' => [
         'client' => [
             'region' => env('AWS_DEFAULT_REGION'),
-            'version' => '2020-05-31'
+            'version' => '2020-05-31',
         ],
         'url' => env('AWS_CLOUDFRONT_URL', ''),
         'cname' => env('AWS_CLOUDFRONT_CNAME_URL', ''),
@@ -73,6 +73,6 @@ return [
     ],
 
     'ua_append' => [
-        'L5MOD/' . AwsServiceProvider::VERSION,
-    ]
+        'L5MOD/'.AwsServiceProvider::VERSION,
+    ],
 ];

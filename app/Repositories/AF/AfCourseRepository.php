@@ -8,15 +8,14 @@ use App\Models\Course;
 use App\Models\CourseLevel;
 use App\Repositories\AF\AfCourseModuleRepository;
 use App\Repositories\IU\IuUserRepository;
-use App\Transformers\AF\AfCourseTransformer;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Lang;
 
 class AfCourseRepository
 {
     private Course $course;
+
     private CourseLevel $courseLevel;
+
     private AfCourseModuleRepository $afCourseModuleRepository;
 
     public function __construct(
@@ -140,7 +139,7 @@ class AfCourseRepository
 
     public function courseHasUsersEnrolled($courseId)
     {
-        return DB::table('course_user')->where("course_id", $courseId)->count();
+        return DB::table('course_user')->where('course_id', $courseId)->count();
     }
 
     public function deleteCourse($id)

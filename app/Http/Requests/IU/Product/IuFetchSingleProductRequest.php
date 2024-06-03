@@ -24,7 +24,11 @@ class IuFetchSingleProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'product_id' => 'required|numeric|exists:products,id',
+            'product_id' => [
+                'required',
+                'numeric',
+                'exists:products,id',
+            ],
         ];
     }
 }

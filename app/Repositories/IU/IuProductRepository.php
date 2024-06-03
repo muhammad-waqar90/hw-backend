@@ -2,17 +2,18 @@
 
 namespace App\Repositories\IU;
 
-use App\Models\Product;
-use App\Models\PurchaseItem;
 use App\DataObject\IuProductData;
 use App\DataObject\Purchases\PurchaseItemTypeData;
+use App\Models\Product;
+use App\Models\PurchaseItem;
+use App\Transformers\IU\Product\IuAvailableProductsTransformer;
 use App\Transformers\IU\Product\IuProductsTransformer;
 use App\Transformers\IU\Product\IuSingleProductTransformer;
-use App\Transformers\IU\Product\IuAvailableProductsTransformer;
 
 class IuProductRepository
 {
     private Product $product;
+
     private PurchaseItem $purchaseItem;
 
     public function __construct(Product $product, PurchaseItem $purchasedItem)
@@ -39,10 +40,8 @@ class IuProductRepository
             ->latest()
             ->paginate(10);
 
-
         // Transform
         $transformedProducts = fractal($filteredProducts->getCollection(), new IuProductsTransformer());
-
 
         // Set collection
         $filteredProducts->setCollection(collect($transformedProducts));
@@ -112,7 +111,7 @@ class IuProductRepository
             })
             ->selectRaw('COUNT(purchase_items.entity_id) as trending')
             ->groupBy('products.id')
-            ->orderBy('trending', 'DESC')
+            ->latest('trending')
             ->simplePaginate(config('product.pagination'));
 
         $fractal = fractal($data->getCollection(), new IuSingleProductTransformer());

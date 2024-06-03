@@ -24,7 +24,10 @@ class IuUpdateEnableSalaryScaleFlagRequest extends FormRequest
     public function rules()
     {
         return [
-            'enable_salary_scale' => 'required|boolean'
+            'enable_salary_scale' => [
+                'required',
+                'boolean',
+            ],
         ];
     }
 }

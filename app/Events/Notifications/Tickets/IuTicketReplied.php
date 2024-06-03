@@ -12,20 +12,15 @@ class IuTicketReplied
 
     /**
      * IU ticket reply
-     *
-     * @var $userId
-     * @var $description
      */
     public $userId;
+
     public $description;
+
     public $ticketId;
 
     /**
      * Create a new event instance.
-     *
-     * @param $ticketId
-     * @param $userId
-     * @param $description
      */
     public function __construct($ticketId, $userId, $description)
     {

@@ -2,30 +2,31 @@
 
 namespace Tests\Feature\IU\Course;
 
-use App\Models\User;
-use App\Models\Certificate;
-use App\Models\Course;
-use App\Models\UserProfile;
-use App\Models\IdentityVerification;
-
 use App\DataObject\CertificateEntityData;
 use App\DataObject\IdentityVerificationStatusData;
-
-use Tests\TestCase;
-
+use App\Models\Certificate;
+use App\Models\Course;
+use App\Models\IdentityVerification;
+use App\Models\User;
+use App\Models\UserProfile;
 use App\Traits\Tests\CertificateTestTrait;
-use App\Traits\Tests\JSONResponseTestTrait;
 use App\Traits\Tests\CourseTestTrait;
+use App\Traits\Tests\JSONResponseTestTrait;
+use Tests\TestCase;
 
 class CertificatesTest extends TestCase
 {
     use CertificateTestTrait;
-    use JSONResponseTestTrait;
     use CourseTestTrait;
+    use JSONResponseTestTrait;
 
-    private $user, $data, $userIdentityVerified;
+    private $user;
 
-    public function setUp(): void
+    private $data;
+
+    private $userIdentityVerified;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -39,7 +40,7 @@ class CertificatesTest extends TestCase
     public function testCertificatesAvailability()
     {
 
-        $response = $this->json('GET',  '/api/iu/certificates/');
+        $response = $this->json('GET', '/api/iu/certificates/');
 
         $response->assertStatus(200);
     }
@@ -48,7 +49,7 @@ class CertificatesTest extends TestCase
     {
         $certificate = Certificate::factory()->withUserId($this->user->id)->withCourseId($this->data->course->id)->create();
 
-        $response = $this->json('GET',  '/api/iu/certificates/' . $certificate->id);
+        $response = $this->json('GET', '/api/iu/certificates/'.$certificate->id);
 
         $response->assertStatus(200);
     }
@@ -57,7 +58,7 @@ class CertificatesTest extends TestCase
     {
         $certificate = Certificate::factory()->withUserId($this->user->id)->withCourseLevelId($this->data->courseLevel->id)->create();
 
-        $response = $this->json('GET',  '/api/iu/certificates/' . $certificate->id);
+        $response = $this->json('GET', '/api/iu/certificates/'.$certificate->id);
 
         $response->assertStatus(200);
     }
@@ -66,7 +67,7 @@ class CertificatesTest extends TestCase
     {
         $certificate = Certificate::factory()->withUserId($this->user->id)->withCourseModuleId($this->data->courseModule->id)->create();
 
-        $response = $this->json('GET',  '/api/iu/certificates/' . $certificate->id);
+        $response = $this->json('GET', '/api/iu/certificates/'.$certificate->id);
 
         $response->assertStatus(200);
     }
@@ -77,7 +78,7 @@ class CertificatesTest extends TestCase
         $levelCertificate = Certificate::factory()->withUserId($this->user->id)->withCourseLevelId($this->data->courseLevel->id)->create();
         $moduleCertificate = Certificate::factory()->withUserId($this->user->id)->withCourseModuleId($this->data->courseModule->id)->create();
 
-        $response = $this->json('GET',  '/api/iu/certificates/');
+        $response = $this->json('GET', '/api/iu/certificates/');
         $certificates = $response['data'];
 
         $this->assertEquals(count($certificates), 3);
@@ -96,7 +97,7 @@ class CertificatesTest extends TestCase
     {
         $certificate = Certificate::factory()->withUserId($this->user->id)->withCourseId($this->data->course->id)->create();
 
-        $response = $this->json('GET',  '/api/iu/certificates/' . $certificate->id . '/download');
+        $response = $this->json('GET', '/api/iu/certificates/'.$certificate->id.'/download');
 
         $response->assertStatus(200);
     }
@@ -107,8 +108,8 @@ class CertificatesTest extends TestCase
 
         $this->userIdentityVerified->delete();
 
-        $response = $this->json('GET',  '/api/iu/certificates/' . $certificate->id);
-        
+        $response = $this->json('GET', '/api/iu/certificates/'.$certificate->id);
+
         $this->assertTrue(json_decode($response->content())->error->identityUnverified);
         $this->assertEquals(json_decode($response->content())->error->identityVerificationStatus, IdentityVerificationStatusData::PENDING);
     }
@@ -118,7 +119,7 @@ class CertificatesTest extends TestCase
         $courses = Course::factory(20)->create();
         $this->GenerateCertificatesForMultipleCourses($courses, $this->user);
 
-        $response = $this->json('GET',  '/api/iu/certificates/');
+        $response = $this->json('GET', '/api/iu/certificates/');
 
         $this->assertEquals($response['total'], 20);
 

@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Lang;
 
 class AfNotificationController extends Controller
 {
-
     private AfNotificationRepository $afNotificationRepository;
 
     public function __construct(AfNotificationRepository $afNotificationRepository)

@@ -2,44 +2,51 @@
 
 namespace App\Http\Controllers\IU;
 
-use Illuminate\Http\Request;
-use App\DataObject\CouponData;
-use App\DataObject\ShippingData;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use App\Services\InApp\InAppService;
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Mail;
 use App\DataObject\AF\AdminEmailData;
+use App\DataObject\CouponData;
 use App\DataObject\PaymentGatewaysData;
-use App\Repositories\IU\IuQuizRepository;
-use App\Repositories\IU\IuUserRepository;
-use App\Repositories\IU\IuEbookRepository;
-use App\Repositories\IU\IuCouponRepository;
-use App\Repositories\IU\IuCourseRepository;
-use App\Repositories\IU\IuPaymentRepository;
-use App\Repositories\IU\IuPurchaseRepository;
-use App\Http\Requests\IU\IuCartCheckoutRequest;
-use App\Repositories\IU\IuSalaryScaleRepository;
+use App\DataObject\Purchases\PurchaseHistoryEntityData;
 use App\DataObject\Purchases\PurchaseItemTypeData;
+use App\DataObject\ShippingData;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\IU\IuCartCheckoutRequest;
 use App\Mail\AF\Order\AfNewOrderConfirmationEmail;
 use App\Mail\IU\Purchase\IuPurchaseConfirmationEmail;
-use App\DataObject\Purchases\PurchaseHistoryEntityData;
+use App\Repositories\IU\IuCouponRepository;
+use App\Repositories\IU\IuCourseRepository;
+use App\Repositories\IU\IuEbookRepository;
+use App\Repositories\IU\IuPaymentRepository;
+use App\Repositories\IU\IuPurchaseRepository;
+use App\Repositories\IU\IuQuizRepository;
+use App\Repositories\IU\IuSalaryScaleRepository;
 use App\Repositories\IU\IuUserProfileRepository;
+use App\Repositories\IU\IuUserRepository;
+use App\Services\InApp\InAppService;
 use App\Transformers\IU\Purchase\IuPurchaseHistoryTransformer;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class IuPurchaseController extends Controller
 {
-
     private IuPurchaseRepository $iuPurchaseRepository;
+
     private IuCourseRepository $iuCourseRepository;
+
     private IuPaymentRepository $iuPaymentRepository;
+
     private IuEbookRepository $iuEbookRepository;
+
     private IuQuizRepository $iuQuizRepository;
+
     private IuUserRepository $iuUserRepository;
+
     private IuCouponRepository $iuCouponRepository;
+
     private IuSalaryScaleRepository $iuSalaryScaleRepository;
+
     private IuUserProfileRepository $iuUserProfileRepository;
 
     public function __construct(
@@ -86,7 +93,7 @@ class IuPurchaseController extends Controller
         DB::beginTransaction();
         try {
             $items = collect($request->items)->uniqueStrict(function ($item) {
-                return $item['id'] . $item['type'];
+                return $item['id'].$item['type'];
             });
 
             $courses = $this->iuPurchaseRepository->getCoursesFromCart($items);
@@ -116,22 +123,25 @@ class IuPurchaseController extends Controller
             $coupon = $request->code ?: null;
             if ($coupon) {
                 $coupon = $this->iuCouponRepository->getCoupon($request->code, CouponData::ACTIVE, true);
-                if (!$coupon || ($coupon->redeem_count >= $coupon->redeem_limit))
+                if (! $coupon || ($coupon->redeem_count >= $coupon->redeem_limit)) {
                     return response()->json(['errors' => Lang::get('iu.coupon.canNotRedeem')], 404);
+                }
             }
 
             // apply coupon
             if ($coupon?->restrictions->count()) {
                 $courses = $this->iuCouponRepository->applyCouponToCartCourses($coupon, $courses, $items, $user->salaryScale);
-                if (!$courses)
+                if (! $courses) {
                     return response()->json(['message' => Lang::get('general.salaryScaleDiscountDisabledOrEnabled')], 400);
+                }
 
                 // TODO: required for other entities as well.
             } elseif ($courses->count() && $user->salaryScale) {
                 // Apply Salary Scale Discount
                 $courses = $this->iuSalaryScaleRepository->applySalaryScaleDiscount($courses, $items, $user->salaryScale);
-                if (!$courses)
+                if (! $courses) {
                     return response()->json(['message' => Lang::get('general.salaryScaleDiscountDisabledOrEnabled')], 400);
+                }
             }
 
             // Apply Book Binding Deduction to Ebooks
@@ -146,7 +156,7 @@ class IuPurchaseController extends Controller
 
             switch ($request->transactionBy) {
                 case PaymentGatewaysData::INAPP:
-                    if (!InAppService::verifyReceipt($request->transactionReceipt['transactionReceipt'])) {
+                    if (! InAppService::verifyReceipt($request->transactionReceipt['transactionReceipt'])) {
                         return response()->json(['message' => Lang::get('iu.purchases.invalidReceipt')], 422);
                     }
 
@@ -164,13 +174,13 @@ class IuPurchaseController extends Controller
             $purchaseHistory = $this->iuPurchaseRepository->savePurchaseHistory($user, $grandTotal, $entity['entity_id'], $entity['entity_type']);
 
             // Save shipping/delivery address in case of physical products
-            if (!$physicalProducts->isEmpty()) {
+            if (! $physicalProducts->isEmpty()) {
                 $this->iuPurchaseRepository->saveDeliveryAddressAndShippingCost($purchaseHistory->id, $request, $user, $flatShippingRate);
                 $this->iuPurchaseRepository->saveShippingCost($purchaseHistory->id, PurchaseItemTypeData::SHIPPING);
 
                 //add user profile address in case of incomplete profile address
                 $isProfileAddressCompleted = $this->iuUserProfileRepository->getIsProfileAddressCompleted($request->user()->userProfile);
-                if (!$isProfileAddressCompleted) {
+                if (! $isProfileAddressCompleted) {
                     $this->iuUserProfileRepository->updateUserAddress(
                         $user->id,
                         $request->shipping_address,
@@ -210,22 +220,22 @@ class IuPurchaseController extends Controller
             Mail::to($user->userProfile->email)->queue(new IuPurchaseConfirmationEmail($user, $purchaseHistory->id));
 
             // Notify admin of a new order in case of $physicalProducts
-            if (!$physicalProducts->isEmpty()) {
+            if (! $physicalProducts->isEmpty()) {
                 // Email books@hijazworld.com
-                Mail::to(AdminEmailData::ADMIN_EMAIL)->queue(new AfNewOrderConfirmationEmail($user, $purchaseHistory->id));
+                Mail::to(AdminEmailData::ADMIN_EMAIL)->queue(new AfNewOrderConfirmationEmail(null, $purchaseHistory->id));
             }
 
             // Introducing a variable $grantedAccessTo with a initial value of NULL
             $grantedAccessToEbooks = null;
 
             // Grant access to lecture notes
-            if (!$physicalProducts->isEmpty()) {
+            if (! $physicalProducts->isEmpty()) {
                 // Cast output of method grantAccessToLectureNotes() to $accessGranted variable
                 $courses = $this->grantAccessToLectureNotes($physicalProducts, $user);
-                if (!empty($courses)) :
+                if (! empty($courses)) {
                     // Mapping the value of $accessGranted to $grantedAccessTo
                     $grantedAccessToEbooks = $courses;
-                endif;
+                }
             }
 
             return response()->json([
@@ -236,16 +246,19 @@ class IuPurchaseController extends Controller
             DB::rollback();
 
             Log::error('Exception: IuPurchaseController@cartCheckout::cardException', [$cardException->getMessage()]);
+
             return response()->json(['errors' => $cardException->getMessage()], 500);
         } catch (\Stripe\Exception\InvalidRequestException $invalidRequestException) {
             DB::rollback();
 
             Log::error('Exception: IuPurchaseController@cartCheckout::invalidRequestException', [$invalidRequestException->getMessage()]);
+
             return response()->json(['errors' => $invalidRequestException->getMessage()], 500);
         } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: IuPurchaseController@cartCheckout', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500]), 500]);
         }
     }
@@ -268,7 +281,8 @@ class IuPurchaseController extends Controller
 
             $payment = $customer->charge(
                 $totalPrice * 100,
-                $paymentMethodId
+                $paymentMethodId,
+                ['return_url' => config('app.url')]
             );
         }
 
@@ -299,11 +313,11 @@ class IuPurchaseController extends Controller
         $moduleCourses = [];
 
         // Iterate through $purchasedBooks array
-        foreach ($purchasedBooks as $purchasedBook) :
+        foreach ($purchasedBooks as $purchasedBook) {
             // Check if the $purchasedBook is bound to a module
-            if (!is_null($purchasedBook->course_module_id)) :
+            if (! is_null($purchasedBook->course_module_id)) {
                 // Check if $user has access to lecture notes
-                if (!$this->iuPurchaseRepository->userHasAccessToLectureNotes($purchasedBook, $user)) :
+                if (! $this->iuPurchaseRepository->userHasAccessToLectureNotes($purchasedBook, $user)) {
                     // Grant $user access to lecture notes
                     $this->iuEbookRepository->assignEbookToUser($user->id, $purchasedBook->course_module_id);
                     $course = $this->iuPurchaseRepository->fetchCourseOfModule($purchasedBook->course_module_id, $user);
@@ -313,9 +327,9 @@ class IuPurchaseController extends Controller
 
                     // Push $course to $moduleCourses
                     array_push($moduleCourses, $course);
-                endif;
-            endif;
-        endforeach;
+                }
+            }
+        }
 
         return $moduleCourses;
     }

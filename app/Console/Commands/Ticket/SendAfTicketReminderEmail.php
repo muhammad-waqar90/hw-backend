@@ -2,15 +2,15 @@
 
 namespace App\Console\Commands\Ticket;
 
-use App\DataObject\RoleData;
 use App\DataObject\PermissionData;
+use App\DataObject\RoleData;
 use App\DataObject\Tickets\TicketCategoryData;
 use App\DataObject\Tickets\TicketStatusData;
-use App\Models\User;
-use App\Models\Ticket;
 use App\Events\Notifications\Tickets\IuTicketNotClaimed;
 use App\Mail\IU\Ticket\IuTicketNotClaimedReminderEmail;
-use Carbon\Carbon;
+use App\Models\Ticket;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,12 +31,12 @@ class SendAfTicketReminderEmail extends Command
     protected $description = 'Send AF ticket reminder email';
 
     /**
-     * @var Ticket $ticket
+     * @var Ticket
      */
     protected $ticket;
 
     /**
-     * @var User $user
+     * @var User
      */
     protected $user;
 
@@ -60,12 +60,14 @@ class SendAfTicketReminderEmail extends Command
     public function handle()
     {
         $ticketsNotClaimed = $this->getUnclaimedTickets();
-        if($ticketsNotClaimed->isEmpty())
+        if ($ticketsNotClaimed->isEmpty()) {
             return;
+        }
 
         $admins = $this->getTicketTeamLeaders();
-        if($admins->isEmpty())
+        if ($admins->isEmpty()) {
             return;
+        }
 
         $this->sendNotificationAndEmail($ticketsNotClaimed, $admins);
         $this->info('Sending AF ticket reminder email');
@@ -96,13 +98,14 @@ class SendAfTicketReminderEmail extends Command
 
     public function sendNotificationAndEmail($ticketsNotClaimed, $admins)
     {
-        foreach($ticketsNotClaimed as $ticket) {
-            if($ticket->user_id && $ticket->ticket_category_id != TicketCategoryData::LESSON_QA)
-              IuTicketNotClaimed::dispatch($ticket->id, $ticket->user_id, $ticket->subject);
-
-            foreach($admins as $admin) {
-              Mail::to($admin->adminProfile->email)->queue(new IuTicketNotClaimedReminderEmail($admin, $ticket->subject, $ticket->id));
+        foreach ($ticketsNotClaimed as $ticket) {
+            if ($ticket->user_id && $ticket->ticket_category_id != TicketCategoryData::LESSON_QA) {
+                IuTicketNotClaimed::dispatch($ticket->id, $ticket->user_id, $ticket->subject);
             }
-          }
+
+            foreach ($admins as $admin) {
+                Mail::to($admin->adminProfile->email)->queue(new IuTicketNotClaimedReminderEmail($admin, $ticket->subject, $ticket->id));
+            }
+        }
     }
 }

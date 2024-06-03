@@ -24,11 +24,24 @@ class GuFetchProductsRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
-            'category' => 'nullable|string',
-            'price' => 'nullable|string',
-            'is_available' => 'nullable',
-            'is_not_bounded' => 'nullable',
+            'name' => [
+                'nullable',
+                'string',
+            ],
+            'category' => [
+                'nullable',
+                'string',
+            ],
+            'price' => [
+                'nullable',
+                'string',
+            ],
+            'is_available' => [
+                'nullable',
+            ],
+            'is_not_bounded' => [
+                'nullable',
+            ],
         ];
     }
 }

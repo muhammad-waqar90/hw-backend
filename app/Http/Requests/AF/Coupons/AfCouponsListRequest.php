@@ -24,7 +24,11 @@ class AfCouponsListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText' => 'string|nullable|max:100',
+            'searchText' => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
             // 'status' => ['integer', Rule::in()],
         ];
     }

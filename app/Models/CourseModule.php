@@ -19,33 +19,33 @@ class CourseModule extends Model
         parent::boot();
 
         static::addGlobalScope('order', function ($query) {
-            $query->orderBy('order_id', 'asc');
+            $query->oldest('order_id');
         });
     }
 
     public function course()
     {
-        return $this->belongsTo('App\Models\Course', 'course_id');
+        return $this->belongsTo(Course::class, 'course_id');
     }
 
     public function courseLevel()
     {
-        return $this->belongsTo('App\Models\CourseLevel');
+        return $this->belongsTo(CourseLevel::class);
     }
 
     public function lessons()
     {
-        return $this->hasMany('App\Models\Lesson');
+        return $this->hasMany(Lesson::class);
     }
 
     public function ebook()
     {
-        return $this->hasOne('App\Models\Lesson');
+        return $this->hasOne(Lesson::class);
     }
 
     public function quiz()
     {
-        return $this->morphMany('App\Models\Quiz', 'entity');
+        return $this->morphMany(Quiz::class, 'entity');
     }
 
     public static function minimalLessonsWithData()
@@ -57,5 +57,4 @@ class CourseModule extends Model
     {
         return $this->hasOne(Book::class);
     }
-
 }

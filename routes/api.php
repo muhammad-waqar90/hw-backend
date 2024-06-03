@@ -1,60 +1,60 @@
 <?php
 
+use App\DataObject\AF\CourseStatusData;
+use App\DataObject\PermissionData;
 use App\DataObject\QuizData;
 use App\DataObject\RoleData;
-use App\DataObject\PermissionData;
-use Illuminate\Support\Facades\Route;
-use App\DataObject\AF\CourseStatusData;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AF\AfFaqController;
-use App\Http\Controllers\GU\GuFaqController;
-use App\Http\Controllers\IU\IuFaqController;
-use App\Http\Controllers\AF\AfUserController;
-use App\Http\Controllers\GU\GuCartController;
-use App\Http\Controllers\IU\IuGdprController;
-use App\Http\Controllers\IU\IuQuizController;
-use App\Http\Controllers\AF\AfEventController;
-use App\Http\Controllers\GU\GuEbookController;
-use App\Http\Controllers\IU\IuEbookController;
 use App\Http\Controllers\AF\AfAdvertController;
+use App\Http\Controllers\AF\AfBulkImportController;
+use App\Http\Controllers\AF\AfCategoryController;
 use App\Http\Controllers\AF\AfCouponController;
 use App\Http\Controllers\AF\AfCourseController;
+use App\Http\Controllers\AF\AfCourseLevelController;
+use App\Http\Controllers\AF\AfCourseModuleController;
+use App\Http\Controllers\AF\AfEventController;
+use App\Http\Controllers\AF\AfFaqController;
+use App\Http\Controllers\AF\AfGlobalNotificationsController;
+use App\Http\Controllers\AF\AfInAppTiersController;
 use App\Http\Controllers\AF\AfLessonController;
+use App\Http\Controllers\AF\AfLessonEbookController;
+use App\Http\Controllers\AF\AfLessonFaqController;
+use App\Http\Controllers\AF\AfNotificationController;
+use App\Http\Controllers\AF\AfProductController;
+use App\Http\Controllers\AF\AfPurchaseController;
+use App\Http\Controllers\AF\AfQuizController;
 use App\Http\Controllers\AF\AfTicketController;
+use App\Http\Controllers\AF\AfUserController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GU\GuCartController;
 use App\Http\Controllers\GU\GuCourseController;
+use App\Http\Controllers\GU\GuEbookController;
+use App\Http\Controllers\GU\GuFaqController;
+use App\Http\Controllers\GU\GuProductController;
 use App\Http\Controllers\GU\GuTicketController;
+use App\Http\Controllers\HA\HaAdminManipulationController;
+use App\Http\Controllers\HA\PermissionController;
 use App\Http\Controllers\IU\IuAdvertController;
+use App\Http\Controllers\IU\IuCertificateController;
 use App\Http\Controllers\IU\IuCouponController;
 use App\Http\Controllers\IU\IuCourseController;
+use App\Http\Controllers\IU\IuEbookController;
 use App\Http\Controllers\IU\IuEventsController;
+use App\Http\Controllers\IU\IuFaqController;
+use App\Http\Controllers\IU\IuGdprController;
+use App\Http\Controllers\IU\IuGlobalNotificationsController;
 use App\Http\Controllers\IU\IuLessonController;
-use App\Http\Controllers\IU\IuTicketController;
-use App\Http\Controllers\AF\AfProductController;
-use App\Http\Controllers\GU\GuProductController;
+use App\Http\Controllers\IU\IuLessonQaController;
+use App\Http\Controllers\IU\IuNotificationController;
 use App\Http\Controllers\IU\IuPaymentController;
 use App\Http\Controllers\IU\IuProductController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\AF\AfPurchaseController;
-use App\Http\Controllers\HA\PermissionController;
-use App\Http\Controllers\IU\IuLessonQaController;
 use App\Http\Controllers\IU\IuPurchaseController;
-use App\Http\Controllers\AF\AfLessonFaqController;
-use App\Http\Controllers\AF\AfBulkImportController;
-use App\Http\Controllers\AF\AfInAppTiersController;
-use App\Http\Controllers\AF\AfCourseLevelController;
-use App\Http\Controllers\AF\AfLessonEbookController;
-use App\Http\Controllers\IU\IuCertificateController;
+use App\Http\Controllers\IU\IuQuizController;
 use App\Http\Controllers\IU\IuSalaryScaleController;
+use App\Http\Controllers\IU\IuTicketController;
 use App\Http\Controllers\IU\IuUserProfileController;
-use App\Http\Controllers\AF\AfCourseModuleController;
-use App\Http\Controllers\AF\AfNotificationController;
-use App\Http\Controllers\IU\IuNotificationController;
-use App\Http\Controllers\AF\AfCategoryController;
-use App\Http\Controllers\HA\HaAdminManipulationController;
 use App\Http\Controllers\MA\MaAdminManipulationController;
-use App\Http\Controllers\AF\AfGlobalNotificationsController;
-use App\Http\Controllers\AF\AfQuizController;
-use App\Http\Controllers\IU\IuGlobalNotificationsController;
+use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,8 +62,8 @@ use App\Http\Controllers\IU\IuGlobalNotificationsController;
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
 |
  */
 
@@ -122,7 +122,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'checkActive', 'role:' . RoleData::INDEPENDENT_USER],
+    'middleware' => ['auth:api', 'checkActive', 'role:'.RoleData::INDEPENDENT_USER],
     'prefix' => 'iu',
 ], function () {
     Route::delete('me', [AuthController::class, 'delete']);
@@ -181,7 +181,7 @@ Route::group([
 
                     //Quizzes for lessons
                     Route::group([
-                        'middleware' => 'IuCanAccessEntityQuiz:' . QuizData::ENTITY_LESSON,
+                        'middleware' => 'IuCanAccessEntityQuiz:'.QuizData::ENTITY_LESSON,
                         'prefix' => 'quiz',
                     ], function () {
                         Route::get('', [IuQuizController::class, 'getLessonQuiz']);
@@ -198,11 +198,11 @@ Route::group([
 
                 //Quizzes for course modules
                 Route::group([
-                    'middleware' => 'IuCanAccessEntityQuiz:' . QuizData::ENTITY_COURSE_MODULE,
+                    'middleware' => 'IuCanAccessEntityQuiz:'.QuizData::ENTITY_COURSE_MODULE,
                     'prefix' => 'quiz',
                 ], function () {
                     Route::group([
-                        'middleware' => 'IuHasEntityExamAccess:' . QuizData::ENTITY_COURSE_MODULE,
+                        'middleware' => 'IuHasEntityExamAccess:'.QuizData::ENTITY_COURSE_MODULE,
                     ], function () {
                         Route::post('', [IuQuizController::class, 'submitCourseModuleQuiz']);
                         Route::get('', [IuQuizController::class, 'getCourseModuleQuiz']);
@@ -214,11 +214,11 @@ Route::group([
 
             //Quizzes for course levels
             Route::group([
-                'middleware' => 'IuCanAccessEntityQuiz:' . QuizData::ENTITY_COURSE_LEVEL,
+                'middleware' => 'IuCanAccessEntityQuiz:'.QuizData::ENTITY_COURSE_LEVEL,
                 'prefix' => 'course-levels/{courseLevelId}/quiz',
             ], function () {
                 Route::group([
-                    'middleware' => 'IuHasEntityExamAccess:' . QuizData::ENTITY_COURSE_LEVEL,
+                    'middleware' => 'IuHasEntityExamAccess:'.QuizData::ENTITY_COURSE_LEVEL,
                 ], function () {
                     Route::get('', [IuQuizController::class, 'getCourseLevelQuiz']);
                     Route::post('', [IuQuizController::class, 'submitCourseLevelQuiz']);
@@ -273,7 +273,7 @@ Route::group([
     ], function () {
         Route::get('setup', [IuPaymentController::class, 'getSetupIntent']);
         Route::get('', [IuPaymentController::class, 'getPaymentMethod']);
-        Route::post('', [IuPaymentController::class, 'updatePaymentMethod']);
+        Route::post('', [IuPaymentController::class, 'updatePaymentMethod'])->middleware('IuUserCanUpdatePaymentMethod');
         Route::delete('', [IuPaymentController::class, 'deletePaymentMethod']);
     });
     Route::group([
@@ -282,6 +282,7 @@ Route::group([
         Route::get('history', [IuPurchaseController::class, 'getPurchaseHistory']);
         Route::group([
             'prefix' => 'cart',
+            'middleware' => 'IuUserCanUpdatePaymentMethod',
         ], function () {
             Route::post('checkout', [IuPurchaseController::class, 'cartCheckout']);
         });
@@ -334,7 +335,7 @@ Route::group([
     });
 
     Route::group([
-        'prefix' => 'coupons/redeem'
+        'prefix' => 'coupons/redeem',
     ], function () {
         Route::post('can', [IuCouponController::class, 'canRedeem']);
     });
@@ -348,7 +349,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'checkActive', 'role:' . RoleData::HEAD_ADMIN],
+    'middleware' => ['auth:api', 'checkActive', 'role:'.RoleData::HEAD_ADMIN],
     'prefix' => 'ha',
 ], function () {
     Route::group([
@@ -380,7 +381,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'checkActive', 'role:' . RoleData::ADMIN],
+    'middleware' => ['auth:api', 'checkActive', 'role:'.RoleData::ADMIN],
     'prefix' => 'af',
 ], function () {
     Route::group([
@@ -388,7 +389,7 @@ Route::group([
     ], function () {
         Route::get('categories', [AfTicketController::class, 'getTicketCategories']);
         Route::group([
-            'middleware' => ['permission:' . PermissionData::TICKET_SUBJECT_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::TICKET_SUBJECT_MANAGEMENT],
             'prefix' => 'subjects',
         ], function () {
             Route::post('', [AfTicketController::class, 'createTicketSubject']);
@@ -398,7 +399,7 @@ Route::group([
             Route::delete('{id}', [AfTicketController::class, 'deleteTicketSubject']);
         });
         Route::group([
-            'middleware' => ['orPermission:' . PermissionData::TICKET_SYSTEM_MANAGEMENT . ',' . PermissionData::TICKET_CONTENT_MANAGEMENT . ',' . PermissionData::TICKET_REFUND_MANAGEMENT . ',' . PermissionData::TICKET_LESSON_QA_MANAGEMENT],
+            'middleware' => ['orPermission:'.PermissionData::TICKET_SYSTEM_MANAGEMENT.','.PermissionData::TICKET_CONTENT_MANAGEMENT.','.PermissionData::TICKET_REFUND_MANAGEMENT.','.PermissionData::TICKET_LESSON_QA_MANAGEMENT],
         ], function () {
             Route::get('', [AfTicketController::class, 'getTicketList']);
             Route::get('me', [AfTicketController::class, 'getMyTicketList']);
@@ -417,7 +418,7 @@ Route::group([
     ], function () {
         Route::group([
             'prefix' => 'categories',
-            'middleware' => ['permission:' . PermissionData::FAQ_CATEGORY_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::FAQ_CATEGORY_MANAGEMENT],
         ], function () {
             Route::get('', [AfFaqController::class, 'getFaqCategoryList']);
             Route::post('', [AfFaqController::class, 'createFaqCategory']);
@@ -429,7 +430,7 @@ Route::group([
             Route::put('{id}/unpublish', [AfFaqController::class, 'unpublishFaqCategory']);
         });
         Route::group([
-            'middleware' => ['permission:' . PermissionData::FAQ_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::FAQ_MANAGEMENT],
         ], function () {
             Route::get('', [AfFaqController::class, 'getFaqList']);
             Route::post('', [AfFaqController::class, 'createFaq']);
@@ -443,7 +444,7 @@ Route::group([
     });
     Route::group([
         'prefix' => 'users',
-        'middleware' => ['permission:' . PermissionData::USER_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::USER_MANAGEMENT],
     ], function () {
         Route::get('', [AfUserController::class, 'getUsersList']);
         Route::get('{id}', [AfUserController::class, 'getUser']);
@@ -452,22 +453,22 @@ Route::group([
         Route::put('{id}/disable', [AfUserController::class, 'disableUser'])->middleware('IsUserDeleted');
         Route::group([
             'prefix' => '{id}/purchases',
-            'middleware' => ['permission:' . PermissionData::VIEW_USERS_PURCHASE_HISTORY],
+            'middleware' => ['permission:'.PermissionData::VIEW_USERS_PURCHASE_HISTORY],
         ], function () {
             Route::get('', [AfUserController::class, 'getUserPurchases']);
             Route::get('unselectedEbooks/{items}', [AfUserController::class, 'getUnselectedEbooks']);
         });
-        Route::delete('{id}', [AfUserController::class, 'deleteUser'])->middleware(['permission:' . PermissionData::DELETE_USERS]);
+        Route::delete('{id}', [AfUserController::class, 'deleteUser'])->middleware(['permission:'.PermissionData::DELETE_USERS]);
         Route::group([
             'prefix' => '{id}/gdpr',
-            'middleware' => ['permission:' . PermissionData::GDPR_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::GDPR_MANAGEMENT],
         ], function () {
             Route::post('export', [AfUserController::class, 'exportUserGDPRData'])->middleware(['CheckIfGdprDataIsProcessing', 'IsUserDeleted']);
         });
     });
     Route::group([
         'prefix' => 'categories',
-        'middleware' => ['permission:' . PermissionData::CATEGORY_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::CATEGORY_MANAGEMENT],
     ], function () {
         Route::get('', [AfCategoryController::class, 'getCategoryListDetailed']);
         Route::get('root', [AfCategoryController::class, 'getRootCategoryList']);
@@ -477,19 +478,19 @@ Route::group([
         Route::put('{id}', [AfCategoryController::class, 'updateCategory']);
         Route::delete('{id}', [AfCategoryController::class, 'deleteCategory']);
     });
-    Route::get('categories/filter', [AfCategoryController::class, 'getCategoryList'])->middleware(['permission:' . PermissionData::COURSE_MANAGEMENT . '|' . PermissionData::PHYSICAL_PRODUCT_MANAGEMENT]);
+    Route::get('categories/filter', [AfCategoryController::class, 'getCategoryList'])->middleware(['permission:'.PermissionData::COURSE_MANAGEMENT.'|'.PermissionData::PHYSICAL_PRODUCT_MANAGEMENT]);
     Route::group([
         'prefix' => 'courses',
     ], function () {
         Route::group([
             'prefix' => 'filter',
-            'middleware' => ['permission:' . PermissionData::USER_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::USER_MANAGEMENT],
         ], function () {
             Route::get('', [AfCourseController::class, 'getCoursesList']);
             Route::get('{id}', [AfCourseController::class, 'getCourse']);
         });
         Route::group([
-            'middleware' => ['permission:' . PermissionData::COURSE_MANAGEMENT],
+            'middleware' => ['permission:'.PermissionData::COURSE_MANAGEMENT],
         ], function () {
             Route::get('unboundedBooks/filter', [AfProductController::class, 'getAllUnboundedBooks']);
             Route::get('', [AfCourseController::class, 'getCoursesListDetailed']);
@@ -500,22 +501,22 @@ Route::group([
                 Route::get('validate', [AfCourseController::class, 'validateCourse']);
                 Route::get('', [AfCourseController::class, 'getCourseDetailed']);
                 Route::post('', [AfCourseController::class, 'updateCourse']);
-                Route::delete('', [AfCourseController::class, 'deleteCourse'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                Route::delete('', [AfCourseController::class, 'deleteCourse'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
 
                 Route::group([
                     'prefix' => 'bulk',
                 ], function () {
                     Route::get('quizzes', [AfBulkImportController::class, 'getCourseBulkImports']);
                     Route::group([
-                        'middleware' => ['permission:' . PermissionData::BULK_UPLOAD_QUIZZES],
+                        'middleware' => ['permission:'.PermissionData::BULK_UPLOAD_QUIZZES],
                     ], function () {
-                        Route::post('quizzes', [AfBulkImportController::class, 'importCourseQuizzes'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                        Route::post('quizzes', [AfBulkImportController::class, 'importCourseQuizzes'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                     });
                 });
 
                 Route::group([
                     'prefix' => 'status',
-                    'middleware' => ['permission:' . PermissionData::UPDATE_COURSE_STATUS],
+                    'middleware' => ['permission:'.PermissionData::UPDATE_COURSE_STATUS],
                 ], function () {
                     Route::put('publish', [AfCourseController::class, 'publishCourse']);
                     Route::put('unpublish', [AfCourseController::class, 'unpublishCourse']);
@@ -528,7 +529,7 @@ Route::group([
                 ], function () {
                     Route::put('{levelId}', [AfCourseLevelController::class, 'updateLevel']);
                     Route::group([
-                        'middleware' => ['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON],
+                        'middleware' => ['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON],
                     ], function () {
                         Route::post('', [AfCourseLevelController::class, 'createLevel']);
                         Route::delete('{levelId}', [AfCourseLevelController::class, 'deleteLevel']);
@@ -537,10 +538,10 @@ Route::group([
                     Route::group([
                         'prefix' => '{levelId}/modules',
                     ], function () {
-                        Route::post('', [AfCourseModuleController::class, 'createModule'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
-                        Route::put('sort', [AfCourseModuleController::class, 'sortModule'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                        Route::post('', [AfCourseModuleController::class, 'createModule'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
+                        Route::put('sort', [AfCourseModuleController::class, 'sortModule'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                         Route::post('{courseModuleId}', [AfCourseModuleController::class, 'updateModule'])->middleware('afCanUpdateModuleHasExam');
-                        Route::delete('{moduleIds}', [AfCourseModuleController::class, 'deleteModule'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                        Route::delete('{moduleIds}', [AfCourseModuleController::class, 'deleteModule'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                         Route::group([
                             'prefix' => '{courseModuleId}/quizzes',
                         ], function () {
@@ -550,7 +551,7 @@ Route::group([
                             ], function () {
                                 Route::get('', [AfBulkImportController::class, 'getModuleBulkImports']);
                                 Route::group([
-                                    'middleware' => ['permission:' . PermissionData::BULK_UPLOAD_QUIZZES, 'afCanUploadModuleQuiz'],
+                                    'middleware' => ['permission:'.PermissionData::BULK_UPLOAD_QUIZZES, 'afCanUploadModuleQuiz'],
                                 ], function () {
                                     Route::post('', [AfBulkImportController::class, 'importModuleQuizzes']);
                                 });
@@ -559,20 +560,20 @@ Route::group([
                         Route::group([
                             'prefix' => '{courseModuleId}/lessons',
                         ], function () {
-                            Route::post('', [AfLessonController::class, 'createLesson'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
-                            Route::put('sort', [AfLessonController::class, 'sortLesson'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                            Route::post('', [AfLessonController::class, 'createLesson'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
+                            Route::put('sort', [AfLessonController::class, 'sortLesson'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                             Route::post('{lessonId}', [AfLessonController::class, 'updateLesson']);
-                            Route::delete('{lessonIds}', [AfLessonController::class, 'deleteLesson'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                            Route::delete('{lessonIds}', [AfLessonController::class, 'deleteLesson'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                             Route::group([
                                 'prefix' => '{lessonId}/ebook',
                             ], function () {
                                 Route::get('', [AfLessonEbookController::class, 'getLessonEbook']);
                                 Route::group([
-                                    'middleware' => ['permission:' . PermissionData::EBOOK_MANAGEMENT],
+                                    'middleware' => ['permission:'.PermissionData::EBOOK_MANAGEMENT],
                                 ], function () {
                                     Route::post('', [AfLessonEbookController::class, 'createLessonEbook']);
                                     Route::post('{ebookId}', [AfLessonEbookController::class, 'updateLessonEbook']);
-                                    Route::delete('{ebookId}', [AfLessonEbookController::class, 'deleteLessonEbook'])->middleware(['isCourseStatus:' . CourseStatusData::DRAFT . ',' . CourseStatusData::COMING_SOON]);
+                                    Route::delete('{ebookId}', [AfLessonEbookController::class, 'deleteLessonEbook'])->middleware(['isCourseStatus:'.CourseStatusData::DRAFT.','.CourseStatusData::COMING_SOON]);
                                 });
                             });
                             Route::group([
@@ -584,7 +585,7 @@ Route::group([
                                 ], function () {
                                     Route::get('', [AfBulkImportController::class, 'getLessonBulkImports']);
                                     Route::group([
-                                        'middleware' => ['permission:' . PermissionData::BULK_UPLOAD_QUIZZES, 'AfCanUploadLessonQuiz'],
+                                        'middleware' => ['permission:'.PermissionData::BULK_UPLOAD_QUIZZES, 'AfCanUploadLessonQuiz'],
                                     ], function () {
                                         Route::post('', [AfBulkImportController::class, 'importLessonQuizzes']);
                                     });
@@ -598,7 +599,7 @@ Route::group([
         // Routes for salary scale discounts
         Route::group([
             'prefix' => 'salary-scale-discounts',
-            'middleware' => ['permission:' . PermissionData::SALARY_SCALE_DISCOUNTS_MANAGEMENT]
+            'middleware' => ['permission:'.PermissionData::SALARY_SCALE_DISCOUNTS_MANAGEMENT],
         ], function () {
             Route::put('', [AfCourseController::class, 'updateDiscountStatus']);
         });
@@ -614,12 +615,12 @@ Route::group([
     Route::group([
         'prefix' => 'refunds',
     ], function () {
-        Route::post('users/{id}', [AfPurchaseController::class, 'refund'])->middleware(['permission:' . PermissionData::REFUNDS_MANAGEMENT, 'IsUserDeleted']);
-        Route::get('', [AfPurchaseController::class, 'getRefundedItems'])->middleware(['permission:' . PermissionData::VIEW_REFUNDS]);
+        Route::post('users/{id}', [AfPurchaseController::class, 'refund'])->middleware(['permission:'.PermissionData::REFUNDS_MANAGEMENT, 'IsUserDeleted']);
+        Route::get('', [AfPurchaseController::class, 'getRefundedItems'])->middleware(['permission:'.PermissionData::VIEW_REFUNDS]);
     });
     Route::group([
         'prefix' => 'global-notifications',
-        'middleware' => ['permission:' . PermissionData::GLOBAL_NOTIFICATIONS_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::GLOBAL_NOTIFICATIONS_MANAGEMENT],
     ], function () {
         Route::get('', [AfGlobalNotificationsController::class, 'getGlobalNotificationList']);
         Route::post('', [AfGlobalNotificationsController::class, 'createGlobalNotification']);
@@ -629,7 +630,7 @@ Route::group([
     });
     Route::group([
         'prefix' => 'adverts',
-        'middleware' => ['permission:' . PermissionData::ADVERT_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::ADVERT_MANAGEMENT],
     ], function () {
         Route::get('', [AfAdvertController::class, 'getAdvertList']);
         Route::post('', [AfAdvertController::class, 'createAdvert']);
@@ -640,7 +641,7 @@ Route::group([
     });
     Route::group([
         'prefix' => 'events',
-        'middleware' => ['permission:' . PermissionData::EVENT_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::EVENT_MANAGEMENT],
     ], function () {
         Route::post('', [AfEventController::class, 'createEvent']);
         Route::get('', [AfEventController::class, 'getEventsList']);
@@ -656,7 +657,7 @@ Route::group([
     });
     Route::group([
         'prefix' => 'products',
-        'middleware' => ['permission:' . PermissionData::PHYSICAL_PRODUCT_MANAGEMENT]
+        'middleware' => ['permission:'.PermissionData::PHYSICAL_PRODUCT_MANAGEMENT],
     ], function () {
         Route::post('', [AfProductController::class, 'createProduct']);
         Route::get('', [AfProductController::class, 'getProductList']);
@@ -667,7 +668,7 @@ Route::group([
 
     Route::group([
         'prefix' => 'coupons',
-        'middleware' => ['permission:' . PermissionData::COUPON_MANAGEMENT],
+        'middleware' => ['permission:'.PermissionData::COUPON_MANAGEMENT],
     ], function () {
         Route::post('', [AfCouponController::class, 'createCoupon']);
         Route::get('', [AfCouponController::class, 'getCouponList']);
@@ -677,7 +678,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'role:' . RoleData::MASTER_ADMIN],
+    'middleware' => ['auth:api', 'role:'.RoleData::MASTER_ADMIN],
     'prefix' => 'ma',
 ], function () {
     Route::group([
@@ -755,7 +756,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => ['auth:api', 'role:' . RoleData::ADMIN . '|' . RoleData::HEAD_ADMIN . '|' . RoleData::MASTER_ADMIN],
+    'middleware' => ['auth:api', 'role:'.RoleData::ADMIN.'|'.RoleData::HEAD_ADMIN.'|'.RoleData::MASTER_ADMIN],
     'prefix' => 'admins',
 ], function () {
     Route::group([

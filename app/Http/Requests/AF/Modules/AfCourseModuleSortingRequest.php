@@ -24,8 +24,14 @@ class AfCourseModuleSortingRequest extends FormRequest
     public function rules()
     {
         return [
-            '*.id' => 'required|integer',
-            '*.order_id' => 'required|integer'
+            '*.id' => [
+                'required',
+                'integer',
+            ],
+            '*.order_id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 }

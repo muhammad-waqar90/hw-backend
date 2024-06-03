@@ -47,7 +47,7 @@ class UserInfoExport implements FromQuery, WithHeadings, WithMapping
             'linkedin_url',
             'snapchat_url',
             'youtube_url',
-            'pinterest_url'
+            'pinterest_url',
         ];
     }
 
@@ -76,7 +76,7 @@ class UserInfoExport implements FromQuery, WithHeadings, WithMapping
             $row->userProfile->linkedin_url,
             $row->userProfile->snapchat_url,
             $row->userProfile->youtube_url,
-            $row->userProfile->pinterest_url
+            $row->userProfile->pinterest_url,
         ];
     }
 }

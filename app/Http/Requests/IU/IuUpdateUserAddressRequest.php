@@ -24,10 +24,30 @@ class IuUpdateUserAddressRequest extends FormRequest
     public function rules()
     {
         return [
-            'country'  => 'required|string|min:3|max:100',
-            'city'  => 'required|string|min:3|max:100',
-            'address' => 'required|string|min:3|max:100',
-            'postalCode' => 'required|string|min:3|max:20',
+            'country'  => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+            ],
+            'city'  => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+            ],
+            'address' => [
+                'required',
+                'string',
+                'min:3',
+                'max:100',
+            ],
+            'postalCode' => [
+                'required',
+                'string',
+                'min:3',
+                'max:20',
+            ],
         ];
     }
 }

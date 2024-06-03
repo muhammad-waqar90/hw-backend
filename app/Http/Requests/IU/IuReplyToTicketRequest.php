@@ -24,9 +24,23 @@ class IuReplyToTicketRequest extends FormRequest
     public function rules()
     {
         return [
-            'message'   => 'required|string|min:1|max:4000',
-            'assets'    => 'sometimes|array|max:3',
-            'assets.*'  => 'required_with:assets.*|image|mimes:jpg,jpeg,png|max:500',
+            'message'   => [
+                'required',
+                'string',
+                'min:1',
+                'max:4000',
+            ],
+            'assets'    => [
+                'sometimes',
+                'array',
+                'max:3',
+            ],
+            'assets.*'  => [
+                'required_with:assets.*',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:500',
+            ],
         ];
     }
 }

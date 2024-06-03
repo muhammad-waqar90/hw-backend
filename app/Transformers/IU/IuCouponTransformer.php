@@ -15,11 +15,11 @@ class IuCouponTransformer extends TransformerAbstract
     public function transform(Coupon $coupon)
     {
         return [
-            'name'          => $coupon->name,
-            'description'   => $coupon->description,
-            'code'          => $coupon->code,
-            'value_type'    => $coupon->value_type,
-            'value'         => $coupon->value,
+            'name' => $coupon->name,
+            'description' => $coupon->description,
+            'code' => $coupon->code,
+            'value_type' => $coupon->value_type,
+            'value' => $coupon->value,
         ];
     }
 }

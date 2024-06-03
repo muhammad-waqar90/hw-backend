@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Mail;
 
 class TicketRepository
 {
-
     use FileSystemsCloudTrait;
 
     private TicketSubject $ticketSubject;
+
     private Ticket $ticket;
+
     private TicketCategory $ticketCategory;
+
     private TicketMessage $ticketMessage;
 
     public function __construct(TicketSubject $ticketSubject, Ticket $ticket, TicketCategory $ticketCategory, TicketMessage $ticketMessage)
@@ -41,9 +43,9 @@ class TicketRepository
     {
         return $this->ticketSubject->create([
             'ticket_category_id' => $categoryId,
-            'name'  => $name,
-            'desc'  => $desc,
-            'only_logged_in_users' => $only_logged_in
+            'name' => $name,
+            'desc' => $desc,
+            'only_logged_in_users' => $only_logged_in,
         ]);
     }
 
@@ -56,7 +58,7 @@ class TicketRepository
             ->when($guestsOnly, function ($query) {
                 return $query->where('only_logged_in_users', 0);
             })
-            ->orderBy('id', 'DESC')
+            ->latest('id')
             ->paginate(20)
             ->appends(['searchText' => $searchText]);
     }
@@ -67,7 +69,7 @@ class TicketRepository
             ->when($guestsOnly, function ($query) {
                 return $query->where('only_logged_in_users', 0);
             })
-            ->orderBy('name', 'ASC')
+            ->oldest('name')
             ->get();
     }
 
@@ -88,14 +90,14 @@ class TicketRepository
             ->where('id', $id)
             ->update([
                 'ticket_category_id' => $categoryId,
-                'name'  => $name,
-                'desc'  => $desc,
-                'only_logged_in_users' => $only_logged_in
+                'name' => $name,
+                'desc' => $desc,
+                'only_logged_in_users' => $only_logged_in,
             ]);
     }
 
     /**
-     * @param TicketSubject $ticketSubject
+     * @param  TicketSubject  $ticketSubject
      */
     public function deleteTicketSubject($ticketSubject)
     {
@@ -103,56 +105,44 @@ class TicketRepository
     }
 
     /**
-     * @param $categoryId
-     * @param $email
-     * @param $subject
-     * @param $log
      * @return mixed
      */
     public function createGuestTicket($categoryId, $email, $subject, $log)
     {
         return $this->ticket->create([
-            'ticket_category_id'    => $categoryId,
-            'ticket_status_id'      => TicketStatusData::UNCLAIMED,
-            'user_email'            => $email,
-            'subject'               => $subject,
-            'log'                   => json_encode($log)
+            'ticket_category_id' => $categoryId,
+            'ticket_status_id' => TicketStatusData::UNCLAIMED,
+            'user_email' => $email,
+            'subject' => $subject,
+            'log' => json_encode($log),
         ]);
     }
 
     /**
-     * @param $categoryId
-     * @param $userId
-     * @param $subject
-     * @param $log
      * @return mixed
      */
     public function createIuTicket($categoryId, $userId, $subject, $log)
     {
         return $this->ticket->create([
-            'ticket_category_id'    => $categoryId,
-            'ticket_status_id'      => TicketStatusData::UNCLAIMED,
-            'user_id'               => $userId,
-            'subject'               => $subject,
-            'seen_by_user'          => true,
-            'log'                   => json_encode($log)
+            'ticket_category_id' => $categoryId,
+            'ticket_status_id' => TicketStatusData::UNCLAIMED,
+            'user_id' => $userId,
+            'subject' => $subject,
+            'seen_by_user' => true,
+            'log' => json_encode($log),
         ]);
     }
 
     /**
-     * @param $userId
-     * @param $ticketId
-     * @param $message
-     * @param $type
      * @return mixed
      */
     public function createMessage($userId, $ticketId, $message, $type)
     {
         return $this->ticketMessage->create([
-            'user_id'       => $userId,
-            'ticket_id'     => $ticketId,
-            'message'       => $message,
-            'type'          => $type
+            'user_id' => $userId,
+            'ticket_id' => $ticketId,
+            'message' => $message,
+            'type' => $type,
         ]);
     }
 
@@ -173,7 +163,7 @@ class TicketRepository
             ->where('ticket_messages.type', '!=', TicketMessageTypeData::ADMIN_ONLY_SYSTEM_MESSAGE)
             ->where('ticket_messages.ticket_id', $id)
             ->leftJoin('users as us', 'us.id', '=', 'ticket_messages.user_id')
-            ->orderBy('updated_at', 'DESC')
+            ->latest('updated_at')
             ->simplePaginate(20);
     }
 
@@ -215,7 +205,7 @@ class TicketRepository
             ->with('latestTicketMessage', function ($query) {
                 $query->where('type', '!=', TicketMessageTypeData::ADMIN_ONLY_SYSTEM_MESSAGE);
             })
-            ->orderBy('updated_at', 'DESC')
+            ->latest('updated_at')
             ->simplePaginate(20);
     }
 
@@ -223,12 +213,15 @@ class TicketRepository
     {
         $allStatuses = array_values(TicketStatusData::getConstants());
 
-        if (!$status)
+        if (! $status) {
             return $allStatuses;
-        if (!in_array($status, $allStatuses))
+        }
+        if (! in_array($status, $allStatuses)) {
             return false;
-        if ($status == TicketStatusData::UNCLAIMED)
+        }
+        if ($status == TicketStatusData::UNCLAIMED) {
             return [TicketStatusData::UNCLAIMED, TicketStatusData::REOPENED];
+        }
 
         return [(int) $status];
     }
@@ -237,7 +230,7 @@ class TicketRepository
     {
         return DB::table('tickets')->where('id', $id)
             ->update([
-                'seen_by_user' => $value
+                'seen_by_user' => $value,
             ]);
     }
 
@@ -245,7 +238,7 @@ class TicketRepository
     {
         return DB::table('tickets')->where('id', $id)
             ->update([
-                'seen_by_admin' => $value
+                'seen_by_admin' => $value,
             ]);
     }
 
@@ -255,7 +248,7 @@ class TicketRepository
             ->where('id', $ticket->id)
             ->update([
                 'ticket_status_id' => TicketStatusData::RESOLVED,
-                'seen_by_user' => 1
+                'seen_by_user' => 1,
             ]);
 
         $this->createMessage(
@@ -266,6 +259,7 @@ class TicketRepository
         );
 
         Mail::to($ticket->user->userProfile->email)->queue(new IuTicketClosedEmail($ticket->user, $ticket->subject, $ticket->id));
+
         return true;
     }
 
@@ -273,7 +267,7 @@ class TicketRepository
     {
         return $this->ticket->where('id', $ticketId)
             ->update([
-                'ticket_status_id' => TicketStatusData::RESOLVED
+                'ticket_status_id' => TicketStatusData::RESOLVED,
             ]);
     }
 
@@ -287,12 +281,12 @@ class TicketRepository
                 $query->where('lesson_id', $lessonId);
             })
             ->with('ticketMessages')
-            ->orderBy('updated_at', 'DESC');
+            ->latest('updated_at');
     }
 
     public static function getThumbnailS3StoragePath($ticketid)
     {
-        return 'tickets/' . $ticketid . '/';
+        return 'tickets/'.$ticketid.'/';
     }
 
     public function handleTicketAssets($userId, $assets, $ticketId, $type)

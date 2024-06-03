@@ -3,15 +3,14 @@
 namespace App\Traits\Tests;
 
 use App\Models\Category;
+use App\Models\Certificate;
 use App\Models\Course;
 use App\Models\CourseLevel;
 use App\Models\CourseModule;
 use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizItem;
-use App\Models\Certificate;
 use App\Models\UserProgress;
-
 use Illuminate\Support\Facades\DB;
 
 trait CourseTestTrait
@@ -63,7 +62,7 @@ trait CourseTestTrait
         $quizzes->courseLevel = Quiz::factory()->entityCourseLevelWithId($courseLevel->id)->create();
         $quizzes->course = Quiz::factory()->entityCourseWithId($course->id)->create();
 
-        //QuizItems 
+        //QuizItems
         QuizItem::factory()->withQuizId($quizzes->lesson1->id)->create();
         QuizItem::factory()->withQuizId($quizzes->lesson2->id)->create();
         QuizItem::factory()->withQuizId($quizzes->courseModule->id)->create();
@@ -74,8 +73,8 @@ trait CourseTestTrait
         if ($user) {
             DB::table('course_user')->insert(
                 [
-                    'course_id' =>  $course->id,
-                    'user_id'   =>    $user->id,
+                    'course_id' => $course->id,
+                    'user_id' => $user->id,
                 ]
             );
         }

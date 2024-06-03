@@ -3,7 +3,7 @@
 namespace App\Repositories\AF;
 
 use App\Models\PublishLesson;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class AfPublishLessonRepository
 {

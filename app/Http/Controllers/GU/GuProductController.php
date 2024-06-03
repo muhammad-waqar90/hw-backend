@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\GU;
 
-use Exception;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GU\Product\GuFetchProductsRequest;
-use App\Http\Requests\GU\Product\GuFetchSingleProductRequest;
 use App\Repositories\GU\GuProductRepository;
+use Exception;
 
 class GuProductController extends Controller
 {

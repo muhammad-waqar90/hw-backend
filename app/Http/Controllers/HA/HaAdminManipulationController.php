@@ -8,37 +8,35 @@ use App\Http\Requests\HA\CreateAdminRequest;
 use App\Http\Requests\HA\UpdateAdminRequest;
 use App\Mail\AdminAccountCreatedEmail;
 use App\Repositories\AF\AfTicketRepository;
+use App\Repositories\AF\AfUserRepository;
 use App\Repositories\AuthenticationRepository;
 use App\Repositories\HA\AdminManipulationRepository;
-use App\Repositories\AF\AfUserRepository;
 use App\Repositories\IU\IuUserRepository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class HaAdminManipulationController extends Controller
 {
-
     private AfUserRepository $afUserRepository;
+
     private IuUserRepository $iuUserRepository;
+
     private AuthenticationRepository $authenticationRepository;
+
     private AdminManipulationRepository $adminManipulationRepository;
+
     private AfTicketRepository $afTicketRepository;
 
-    /**
-     * AdminCreationController constructor.
-     * @param AfUserRepository $afUserRepository
-     * @param IuUserRepository $iuUserRepository
-     * @param AuthenticationRepository $authenticationRepository
-     * @param AdminManipulationRepository $adminManipulationRepository
-     * @param AfTicketRepository $afTicketRepository
-     */
-
-    public function __construct(AfUserRepository $afUserRepository, IuUserRepository $iuUserRepository, AuthenticationRepository $authenticationRepository,
-    AdminManipulationRepository $adminManipulationRepository, AfTicketRepository $afTicketRepository)
-    {
+    public function __construct(
+        AfUserRepository $afUserRepository,
+        IuUserRepository $iuUserRepository,
+        AuthenticationRepository $authenticationRepository,
+        AdminManipulationRepository $adminManipulationRepository,
+        AfTicketRepository $afTicketRepository
+    ) {
         $this->afUserRepository = $afUserRepository;
         $this->iuUserRepository = $iuUserRepository;
         $this->authenticationRepository = $authenticationRepository;
@@ -59,12 +57,13 @@ class HaAdminManipulationController extends Controller
             DB::commit();
 
             return response()->json(['message' => 'Successfully created admin'], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: HaAdminManipulationController@createAdmin', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -73,6 +72,7 @@ class HaAdminManipulationController extends Controller
     public function getAdminList(Request $request)
     {
         $data = $this->afUserRepository->getUserList(RoleData::ADMIN, $request->query('searchText'));
+
         return response()->json($data, 200);
     }
 
@@ -82,14 +82,16 @@ class HaAdminManipulationController extends Controller
             ->getUserListQuery(RoleData::ADMIN, $request->query('searchText'))
             ->with('adminProfile')
             ->get();
+
         return response()->json($data, 200);
     }
 
     public function getAdmin($id)
     {
         $admin = $this->adminManipulationRepository->getAdmin($id, RoleData::ADMIN);
-        if(!$admin)
+        if (! $admin) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json($admin, 200);
     }
@@ -100,13 +102,15 @@ class HaAdminManipulationController extends Controller
         try {
             $this->adminManipulationRepository->updateAdmin($id, $request->permGroupIds);
             DB::commit();
+
             return response()->json(['message' => 'Successfully updated admin'], 200);
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: HaAdminManipulationController@updateAdmin', [$e->getMessage()]);
-            if($e->getCode() == 23000)
+            if ($e->getCode() == 23000) {
                 return response()->json(['errors' => $e->getMessage()], 400);
+            }
 
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
@@ -115,18 +119,21 @@ class HaAdminManipulationController extends Controller
     public function deleteAdmin($id)
     {
         $admin = $this->adminManipulationRepository->getAdmin($id, RoleData::ADMIN);
-        if(!$admin)
+        if (! $admin) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->adminManipulationRepository->deleteAdmin($admin);
+
         return response()->json(['message' => 'Successfully deleted admin'], 200);
     }
 
     public function activateAdmin($id)
     {
         $data = $this->adminManipulationRepository->activateAdmin($id);
-        if(!$data)
+        if (! $data) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json(['message' => 'Successfully activated admin'], 200);
     }
@@ -134,11 +141,13 @@ class HaAdminManipulationController extends Controller
     public function deactivateAdmin($id)
     {
         $data = $this->adminManipulationRepository->deactivateAdmin($id);
-        if(!$data)
+        if (! $data) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $admin = $this->iuUserRepository->findById($id);
         $this->afTicketRepository->unclaimAllTicketsFromAdmin($id, $admin->name);
+
         return response()->json(['message' => 'Successfully deactivated admin'], 200);
     }
 }

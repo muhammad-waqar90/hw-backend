@@ -43,7 +43,6 @@ trait SanitizeRequestTrait
      * ----------------------------------
      * url
      * [*]Url
-     *
      */
     private $whiteListKeys = [
         'password',
@@ -59,9 +58,8 @@ trait SanitizeRequestTrait
         'youtubeUrl',
         'pinterestUrl',
         'linkedinUrl',
-        'transactionReceipt'
+        'transactionReceipt',
     ];
-
 
     /**
      * Text Area request params list
@@ -73,7 +71,8 @@ trait SanitizeRequestTrait
      * Rich text input allowed tags
      */
     private $richTextInputKeys = ['description', 'desc', 'answer'];
-    private $whiteListTags = "
+
+    private $whiteListTags = '
         <h2>,
         <h3>,
         <h4>,
@@ -89,23 +88,26 @@ trait SanitizeRequestTrait
         <tbody>,
         <tr>,
         <td>
-    ";
+    ';
 
     public function sanitizeTextInput($value)
     {
         $value = strip_tags($value);
+
         return preg_replace($this->sanitizeTextRegex, '', $value);
     }
 
     public function sanitizeRichTextInput($value)
     {
         $value = strip_tags($value, $this->whiteListTags);
+
         return preg_replace($this->sanitizeRichTextRegex, '', $value);
     }
 
     public function sanitizeTextAreaInput($value)
     {
         $value = strip_tags($value);
+
         return preg_replace($this->sanitizeRichTextRegex, '', $value);
     }
 
@@ -113,7 +115,7 @@ trait SanitizeRequestTrait
     {
         array_walk_recursive($request, function (&$value, $key) {
 
-            if ($value && !in_array($key, $this->whiteListKeys)) {
+            if ($value && ! in_array($key, $this->whiteListKeys)) {
 
                 $value = in_array($key, $this->richTextInputKeys)
                     ? $this->sanitizeRichTextInput($value)

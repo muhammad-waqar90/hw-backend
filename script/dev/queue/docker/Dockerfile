@@ -1,8 +1,8 @@
 # FROM php:8.0-fpm-alpine3.13
-FROM public.ecr.aws/docker/library/php:8.0-alpine3.13
+FROM public.ecr.aws/docker/library/php:8.2-fpm-alpine3.16
 
 # To be used for locale
-ENV MUSL_LOCALE_DEPS cmake make musl-dev gcc gettext-dev libintl 
+ENV MUSL_LOCALE_DEPS cmake make musl-dev gcc gettext-dev libintl
 ENV MUSL_LOCPATH /usr/share/i18n/locales/musl
 
 
@@ -24,11 +24,11 @@ RUN apk update \
   && wget https://gitlab.com/rilian-la-te/musl-locales/-/archive/master/musl-locales-master.zip \
   && unzip musl-locales-master.zip \
       && cd musl-locales-master \
-      && cmake -DLOCALE_PROFILE=OFF -D CMAKE_INSTALL_PREFIX:PATH=/usr . && make && make install \
+      && cmake -DLOCALE_PROFILE=OFF -DCMAKE_INSTALL_PREFIX=/usr . && make && make install \
       && cd .. && rm -r musl-locales-master
 
 # Install extensions
-RUN docker-php-ext-install pdo_mysql zip exif pcntl
+RUN docker-php-ext-install pdo_mysql zip exif pcntl bcmath
 RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/
 RUN NUMPROC=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || 1) \
     && docker-php-ext-install -j${NUMPROC} gd

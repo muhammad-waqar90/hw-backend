@@ -15,11 +15,11 @@ class AfBulkImportListTransformer extends TransformerAbstract
     public function transform(BulkImportStatus $bulkImportStatus)
     {
         return [
-            'id'          => $bulkImportStatus->id,
-            'uploaded_by' => $bulkImportStatus->admin->name . '(' . $bulkImportStatus->admin->adminProfile->email . ')',
-            'status'      => $bulkImportStatus->status,
-            'errors'      => $bulkImportStatus->errors,
-            'updated_at'  => $bulkImportStatus->updated_at
+            'id' => $bulkImportStatus->id,
+            'uploaded_by' => $bulkImportStatus->admin->name.'('.$bulkImportStatus->admin->adminProfile->email.')',
+            'status' => $bulkImportStatus->status,
+            'errors' => $bulkImportStatus->errors,
+            'updated_at' => $bulkImportStatus->updated_at,
         ];
     }
 }

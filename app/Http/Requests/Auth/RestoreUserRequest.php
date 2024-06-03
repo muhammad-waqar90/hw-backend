@@ -25,7 +25,11 @@ class RestoreUserRequest extends FormRequest
     {
         return [
             // 'username' => 'required|min:3|max:255',
-            'token' => 'required|string|size:40'
+            'token' => [
+                'required',
+                'string',
+                'size:40',
+            ],
         ];
     }
 }

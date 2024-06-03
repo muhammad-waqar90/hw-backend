@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\AF;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\AF\Product\AfProductListRequest;
 use App\Http\Requests\AF\Product\AfProductCreateRequest;
+use App\Http\Requests\AF\Product\AfProductListRequest;
 use App\Http\Requests\AF\Product\AfProductUpdateRequest;
 use App\Repositories\AF\AfProductRepository;
 use App\Traits\FileSystemsCloudTrait;
@@ -38,7 +38,7 @@ class AfProductController extends Controller
                 $request->price
             );
 
-            if($request->product_metas) {
+            if ($request->product_metas) {
                 $productMetas = $this->afProductRepository->prepareProductMetaData($product->id, $request->product_metas);
                 $this->afProductRepository->insertProductMetas($productMetas);
             }
@@ -50,6 +50,7 @@ class AfProductController extends Controller
             DB::rollBack();
 
             Log::error('Exception: AfProductController@createProduct', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -61,7 +62,7 @@ class AfProductController extends Controller
             ->latest()
             ->paginate(20)
             ->appends([
-                'searchText' => $request->searchText
+                'searchText' => $request->searchText,
             ]);
 
         $fractal = fractal($data->getCollection(), new AfProductTransformer());
@@ -73,18 +74,21 @@ class AfProductController extends Controller
     public function getProduct(int $id)
     {
         $product = $this->afProductRepository->getProductDetailed($id);
-        if (!$product)
+        if (! $product) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $fractal = fractal($product, new AfProductTransformer)->parseIncludes('category');
+
         return response()->json($fractal, 200);
     }
 
     public function deleteProduct(int $id)
     {
         $product = $this->afProductRepository->getProduct($id);
-        if (!$product)
+        if (! $product) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afProductRepository->deleteProduct($id);
 
@@ -94,8 +98,9 @@ class AfProductController extends Controller
     public function updateProduct(int $id, AfProductUpdateRequest $request)
     {
         $product = $this->afProductRepository->getProduct($id);
-        if (!$product)
+        if (! $product) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $thumbnail = $request->img ? $this->updateFile($this->afProductRepository->getThumbnailS3StoragePath(), $product->img, $request->img) : $product->img;
 
@@ -111,8 +116,9 @@ class AfProductController extends Controller
                 $request->is_available,
             );
 
-            if ($request->author)
+            if ($request->author) {
                 $this->afProductRepository->updateAuthor($product, $request->author);
+            }
 
             DB::commit();
 
@@ -121,6 +127,7 @@ class AfProductController extends Controller
             DB::rollBack();
 
             Log::error('Exception: AfProductController@updateProduct', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -132,7 +139,7 @@ class AfProductController extends Controller
 
         $data = $this->afProductRepository
             ->getProductListQuery($request->searchText, null, $isAvailable, $isNotBounded)
-            ->orderBy('name', 'ASC')
+            ->oldest('name')
             ->limit(10)
             ->get();
 

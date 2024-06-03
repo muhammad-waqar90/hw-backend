@@ -12,24 +12,19 @@ class AfTicketReplied
 
     /**
      * AF ticket reply
-     *
-     * @var $userId;
-     * @var $description;
-     * @var $subject;
      */
     public $userId;
+
     public $description;
+
     public $subject;
+
     public $ticketId;
+
     public $iuTicketLinkIds;
 
     /**
      * Create a new event instance.
-     *
-     * @param $ticketId
-     * @param $userId
-     * @param $description
-     * @param $subject
      */
     public function __construct($ticketId, $userId, $description, $subject, $iuTicketLinkIds = null)
     {

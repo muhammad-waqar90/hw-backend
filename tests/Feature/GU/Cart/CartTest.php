@@ -13,24 +13,24 @@ use Tests\TestCase;
 class CartTest extends TestCase
 {
     use CourseTestTrait;
+
     private $data;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
         $this->data = $this->CategoryCourseCourseModuleLessonSeeder();
     }
 
-
     public function testCreateGuestCartPostRoute()
     {
-        $response = $this->json('POST',  '/api/gu/guest-carts/create', [
-            'cart_id'   => Str::random(5),
-            'items'     => [[
-                'id'    => $this->data->course->id,
-                'type'  => PurchaseItemTypeData::COURSE
-            ]]
+        $response = $this->json('POST', '/api/gu/guest-carts/create', [
+            'cart_id' => Str::random(5),
+            'items' => [[
+                'id' => $this->data->course->id,
+                'type' => PurchaseItemTypeData::COURSE,
+            ]],
         ]);
 
         $response->assertStatus(201);
@@ -42,7 +42,7 @@ class CartTest extends TestCase
         $cartId = Str::random(5);
         GuestCart::factory()->withCartId($cartId)->create();
 
-        $response = $this->json('GET',  '/api/gu/guest-carts/guest-cart/' . $cartId);
+        $response = $this->json('GET', '/api/gu/guest-carts/guest-cart/'.$cartId);
 
         $response->assertStatus(200);
         $response->assertJsonPath('guest-cart.cart_id', $cartId);
@@ -53,7 +53,7 @@ class CartTest extends TestCase
         $cartId = Str::random(5);
         GuestCart::factory()->withCartId($cartId)->create();
 
-        $response = $this->json('DELETE',  '/api/gu/guest-carts/' . $cartId);
+        $response = $this->json('DELETE', '/api/gu/guest-carts/'.$cartId);
 
         $response->assertStatus(200);
         $response->assertJsonPath('message', Lang::get('general.successfullyDeleted', ['model' => 'guest cart']));
@@ -64,17 +64,17 @@ class CartTest extends TestCase
         $product = Product::factory()->create();
         $items = [
             [
-                'id'    => $this->data->course->id,
-                'type'  => PurchaseItemTypeData::COURSE
+                'id' => $this->data->course->id,
+                'type' => PurchaseItemTypeData::COURSE,
             ],
             [
-                'id'    => $product->id,
-                'type'  => PurchaseItemTypeData::PHYSICAL_PRODUCT
-            ]
+                'id' => $product->id,
+                'type' => PurchaseItemTypeData::PHYSICAL_PRODUCT,
+            ],
         ];
 
-        $response = $this->json('POST',  '/api/gu/guest-carts/map-cart-items', [
-            'items' => $items
+        $response = $this->json('POST', '/api/gu/guest-carts/map-cart-items', [
+            'items' => $items,
         ]);
 
         $response->assertStatus(200);

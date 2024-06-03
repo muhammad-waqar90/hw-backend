@@ -25,15 +25,15 @@ class AfCouponRepository
         $individualUse
     ) {
         return $this->coupon->create([
-            'name'                  => $name,
-            'description'           => $description,
-            'code'                  => $code,
-            'value'                 => $value,
-            'value_type'            => $valueType,
-            'status'                => $status,
-            'redeem_limit'          => $redeemLimit,
+            'name' => $name,
+            'description' => $description,
+            'code' => $code,
+            'value' => $value,
+            'value_type' => $valueType,
+            'status' => $status,
+            'redeem_limit' => $redeemLimit,
             'redeem_limit_per_user' => $redeemLimitPerUser,
-            'individual_use'        => $individualUse
+            'individual_use' => $individualUse,
         ]);
     }
 
@@ -49,11 +49,11 @@ class AfCouponRepository
             ->when($restrictions, function ($query) {
                 $query->with('restrictions');
             })
-            ->orderBy('id', 'DESC')
+            ->latest('id')
             ->paginate(20)
             ->appends([
-                'searchText'    => $searchText,
-                'status'        => $status
+                'searchText' => $searchText,
+                'status' => $status,
             ]);
     }
 
@@ -72,11 +72,11 @@ class AfCouponRepository
         return $this->coupon
             ->where('id', $id)
             ->update([
-                'name'                  => $name,
-                'description'           => $description,
-                'status'                => $status,
-                'redeem_limit'          => $redeemLimit,
-                'redeem_limit_per_user' => $redeemLimitPerUser
+                'name' => $name,
+                'description' => $description,
+                'status' => $status,
+                'redeem_limit' => $redeemLimit,
+                'redeem_limit_per_user' => $redeemLimitPerUser,
             ]);
     }
 }

@@ -12,10 +12,10 @@ class GuestCart extends Model
 
     protected $fillable = [
         'cart_id',
-        'items'
+        'items',
     ];
 
     protected $casts = [
-        'items' => AsArrayObject::class
+        'items' => AsArrayObject::class,
     ];
 }

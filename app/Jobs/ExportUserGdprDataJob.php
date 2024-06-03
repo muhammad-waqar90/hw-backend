@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\DataObject\GDPRStatusData;
-use App\DataObject\RoleData;
 use App\Mail\IU\GDPR\IuGdprExportDataEmail;
 use App\Repositories\GdprRepository;
 use App\Repositories\IU\IuUserRepository;
@@ -19,7 +18,9 @@ class ExportUserGdprDataJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $userId;
+
     private $uuid;
+
     private $tmpExportGdprDirectory;
 
     /**
@@ -31,7 +32,7 @@ class ExportUserGdprDataJob implements ShouldQueue
     {
         $this->userId = $userId;
         $this->uuid = $uuid;
-        $this->tmpExportGdprDirectory = "tmp/exports/gdpr/" . $uuid;
+        $this->tmpExportGdprDirectory = 'tmp/exports/gdpr/'.$uuid;
     }
 
     /**
@@ -42,12 +43,14 @@ class ExportUserGdprDataJob implements ShouldQueue
     public function handle(GdprRepository $gdprRepository, IuUserRepository $iuUserRepository)
     {
         $user = $iuUserRepository->getUser($this->userId, true);
-        if(!$user)
+        if (! $user) {
             return false;
+        }
 
         $this->gdprRequest = $gdprRepository->getGdprRequest($user->id, $this->uuid);
-        if(!$this->gdprRequest && $this->gdprRequest->status !== GDPRStatusData::PROCESSING)
+        if (! $this->gdprRequest && $this->gdprRequest->status !== GDPRStatusData::PROCESSING) {
             return false;
+        }
 
         $gdprRepository->generateCSVs($user->id, $this->tmpExportGdprDirectory);
         $gdprRepository->generateZipArchive($this->uuid, $this->tmpExportGdprDirectory);

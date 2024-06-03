@@ -23,7 +23,9 @@ use Illuminate\Support\Facades\Log;
 class IuCourseController extends Controller
 {
     private IuCourseRepository $iuCourseRepository;
+
     private IuUserRepository $iuUserRepository;
+
     private VideoRepository $videoRepository;
 
     public function __construct(IuCourseRepository $iuCourseRepository, VideoRepository $videoRepository, IuUserRepository $iuUserRepository)
@@ -46,6 +48,7 @@ class IuCourseController extends Controller
         $userOwnCourses = fractal($userOwnCourses, new IuCourseOwnedListTransformer());
 
         $data = ['userOverview' => $userOverview, 'availableCourses' => $availableCourses, 'userOwnCourses' => $userOwnCourses];
+
         return response()->json($data, 200);
     }
 
@@ -64,7 +67,7 @@ class IuCourseController extends Controller
             ->simplePaginate(config('course.pagination'))
             ->appends([
                 'order' => $request->order ?: 'createdDate',
-                'orderDirection' => $request->orderDirection ?: 'DESC'
+                'orderDirection' => $request->orderDirection ?: 'DESC',
             ]);
 
         $fractal = fractal($data->getCollection(), new IuCourseAvailableListTransformer());
@@ -87,7 +90,7 @@ class IuCourseController extends Controller
             ->simplePaginate(config('course.pagination'))
             ->appends([
                 'order' => $request->order ?: 'createdDate',
-                'orderDirection' => $request->orderDirection ?: 'DESC'
+                'orderDirection' => $request->orderDirection ?: 'DESC',
             ]);
 
         $fractal = fractal($data->getCollection(), new IuCourseComingSoonListTransformer());
@@ -119,8 +122,9 @@ class IuCourseController extends Controller
             $userOwnsCourse = IuUserRepository::iuUserOwnsCourse($userId, $id);
 
             $data = $userOwnsCourse ? $this->iuCourseRepository->getIuCourse($userId, $id) : $this->iuCourseRepository->getIuCoursePreview($id);
-            if (!$data)
+            if (! $data) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
             $data->video_preview = $data->video_preview ? $this->videoRepository->generateLinkForLesson($data->video_preview, true) : '';
 
@@ -129,6 +133,7 @@ class IuCourseController extends Controller
             return response()->json($fractal, 200);
         } catch (\Exception $e) {
             Log::error('Exception: IuCourseController@getIuCourse', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
         }
     }
@@ -139,11 +144,13 @@ class IuCourseController extends Controller
             $userId = $request->user()->id;
             $data = $this->iuCourseRepository->getIuCourseLevel($userId, $courseId, $value);
 
-            if ($data->courseModules->count() == 0)
+            if ($data->courseModules->count() == 0) {
                 return response()->json(['errors' => Lang::get('general.notFound')], 404);
+            }
 
-            if ($data->value !== 1)
+            if ($data->value !== 1) {
                 $data->previousLevel = $this->iuCourseRepository->getIuCourseLevelProgress($userId, $courseId, $data->value - 1);
+            }
 
             $passedPreviousLevel = $this->computePreviousLevelPassed($data);
             $fractal = fractal($data, new IuCourseLevelTransformer($passedPreviousLevel));
@@ -156,12 +163,16 @@ class IuCourseController extends Controller
 
     private function computePreviousLevelPassed($data): bool
     {
-        if ($data->value === 1)
+        if ($data->value === 1) {
             return true;
-        if (!$data->previousLevel)
+        }
+        if (! $data->previousLevel) {
             return false;
-        if ($data->previousLevel->progress === 100)
+        }
+        if ($data->previousLevel->progress === 100) {
             return true;
+        }
+
         return false;
     }
 }

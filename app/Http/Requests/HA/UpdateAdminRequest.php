@@ -24,7 +24,10 @@ class UpdateAdminRequest extends FormRequest
     public function rules()
     {
         return [
-            'permGroupIds'   => 'present|array',
+            'permGroupIds'   => [
+                'present',
+                'array',
+            ],
         ];
     }
 }

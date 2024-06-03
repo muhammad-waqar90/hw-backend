@@ -31,7 +31,7 @@ class RefundsExport implements FromQuery, WithHeadings, WithMapping, WithStrictN
             'entity_type',
             'entity_name',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\AF\Categories;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AfCategoryCreateUpdateRequest extends FormRequest
 {
@@ -11,7 +12,7 @@ class AfCategoryCreateUpdateRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -21,20 +22,35 @@ class AfCategoryCreateUpdateRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
+        $categoryId = request()->route('id');
+
         return [
-            'root_category_id'   => 'nullable|integer',
-            'parent_category_id' => 'nullable|integer|required_with:root_category_id',
-            'name'               => 'required|string|min:3|max:50'
+            'root_category_id'   => [
+                'nullable',
+                'integer',
+            ],
+            'parent_category_id' => [
+                'nullable',
+                'integer',
+                'required_with:root_category_id',
+            ],
+            'name'               => [
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+                Rule::unique('categories')->ignore($categoryId),
+            ],
         ];
     }
 
-    public function attributes()
+    public function attributes(): array
     {
         return [
-            'parent_category_id'   => 'Parent category',
-            'root_category_id'     => 'Root category',
+            'parent_category_id' => 'Parent category',
+            'root_category_id' => 'Root category',
         ];
     }
 }

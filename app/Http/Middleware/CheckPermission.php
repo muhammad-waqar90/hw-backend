@@ -16,10 +16,7 @@ class CheckPermission
 
     /**
      * Handle an incoming request.
-     *
-     * @param PermissionRepository $permissionRepository
      */
-
     public function __construct(PermissionRepository $permissionRepository)
     {
         $this->permissionRepository = $permissionRepository;
@@ -28,8 +25,9 @@ class CheckPermission
     public function handle(Request $request, Closure $next, $permission)
     {
         $canAccess = $this->permissionRepository->hasUserPermissionIds($request->user()->id, $permission);
-        if (!$canAccess)
+        if (! $canAccess) {
             return response()->json(['errors' => Lang::get('auth.forbidden')], 403);
+        }
 
         return $next($request);
     }

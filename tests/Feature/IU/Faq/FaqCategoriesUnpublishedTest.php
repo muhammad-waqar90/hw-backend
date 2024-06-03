@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\IU\Faq;
 
-use App\Models\User;
-use App\Models\FaqCategory;
 use App\Models\Faq;
-
-use Tests\TestCase;
-
+use App\Models\FaqCategory;
+use App\Models\User;
 use App\Traits\Tests\FaqCategoryTestTrait;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Tests\TestCase;
 
 class FaqCategoriesUnpublishedTest extends TestCase
 {
@@ -18,7 +16,7 @@ class FaqCategoriesUnpublishedTest extends TestCase
 
     private $data;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -48,7 +46,7 @@ class FaqCategoriesUnpublishedTest extends TestCase
         $faqCategory = FaqCategory::factory()->published()->create();
         FaqCategory::factory()->withFaqCategoryId($faqCategory->id)->published()->create();
 
-        $response = $this->json('GET', '/api/iu/faqs/categories/' . $faqCategory->id);
+        $response = $this->json('GET', '/api/iu/faqs/categories/'.$faqCategory->id);
 
         $this->assertEquals(1, count(json_decode($response->content())->data));
     }
@@ -58,7 +56,7 @@ class FaqCategoriesUnpublishedTest extends TestCase
         $faqCategory = FaqCategory::factory()->published()->create();
         Faq::factory()->withFaqCategoryId($faqCategory->id)->published()->create();
 
-        $response = $this->json('GET', '/api/iu/faqs/categories/' . $faqCategory->id . '/items');
+        $response = $this->json('GET', '/api/iu/faqs/categories/'.$faqCategory->id.'/items');
 
         $this->assertEquals(1, count(json_decode($response->content())));
     }

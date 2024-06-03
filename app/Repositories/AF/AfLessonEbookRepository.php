@@ -23,8 +23,8 @@ class AfLessonEbookRepository
     public function createLessonEbook($lessonId, $content)
     {
         return $this->ebook->create([
-            'lesson_id' =>  $lessonId,
-            'content'   =>  $content
+            'lesson_id' => $lessonId,
+            'content' => $content,
         ]);
     }
 
@@ -34,7 +34,7 @@ class AfLessonEbookRepository
             ->where('id', $id)
             ->where('lesson_id', $lessonId)
             ->update([
-                'content'   =>  $content
+                'content' => $content,
             ]);
     }
 

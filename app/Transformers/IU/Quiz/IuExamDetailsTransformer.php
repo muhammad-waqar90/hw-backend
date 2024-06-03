@@ -8,6 +8,7 @@ use League\Fractal\TransformerAbstract;
 class IuExamDetailsTransformer extends TransformerAbstract
 {
     private $userCanAccessExam;
+
     private $userExamAttemptsLeft;
 
     public function __construct($userCanAccessExam, $userExamAttemptsLeft)
@@ -19,15 +20,14 @@ class IuExamDetailsTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param Quiz $quiz
      * @return array
      */
     public function transform(Quiz $quiz)
     {
         return [
-            'price'  => $quiz->price,
+            'price' => $quiz->price,
             'user_can_access_exam' => $this->userCanAccessExam,
-            'user_exam_attempts_left' => $this->userExamAttemptsLeft
+            'user_exam_attempts_left' => $this->userExamAttemptsLeft,
         ];
     }
 }

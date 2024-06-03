@@ -26,15 +26,24 @@ class IuGetEventsRequest extends FormRequest
     public function rules()
     {
         return [
-            'from' => 'required|date|',
-            'to'   => 'required|date|after_or_equal:from|max_diff_in_months:from,2',
+            'from' => [
+                'required',
+                'date',
+                '',
+            ],
+            'to'   => [
+                'required',
+                'date',
+                'after_or_equal:from',
+                'max_diff_in_months:from,2',
+            ],
             'type' => [
                 'nullable',
-                'array'
+                'array',
             ],
             'type.*' => [
-                Rule::in(array_values(EventTypeData::getConstants()))
-            ]
+                Rule::in(array_values(EventTypeData::getConstants())),
+            ],
         ];
     }
 }

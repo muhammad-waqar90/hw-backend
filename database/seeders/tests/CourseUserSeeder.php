@@ -20,9 +20,9 @@ class CourseUserSeeder extends Seeder
         foreach ($users_id as $user_id) {
             DB::table('course_user')->insert(
                 [
-                'course_id' =>  $courses_id->random(),
-                'user_id'   =>    $user_id,
-            ]
+                    'course_id' => $courses_id->random(),
+                    'user_id' => $user_id,
+                ]
             );
         }
     }

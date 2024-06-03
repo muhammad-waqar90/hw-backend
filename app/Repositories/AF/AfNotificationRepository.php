@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Repositories\AF;
 
 use App\Models\Notification;
@@ -17,15 +16,11 @@ class AfNotificationRepository
         $this->notification = $notification;
     }
 
-    /**
-     * @param $userId
-     * @return mixed
-     */
     public function getMyNotificationList($userId)
     {
         return $this->notification
             ->where('user_id', $userId)
-            ->orderBy('created_at', 'DESC')
+            ->latest()
             ->simplePaginate(10);
     }
 

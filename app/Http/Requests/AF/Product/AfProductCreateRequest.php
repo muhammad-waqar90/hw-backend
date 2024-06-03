@@ -24,12 +24,37 @@ class AfProductCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'category_id'   => 'required|numeric|exists:categories,id',
-            'name'          => 'required|string|min:3|max:50',
-            'description'   => 'required|string|min:10|max:65535',
-            'product_metas' => 'nullable|array', // TODO: required validation for the meta keys according to product type
-            'img'           => 'required|mimes:jpg,jpeg,png|max_mb:10',
-            'price'         => 'required|gte:0|lte:5000',
+            'category_id'   => [
+                'required',
+                'numeric',
+                'exists:categories,id',
+            ],
+            'name'          => [
+                'required',
+                'string',
+                'min:3',
+                'max:50',
+            ],
+            'description'   => [
+                'required',
+                'string',
+                'min:10',
+                'max:65535',
+            ],
+            'product_metas' => [
+                'nullable',
+                'array',
+            ], // TODO: required validation for the meta keys according to product type
+            'img'           => [
+                'required',
+                'mimes:jpg,jpeg,png',
+                'max_mb:10',
+            ],
+            'price'         => [
+                'required',
+                'gte:0',
+                'lte:5000',
+            ],
         ];
     }
 }

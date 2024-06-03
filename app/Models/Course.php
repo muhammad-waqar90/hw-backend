@@ -4,54 +4,53 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Course extends Model
 {
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function category()
     {
-        return $this->belongsTo('App\Models\Category', 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     public function categoryWithRecursiveParents()
     {
-        return $this->belongsTo('App\Models\Category', 'category_id')->with('parentCategoriesRecursive' . Category::minimalWithData());
+        return $this->belongsTo(Category::class, 'category_id')->with('parentCategoriesRecursive' . Category::minimalWithData());
     }
 
     public function courseLevels()
     {
-        return $this->hasMany('App\Models\CourseLevel');
+        return $this->hasMany(CourseLevel::class);
     }
 
     public function courseLevel()
     {
-        return $this->hasOne('App\Models\CourseLevel');
+        return $this->hasOne(CourseLevel::class);
     }
 
     public function courseModules()
     {
-        return $this->hasMany('App\Models\CourseModule');
+        return $this->hasMany(CourseModule::class);
     }
 
     public function courseModuleWithLessons()
     {
-        return $this->hasMany('App\Models\CourseModule')->with('lessons' . CourseModule::minimalLessonsWithData());
+        return $this->hasMany(CourseModule::class)->with('lessons' . CourseModule::minimalLessonsWithData());
     }
 
     public function purchaseItems(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany('App\Models\PurchaseItem');
+        return $this->hasMany(PurchaseItem::class);
     }
 
     public function tier()
     {
-        return $this->belongsTo('App\Models\Tier', 'tier_id');
+        return $this->belongsTo(Tier::class, 'tier_id');
     }
 
     public function isSalaryScaleDiscountEnabled($courseId)

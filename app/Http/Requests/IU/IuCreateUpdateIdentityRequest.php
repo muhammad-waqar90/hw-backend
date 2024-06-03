@@ -24,7 +24,12 @@ class IuCreateUpdateIdentityRequest extends FormRequest
     public function rules()
     {
         return [
-            'identityFile'   => 'present|nullable|mimes:jpg,jpeg,png,pdf|max_mb:10'
+            'identityFile'   => [
+                'present',
+                'nullable',
+                'mimes:jpg,jpeg,png,pdf',
+                'max_mb:10',
+            ],
         ];
     }
 }

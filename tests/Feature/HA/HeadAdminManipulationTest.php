@@ -2,23 +2,24 @@
 
 namespace Tests\Feature\HA;
 
-use App\Models\User;
 use App\Models\Ticket;
-
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
+use Tests\TestCase;
 
 class HeadAdminManipulationTest extends TestCase
 {
     use PermGroupUserTestTrait;
 
-    private $wrongUser, $deactivatedAdmin, $data;
+    private $wrongUser;
 
-    public function setUp(): void
+    private $deactivatedAdmin;
+
+    private $data;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -31,7 +32,7 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminGetRouteValidPage1()
     {
-        $response = $this->json('GET',  '/api/ha/admins/');
+        $response = $this->json('GET', '/api/ha/admins/');
 
         $response->assertStatus(200);
 
@@ -42,7 +43,7 @@ class HeadAdminManipulationTest extends TestCase
     {
         User::factory(10)->verified()->admin()->create();
 
-        $response = $this->json('GET',  '/api/ha/admins/?page=2');
+        $response = $this->json('GET', '/api/ha/admins/?page=2');
 
         $response->assertStatus(200);
 
@@ -51,14 +52,14 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminGetRouteInvalidUser()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/ha/admins/');
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/ha/admins/');
 
         $response->assertStatus(403);
     }
 
     public function testHeadAdminGetRouteValidSingleUser()
     {
-        $response = $this->json('GET',  '/api/ha/admins/' . $this->data->users[0]->id);
+        $response = $this->json('GET', '/api/ha/admins/'.$this->data->users[0]->id);
 
         $response->assertStatus(200);
 
@@ -67,7 +68,7 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminGetRouteValidSearch()
     {
-        $response = $this->json('GET',  '/api/ha/admins?searchText=' . $this->data->users[0]->name);
+        $response = $this->json('GET', '/api/ha/admins?searchText='.$this->data->users[0]->name);
 
         $response->assertStatus(200);
 
@@ -78,7 +79,7 @@ class HeadAdminManipulationTest extends TestCase
     {
         User::factory()->verified()->admin()->withName('Admin1')->create();
         User::factory()->verified()->admin()->withName('Admin2')->create();
-        $response = $this->json('GET',  '/api/ha/admins?searchText=Admin');
+        $response = $this->json('GET', '/api/ha/admins?searchText=Admin');
 
         $response->assertStatus(200);
 
@@ -87,7 +88,7 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminGetRouteValidSearchNoResults()
     {
-        $response = $this->json('GET',  '/api/ha/admins?searchText=adminWrongDoesntExists');
+        $response = $this->json('GET', '/api/ha/admins?searchText=adminWrongDoesntExists');
 
         $response->assertStatus(200);
 
@@ -96,7 +97,7 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminGetRouteValidAll()
     {
-        $response = $this->json('GET',  '/api/ha/admins/all');
+        $response = $this->json('GET', '/api/ha/admins/all');
 
         $response->assertStatus(200);
 
@@ -105,44 +106,44 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminPostRouteValid()
     {
-        $response = $this->json('POST', '/api/ha/admins/', array('email' => 'fakeEmail@fake.com', 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => array($this->data->permGroups[0]->id, $this->data->permGroups[1]->id)));
+        $response = $this->json('POST', '/api/ha/admins/', ['email' => 'fakeEmail@fake.com', 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => [$this->data->permGroups[0]->id, $this->data->permGroups[1]->id]]);
 
         $response->assertStatus(200);
     }
 
     public function testHeadAdminPostRouteInvalidUserAlreadyExists()
     {
-        $response = $this->json('POST', '/api/ha/admins/', array('email' => $this->data->users[0]->email, 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => array($this->data->permGroups[0]->id, $this->data->permGroups[1]->id)));
+        $response = $this->json('POST', '/api/ha/admins/', ['email' => $this->data->users[0]->email, 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => [$this->data->permGroups[0]->id, $this->data->permGroups[1]->id]]);
 
         $response->assertStatus(422);
     }
 
     public function testHeadAdminPostNGetRouteValidUpdatedInGetRoute()
     {
-        $response = $this->json('POST', '/api/ha/admins/', array('email' => 'fakeEmail@fake.com', 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => array($this->data->permGroups[0]->id, $this->data->permGroups[1]->id)));
+        $response = $this->json('POST', '/api/ha/admins/', ['email' => 'fakeEmail@fake.com', 'first_name' => 'Admin', 'last_name' => 'Normal', 'permGroupIds' => [$this->data->permGroups[0]->id, $this->data->permGroups[1]->id]]);
 
-        $response = $this->json('GET',  '/api/ha/admins/');
+        $response = $this->json('GET', '/api/ha/admins/');
         $this->assertEquals(17, count(json_decode($response->content())->data));
     }
 
     public function testHeadAdminDelRouteValid()
     {
-        $response = $this->json('DELETE', '/api/ha/admins/' . $this->data->users[0]->id);
+        $response = $this->json('DELETE', '/api/ha/admins/'.$this->data->users[0]->id);
 
         $response->assertStatus(200);
     }
 
     public function testHeadAdminDelNGetRouteValidUpdatedInGetRoute()
     {
-        $response = $this->json('DELETE', '/api/ha/admins/' . $this->data->users[0]->id);
+        $response = $this->json('DELETE', '/api/ha/admins/'.$this->data->users[0]->id);
 
-        $response = $this->json('GET',  '/api/ha/admins/');
+        $response = $this->json('GET', '/api/ha/admins/');
         $this->assertEquals(15, count(json_decode($response->content())->data));
     }
 
     public function testHeadAdminPutRouteValid()
     {
-        $response = $this->json('PUT', '/api/ha/admins/' . $this->data->users[0]->id, array('permGroupIds' => array($this->data->permGroups[0]->id)));
+        $response = $this->json('PUT', '/api/ha/admins/'.$this->data->users[0]->id, ['permGroupIds' => [$this->data->permGroups[0]->id]]);
 
         $response->assertStatus(200);
     }
@@ -151,21 +152,21 @@ class HeadAdminManipulationTest extends TestCase
 
     public function testHeadAdminDeactivateAdmin()
     {
-        $response = $this->json('PUT', '/api/ha/admins/' . $this->data->users[0]->id . '/deactivate');
+        $response = $this->json('PUT', '/api/ha/admins/'.$this->data->users[0]->id.'/deactivate');
 
         $this->assertEquals('Successfully deactivated admin', json_decode($response->content())->message);
     }
 
     public function testHeadAdminActivateAdmin()
     {
-        $response = $this->json('PUT', '/api/ha/admins/' . $this->deactivatedAdmin->id . '/activate');
+        $response = $this->json('PUT', '/api/ha/admins/'.$this->deactivatedAdmin->id.'/activate');
 
         $this->assertEquals('Successfully activated admin', json_decode($response->content())->message);
     }
 
     public function testHeadAdminActivateActivatedAdmin()
     {
-        $response = $this->json('PUT', '/api/ha/admins/' . $this->data->users[0]->id . '/activate');
+        $response = $this->json('PUT', '/api/ha/admins/'.$this->data->users[0]->id.'/activate');
 
         $this->assertEquals(Lang::get('general.notFound'), json_decode($response->content())->errors);
     }
@@ -174,7 +175,7 @@ class HeadAdminManipulationTest extends TestCase
     {
         $ticket = Ticket::factory()->withAdmin($this->data->users[0])->withTicketStatus(2)->create();
 
-        $this->json('PUT', '/api/ha/admins/' . $this->data->users[0]->id . '/deactivate');
+        $this->json('PUT', '/api/ha/admins/'.$this->data->users[0]->id.'/deactivate');
 
         $this->assertEquals(null, DB::table('tickets')->where('id', $ticket->id)->pluck('admin_id')->first());
     }
@@ -183,7 +184,7 @@ class HeadAdminManipulationTest extends TestCase
     {
         $ticket = Ticket::factory()->withAdmin($this->data->users[0])->withTicketStatus(2)->create();
 
-        $this->json('DELETE', '/api/ha/admins/' . $this->data->users[0]->id);
+        $this->json('DELETE', '/api/ha/admins/'.$this->data->users[0]->id);
 
         $this->assertEquals(null, DB::table('tickets')->where('id', $ticket->id)->pluck('admin_id')->first());
     }

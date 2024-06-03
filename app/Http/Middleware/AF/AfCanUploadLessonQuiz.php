@@ -15,22 +15,13 @@ use Illuminate\Support\Facades\Lang;
 class AfCanUploadLessonQuiz
 {
     use UtilsTrait;
-    /**
-     * @var AfCourseRepository
-     * @var IuQuizRepository
-     * @var LessonRepository
-     */
+
     private AfCourseRepository $afCourseRepository;
+
     private IuQuizRepository $iuQuizRepository;
+
     private LessonRepository $lessonRepository;
 
-    /**
-     * AfCanUploadLessonQuiz constructor.
-     *
-     * @param AfCourseRepository $afCourseRepository
-     * @param IuQuizRepository $iuQuizRepository
-     * @param LessonRepository $lessonRepository
-     */
     public function __construct(
         AfCourseRepository $afCourseRepository,
         IuQuizRepository $iuQuizRepository,
@@ -43,11 +34,6 @@ class AfCanUploadLessonQuiz
 
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     *
-     * @return mixed
      */
     public function handle(Request $request, Closure $next)
     {
@@ -61,18 +47,19 @@ class AfCanUploadLessonQuiz
          * - Lesson PUBLISHED
          * - Already have QUIZ
          */
-
         $courseId = $request->route('id');
         $lessonId = $request->route('lessonId');
 
         $course = $this->afCourseRepository->getCourse($courseId);
         $lesson = $this->lessonRepository->get($course?->id, $lessonId);
-        if (!$lesson)
+        if (! $lesson) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if (!$this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON]) && $lesson->published) {
-            if (!$this->iuQuizRepository->getEntityHasQuiz($lesson->id, QuizData::ENTITY_LESSON))
+        if (! $this->existInArray($course->status, [CourseStatusData::DRAFT, CourseStatusData::COMING_SOON]) && $lesson->published) {
+            if (! $this->iuQuizRepository->getEntityHasQuiz($lesson->id, QuizData::ENTITY_LESSON)) {
                 return response()->json(['errors' => 'Can not import quiz to published lesson with no previous quiz'], 403);
+            }
         }
 
         return $next($request);

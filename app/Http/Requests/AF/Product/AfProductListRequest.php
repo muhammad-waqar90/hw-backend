@@ -24,7 +24,11 @@ class AfProductListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'    => 'nullable|string|max:100',
+            'searchText'    => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
         ];
     }
 }

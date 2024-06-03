@@ -22,13 +22,18 @@ use Illuminate\Support\Facades\DB;
 
 class IuPurchaseRepository
 {
-
     private PurchaseHistory $purchaseHistory;
+
     private Course $course;
+
     private CourseModule $courseModule;
+
     private PurchaseItem $purchaseItem;
+
     private Quiz $quiz;
+
     private Product $product;
+
     private ShippingDetail $shippingDetail;
 
     public function __construct(
@@ -56,7 +61,7 @@ class IuPurchaseRepository
             ->with(['purchaseItems' => function ($query) {
                 $query->select('purchase_items.*');
             }, 'shippingDetails'])
-            ->orderBy('id', 'DESC')
+            ->latest('id')
             ->paginate(15);
     }
 
@@ -131,6 +136,7 @@ class IuPurchaseRepository
 
         return $courseModules->map(function ($item) {
             $item['name'] = self::generateItemName($item['courseName'], $item['courseLevelName'], $item['courseModuleName']);
+
             return $item;
         });
     }
@@ -172,6 +178,7 @@ class IuPurchaseRepository
 
         return $quizzes->map(function ($item) {
             $item['name'] = self::generateItemName($item['courseName'], $item['courseLevelName']);
+
             return $item;
         });
     }
@@ -197,13 +204,14 @@ class IuPurchaseRepository
 
         return $quizzes->map(function ($item) {
             $item['name'] = self::generateItemName($item['courseName'], $item['courseLevelName'], $item['courseModuleName']);
+
             return $item;
         });
     }
 
     public function generateItemName($courseName, $levelName, $moduleName = null)
     {
-        return $courseName . ' - ' . $levelName . ($moduleName ? ' - ' . $moduleName : '');
+        return $courseName.' - '.$levelName.($moduleName ? ' - '.$moduleName : '');
     }
 
     public function userOwnsOneOfCourses($courses, $userId): bool
@@ -274,7 +282,7 @@ class IuPurchaseRepository
         $postalCode = '';
 
         // Get address from user's profile
-        if (!$request->different_shipping_address) :
+        if (! $request->different_shipping_address) {
 
             // Cast $user->userProfile to variable
             $profile = $user->userProfile;
@@ -285,7 +293,7 @@ class IuPurchaseRepository
             $country = $profile->country;
             $postalCode = $profile->postal_code;
 
-        else :
+        } else {
 
             // Map shipping address variables if the choose to use a different shipping address
             $address = $request->shipping_address;
@@ -293,7 +301,7 @@ class IuPurchaseRepository
             $country = $request->shipping_country;
             $postalCode = $request->shipping_postal_code;
 
-        endif;
+        }
 
         // Save $deliveryAddress to purchase history
 
@@ -355,7 +363,7 @@ class IuPurchaseRepository
     // Binding discount
     public function applyBookBindingDeduction($ebooks, $cartItems)
     {
-        foreach ($ebooks as $ebook) :
+        foreach ($ebooks as $ebook) {
 
             if ($this->isBookBindingDiscountApplicable($cartItems, $ebook->id, BookBindingData::TYPE_DEDUCTION_APPLICABLE_TO)) {
                 $discount[] = $this->makeDiscountItem(
@@ -368,7 +376,7 @@ class IuPurchaseRepository
                 $ebook->price = 0;
             }
 
-        endforeach;
+        }
 
         return $ebooks;
     }
@@ -377,7 +385,9 @@ class IuPurchaseRepository
     {
         return $ebooksFromCart->contains(function ($ebookFromCart, $key) use ($entityId, $entityType) {
             $hasModuleDiscountKey = array_key_exists(BookBindingData::PRICE_DEDUCTION_INDICATOR, $ebookFromCart);
-            if ((int)$ebookFromCart['id'] === $entityId && $ebookFromCart['type'] === $entityType && $hasModuleDiscountKey === true) return true;
+            if ((int) $ebookFromCart['id'] === $entityId && $ebookFromCart['type'] === $entityType && $hasModuleDiscountKey === true) {
+                return true;
+            }
         });
     }
 
@@ -397,17 +407,17 @@ class IuPurchaseRepository
     public static function makeDiscountItem($discountType, $value, $valueType)
     {
         return [
-            "type"          => $discountType,
-            "value"         => $value,
-            "value_type"    => $valueType
+            'type' => $discountType,
+            'value' => $value,
+            'value_type' => $valueType,
         ];
     }
 
     public static function makePurchaseItemSummary($price, $discount)
     {
         return [
-            "price"     => $price,
-            "discount"  => $discount
+            'price' => $price,
+            'discount' => $discount,
         ];
     }
 }

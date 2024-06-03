@@ -16,23 +16,23 @@ class TicketStatusSeeder extends Seeder
     public function run()
     {
         TicketStatus::updateOrCreate(
-            ['id'   => TicketStatusData::UNCLAIMED],
+            ['id' => TicketStatusData::UNCLAIMED],
             ['name' => 'unclaimed']
         );
         TicketStatus::updateOrCreate(
-            ['id'   => TicketStatusData::IN_PROGRESS],
+            ['id' => TicketStatusData::IN_PROGRESS],
             ['name' => 'in_progress']
         );
         TicketStatus::updateOrCreate(
-            ['id'   => TicketStatusData::RESOLVED],
+            ['id' => TicketStatusData::RESOLVED],
             ['name' => 'resolved']
         );
         TicketStatus::updateOrCreate(
-            ['id'   => TicketStatusData::REOPENED],
+            ['id' => TicketStatusData::REOPENED],
             ['name' => 'reopened']
         );
         TicketStatus::updateOrCreate(
-            ['id'   => TicketStatusData::ON_HOLD],
+            ['id' => TicketStatusData::ON_HOLD],
             ['name' => 'on_hold']
         );
     }

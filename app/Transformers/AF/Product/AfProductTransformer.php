@@ -7,27 +7,23 @@ use App\Repositories\AF\AfProductRepository;
 use App\Traits\FileSystemsCloudTrait;
 use App\Transformers\AF\AfCategoryTransformer;
 use League\Fractal\TransformerAbstract;
-use App\Transformers\AF\Product\AfProductMetasTransformer;
 
 class AfProductTransformer extends TransformerAbstract
 {
     use FileSystemsCloudTrait;
+
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'productMetas'
+        'productMetas',
     ];
 
     /**
      * List of resources possible to include
-     *
-     * @var array
      */
     protected array $availableIncludes = [
-        'category'
+        'category',
     ];
 
     /**
@@ -38,15 +34,15 @@ class AfProductTransformer extends TransformerAbstract
     public function transform(Product $product)
     {
         return [
-            'id'                => $product->id,
-            'course_module_id'  => $product->course_module_id,
-            'name'              => $product->name,
-            'description'       => $product->description,
-            'img'               => $this->generateS3Link(AfProductRepository::getThumbnailS3StoragePath() . $product->img, 1),
-            'price'             => $product->price,
-            'is_available'      => $product->is_available,
-            'created_at'        => $product->created_at,
-            'updated_at'        => $product->updated_at,
+            'id' => $product->id,
+            'course_module_id' => $product->course_module_id,
+            'name' => $product->name,
+            'description' => $product->description,
+            'img' => $this->generateS3Link(AfProductRepository::getThumbnailS3StoragePath().$product->img, 1),
+            'price' => $product->price,
+            'is_available' => $product->is_available,
+            'created_at' => $product->created_at,
+            'updated_at' => $product->updated_at,
         ];
     }
 

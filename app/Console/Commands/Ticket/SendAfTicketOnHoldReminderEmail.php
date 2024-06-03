@@ -8,7 +8,7 @@ use App\DataObject\Tickets\TicketStatusData;
 use App\Mail\AF\Ticket\AfTicketOnHoldReminderEmail;
 use App\Models\User;
 use App\Models\Ticket;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
 
@@ -33,12 +33,12 @@ class SendAfTicketOnHoldReminderEmail extends Command
     protected $description = 'Sending AF ticket on hold reminder email to Head AF';
 
     /**
-     * @var Ticket $ticket
+     * @var Ticket
      */
     protected $ticket;
 
     /**
-     * @var User $user
+     * @var User
      */
     protected $user;
 
@@ -62,12 +62,14 @@ class SendAfTicketOnHoldReminderEmail extends Command
     public function handle()
     {
         $onHoldTickets = $this->getOnHoldTickets();
-        if ($onHoldTickets->isEmpty())
+        if ($onHoldTickets->isEmpty()) {
             return;
+        }
 
         $admins = $this->getTicketTeamLeaders();
-        if ($admins->isEmpty())
+        if ($admins->isEmpty()) {
             return;
+        }
 
         $this->sendEmail($onHoldTickets, $admins);
         $this->info('Sending AF ticket on hold reminder email to Head AF');

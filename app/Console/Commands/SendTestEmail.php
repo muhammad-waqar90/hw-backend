@@ -3,18 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Mail\AdminAccountCreatedEmail;
-use App\Mail\AgeVeriticationEmail;
-use App\Mail\ClosedGuestTicketEmail;
-use App\Mail\PasswordResetEmail;
-use App\Mail\TestEmail;
-use App\Mail\VerificationEmail;
-use App\Mail\IU\Certificate\IuCertificateEmail;
 use App\Mail\IU\Purchase\IuPurchaseConfirmationEmail;
-use App\Mail\IU\Ticket\IuTicketClaimedEmail;
-use App\Mail\IU\Ticket\IuTicketCreatedEmail;
-use App\Mail\IU\Ticket\IuTicketResolveEmail;
-use App\Mail\IU\Ticket\IuTicketResponseEmail;
-use App\Mail\IU\Ticket\IuTicketUnclaimedEmail;
+use App\Mail\TestEmail;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -62,18 +52,18 @@ class SendTestEmail extends Command
             $maxAttempts = null,
             $allowMultipleSelections = false
         );
-        if($type === 'AdminAccountCreatedEmail') {
+        if ($type === 'AdminAccountCreatedEmail') {
             Mail::to($email)
-            ->queue(new AdminAccountCreatedEmail($userProfile, 'testToken123', 'test'));
+                ->queue(new AdminAccountCreatedEmail($userProfile, 'testToken123', 'test'));
         }
-        if($type === 'IuPurchaseConfirmationEmail') {
+        if ($type === 'IuPurchaseConfirmationEmail') {
             $purchaseHistoryId = 1;
             Mail::to($email)
-            ->queue(new IuPurchaseConfirmationEmail($userProfile, $purchaseHistoryId));
+                ->queue(new IuPurchaseConfirmationEmail($userProfile, $purchaseHistoryId));
         }
-        if($type === 'TestEmail') {
+        if ($type === 'TestEmail') {
             Mail::to($email)
-            ->queue(new TestEmail(null, 'mr Email To'));
+                ->queue(new TestEmail(null, 'mr Email To'));
         }
     }
 }

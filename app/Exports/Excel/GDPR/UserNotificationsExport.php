@@ -31,7 +31,7 @@ class UserNotificationsExport implements FromQuery, WithHeadings, WithMapping, W
             'description',
             'read',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -43,7 +43,7 @@ class UserNotificationsExport implements FromQuery, WithHeadings, WithMapping, W
             $row->description,
             $row->read,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

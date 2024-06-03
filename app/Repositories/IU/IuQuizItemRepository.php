@@ -21,6 +21,7 @@ class IuQuizItemRepository
     {
         $isMinor = IuUserProfileRepository::getIsMinor($userId);
         $quizItems = $this->getQuizItems($isMinor, $quiz);
+
         return $this->formatQuestionsAnswers($quizItems);
     }
 
@@ -39,6 +40,7 @@ class IuQuizItemRepository
             ->limit($numOfEasyQuestions);
 
         $quizItems = $difficultQuizItemsQuery->union($easyQuizItemsQuery)->get();
+
         return $quizItems->shuffle();
     }
 
@@ -46,7 +48,7 @@ class IuQuizItemRepository
     {
         $questionsAnswers = ['questions' => collect([]), 'answers' => collect([])];
 
-        foreach($quizItems as $quizItem) {
+        foreach ($quizItems as $quizItem) {
             $questionsAnswers['questions'][] = $this->formatQuestion($quizItem);
             $questionsAnswers['answers']["$quizItem->uuid"] = $this->formatAnswer($quizItem);
         }
@@ -61,10 +63,11 @@ class IuQuizItemRepository
             'id' => $quizItem->uuid,
             'type' => $quizItem->type,
             'question' => $quizItem->question,
-            'options' => $this->formatOptions(collect($options))
+            'options' => $this->formatOptions(collect($options)),
         ]);
-        if($quizItem->type === QuizData::QUESTION_MCQ_MULTIPLE)
+        if ($quizItem->type === QuizData::QUESTION_MCQ_MULTIPLE) {
             $formatted['maxChoices'] = $options->maxChoices;
+        }
 
         return $formatted;
     }
@@ -75,12 +78,13 @@ class IuQuizItemRepository
         $options = json_decode($quizItem->options);
 
         $formatted = collect([
-                'type' => $quizItem->type,
-                'answerId' => $answerId
+            'type' => $quizItem->type,
+            'answerId' => $answerId,
         ]);
 
-        if($quizItem->type === QuizData::QUESTION_MCQ_MULTIPLE)
+        if ($quizItem->type === QuizData::QUESTION_MCQ_MULTIPLE) {
             $formatted['maxChoices'] = $options->maxChoices;
+        }
 
         return $formatted;
     }
@@ -88,9 +92,10 @@ class IuQuizItemRepository
     private function formatOptions($options)
     {
         $formatted = [];
-        if($options->has('list'))
+        if ($options->has('list')) {
             $formatted = collect($options['list'])->shuffle();
-        if($options->has('leftSide')) {
+        }
+        if ($options->has('leftSide')) {
             $formatted['leftSide'] = collect($options['leftSide'])->shuffle();
             $formatted['rightSide'] = collect($options['rightSide'])->shuffle();
         }

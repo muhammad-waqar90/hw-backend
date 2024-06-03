@@ -17,12 +17,12 @@ class DiscountedCountrySeeder extends Seeder
     {
         DiscountedCountry::updateOrCreate(
             [
-                'id' => DiscountedCountryData::DISCOUNTED_COUNTRY_UK
+                'id' => DiscountedCountryData::DISCOUNTED_COUNTRY_UK,
             ],
             [
                 'name' => 'United Kingdom',
                 'iso_country_code' => 'GBR',
-                'iso_currency_code' => 'GBP'
+                'iso_currency_code' => 'GBP',
             ]
         );
     }

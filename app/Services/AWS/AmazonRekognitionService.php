@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services\AWS;
 
 /*
@@ -23,28 +24,20 @@ namespace App\Services\AWS;
 */
 use Aws\Rekognition\RekognitionClient;
 
-class AmazonRekognitionService {
-
+class AmazonRekognitionService
+{
     /**
      * Configurations
-     * @var $rekognitionClientConfig
-     * @var $s3Bucket
-     * @var $minConfidence
-     *
-    */
+     */
     private mixed $rekognitionClientConfig;
+
     private mixed $s3Bucket;
+
     private mixed $minConfidence;
 
     private RekognitionClient $client;
 
-    /**
-     * The client constructor accepts the following options:
-     * @param array|null $rekognitionClientConfig [region, version]
-     * @param string|null $s3Bucket
-     * @param int $minConfidence
-     */
-    public function __construct(array $rekognitionClientConfig = null, string $s3Bucket = null, int $minConfidence = 0)
+    public function __construct(?array $rekognitionClientConfig = null, ?string $s3Bucket = null, int $minConfidence = 0)
     {
         $this->rekognitionClientConfig = $rekognitionClientConfig ?? config('aws.rekognition.client');
         $this->s3Bucket = $s3Bucket ?? config('aws.rekognition.bucket');
@@ -53,12 +46,7 @@ class AmazonRekognitionService {
         $this->client = new RekognitionClient($this->rekognitionClientConfig);
     }
 
-    /**
-     * @param string $s3ObjectKey
-     * @param string $attributesList (ALL || DEFAULT)
-     * @return boolean
-    */
-    public function detectFaces(string $s3ObjectKey, string $attributesList = 'ALL')
+    public function detectFaces(string $s3ObjectKey, string $attributesList = 'ALL'): bool
     {
         try {
             $result = $this->client->detectFaces([
@@ -70,11 +58,12 @@ class AmazonRekognitionService {
                         'Name' => $s3ObjectKey,
                     ],
                 ],
-                'MinConfidence' => $this->minConfidence
+                'MinConfidence' => $this->minConfidence,
             ])->toArray();
 
-            if($this->isFacesDetected($result) && !$this->isMultipleFacesDetected($result['FaceDetails']) && $this->isFullFace($result['FaceDetails'][0]))
+            if ($this->isFacesDetected($result) && ! $this->isMultipleFacesDetected($result['FaceDetails']) && $this->isFullFace($result['FaceDetails'][0])) {
                 return $result['FaceDetails'][0];
+            }
 
             return false;
         } catch (\Exception $e) {
@@ -82,77 +71,57 @@ class AmazonRekognitionService {
         }
     }
 
-    /**
-     * Aws\Result
-     * @param array $data
-     * @return boolean
-    */
-    private function isFacesDetected(array $data)
+    private function isFacesDetected(array $data): bool
     {
-        if($data['@metadata'] && $data['@metadata']['statusCode'] === 200)
+        if ($data['@metadata'] && $data['@metadata']['statusCode'] === 200) {
             return count($data['FaceDetails']) > 0;
+        }
 
         return false;
     }
 
-    /**
-     * Aws Detect Faces
-     * @param array $faces
-     * @return boolean
-    */
     private function isMultipleFacesDetected(array $faces)
     {
         return count($faces) > 1;
     }
 
-    /**
-     * Detected Face
-     * @param array $faceDetails
-     * @return boolean
-    */
-    private function isFullFace(array $faceDetails)
+    private function isFullFace(array $faceDetails): bool
     {
-        if(!$this->isValidBoundingBox($faceDetails['BoundingBox']))
+        if (! $this->isValidBoundingBox($faceDetails['BoundingBox'])) {
             return false;
+        }
 
-        if(!$this->areEyesOpen($faceDetails['EyesOpen']))
+        if (! $this->areEyesOpen($faceDetails['EyesOpen'])) {
             return false;
+        }
 
-        if(!$this->areValidLandmarks($faceDetails['Landmarks']))
+        if (! $this->areValidLandmarks($faceDetails['Landmarks'])) {
             return false;
+        }
 
         return true;
     }
 
-    /**
-     * @param array $boundingBox
-     * @return boolean
-    */
-    private function isValidBoundingBox(array $boundingBox)
+    private function isValidBoundingBox(array $boundingBox): bool
     {
         return min($boundingBox) >= 0;
     }
 
-    /**
-     * @param array $eyesOpen
-     * @return boolean
-    */
-    private function areEyesOpen(array $eyesOpen)
+    private function areEyesOpen(array $eyesOpen): bool
     {
         return $eyesOpen['Value'] && $eyesOpen['Confidence'] >= 80;
     }
 
     /**
      * Facial analysis and facial recognition
-     * @param array $landmarks
-     * @return boolean
-    */
-    private function areValidLandmarks(array $landmarks)
+     */
+    private function areValidLandmarks(array $landmarks): bool
     {
         foreach ($landmarks as $landmark) {
-			if(min($landmark) < 0)
+            if (min($landmark) < 0) {
                 return false;
-        };
+            }
+        }
 
         return true;
     }

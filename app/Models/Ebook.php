@@ -10,11 +10,11 @@ class Ebook extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function lesson()
     {
-        return $this->belongsTo('App\Models\Lesson');
+        return $this->belongsTo(Lesson::class);
     }
 }

@@ -4,17 +4,16 @@ namespace App\Repositories\HA;
 
 use App\DataObject\RoleData;
 use App\Exceptions\NotFoundException;
-use App\Models\User;
 use App\Models\AdminProfile;
-use App\Models\VerifyUser;
-use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AdminManipulationRepository
 {
-
     private User $user;
+
     private AdminProfile $adminProfile;
 
     public function __construct(User $user, AdminProfile $adminProfile)
@@ -23,23 +22,23 @@ class AdminManipulationRepository
         $this->adminProfile = $adminProfile;
     }
 
-    public function createAdmin($name, $firstName, $lastName, $role, Array $permGroupIds = [])
+    public function createAdmin($name, $firstName, $lastName, $role, array $permGroupIds = [])
     {
         $user = $this->user->create([
-            'name'              => $name,
-            'first_name'        => $firstName,
-            'last_name'         => $lastName,
-            'role_id'           => $role,
-            'password'          => bcrypt(Str::random(50)),
-            'email_verified_at' => Carbon::now()
+            'name' => $name,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'role_id' => $role,
+            'password' => bcrypt(Str::random(50)),
+            'email_verified_at' => Carbon::now(),
         ]);
 
-        foreach($permGroupIds as $permGroupId) {
+        foreach ($permGroupIds as $permGroupId) {
             DB::table('perm_group_user')->insert([
                 'perm_group_id' => $permGroupId,
                 'user_id' => $user->id,
                 'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
+                'updated_at' => Carbon::now(),
             ]);
         }
 
@@ -49,8 +48,8 @@ class AdminManipulationRepository
     public function createAdminProfile($userId, $email)
     {
         return $this->adminProfile->create([
-            'user_id'       => $userId,
-            'email'         => $email
+            'user_id' => $userId,
+            'email' => $email,
         ]);
     }
 
@@ -65,22 +64,23 @@ class AdminManipulationRepository
             ->first();
     }
 
-    public function updateAdmin($userId, Array $permGroupIds)
+    public function updateAdmin($userId, array $permGroupIds)
     {
         $user = $this->user->where('id', $userId)
             ->where('role_id', RoleData::ADMIN)
             ->first();
-        if(!$user)
+        if (! $user) {
             throw new NotFoundException();
+        }
 
         DB::table('perm_group_user')->where('user_id', $userId)->delete();
 
-        foreach($permGroupIds as $permGroupId) {
+        foreach ($permGroupIds as $permGroupId) {
             DB::table('perm_group_user')->insert([
                 'perm_group_id' => $permGroupId,
                 'user_id' => $userId,
                 'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
+                'updated_at' => Carbon::now(),
             ]);
         }
     }
@@ -101,7 +101,7 @@ class AdminManipulationRepository
         return $this->user->where('id', $id)
             ->where('role_id', RoleData::ADMIN)
             ->update([
-                'is_enabled' => 1
+                'is_enabled' => 1,
             ]);
     }
 
@@ -110,7 +110,7 @@ class AdminManipulationRepository
         return $this->user->where('id', $id)
             ->where('role_id', RoleData::ADMIN)
             ->update([
-                'is_enabled' => 0
+                'is_enabled' => 0,
             ]);
     }
 }

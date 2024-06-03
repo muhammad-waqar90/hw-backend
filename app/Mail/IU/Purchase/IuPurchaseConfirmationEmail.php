@@ -11,15 +11,12 @@ use Illuminate\Support\Facades\Lang;
 class IuPurchaseConfirmationEmail extends AbstractMail
 {
     public $purchaseHistoryId;
+
     public $purchaseHistory;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $purchaseHistoryId
      */
-
     public function __construct($userProfile, $purchaseHistoryId)
     {
         parent::__construct($userProfile);
@@ -31,7 +28,6 @@ class IuPurchaseConfirmationEmail extends AbstractMail
      *
      * @return $this
      */
-
     public function build()
     {
         $this->purchaseHistory = PurchaseHistory::where('user_id', $this->userProfile->userProfile->user_id)

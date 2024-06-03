@@ -10,8 +10,6 @@ class GuCategoryTransformer extends TransformerAbstract
 {
     /**
      * List of resources possible to include
-     *
-     * @var array
      */
     protected array $availableIncludes = [
         'products',
@@ -25,12 +23,12 @@ class GuCategoryTransformer extends TransformerAbstract
     public function transform(Category $category)
     {
         return [
-            'id'                    =>  $category->id,
-            'parent_category_id'    =>  $category->parent_category_id,
-            'root_category_id'      =>  $category->root_category_id,
-            'name'                  =>  $category->name,
-            'created_at'            =>  $category->created_at,
-            'updated_at'            =>  $category->updated_at
+            'id' => $category->id,
+            'parent_category_id' => $category->parent_category_id,
+            'root_category_id' => $category->root_category_id,
+            'name' => $category->name,
+            'created_at' => $category->created_at,
+            'updated_at' => $category->updated_at,
         ];
     }
 

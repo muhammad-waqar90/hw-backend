@@ -24,8 +24,13 @@ class UpdateVideoProgress extends FormRequest
     public function rules()
     {
         return [
-            'timestamp' => 'required|integer',
-            'updateLessonProgress' => 'boolean'
+            'timestamp' => [
+                'required',
+                'integer',
+            ],
+            'updateLessonProgress' => [
+                'boolean',
+            ],
         ];
     }
 }

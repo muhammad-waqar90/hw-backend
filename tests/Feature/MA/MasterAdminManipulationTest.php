@@ -3,14 +3,13 @@
 namespace Tests\Feature\MA;
 
 use App\Models\User;
-
 use Tests\TestCase;
 
 class MasterAdminManipulationTest extends TestCase
 {
     private $wrongUser;
-    
-    public function setUp(): void
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -21,7 +20,7 @@ class MasterAdminManipulationTest extends TestCase
 
     public function testDefaultHeadAdminGetRouteValid()
     {
-        $response = $this->json('GET',  '/api/ma/ha');
+        $response = $this->json('GET', '/api/ma/ha');
 
         $response->assertStatus(200);
     }
@@ -30,8 +29,8 @@ class MasterAdminManipulationTest extends TestCase
     {
         User::factory(5)->verified()->hAdmin()->create();
 
-        $response = $this->json('GET',  '/api/ma/ha');
-        
+        $response = $this->json('GET', '/api/ma/ha');
+
         $response->assertStatus(200);
         $this->assertEquals(5, count(json_decode($response->content())->data));
     }
@@ -40,8 +39,8 @@ class MasterAdminManipulationTest extends TestCase
     {
         User::factory(5)->verified()->hAdmin()->create();
 
-        $response = $this->actingAs($this->wrongUser)->json('GET',  '/api/ma/ha');
-        
+        $response = $this->actingAs($this->wrongUser)->json('GET', '/api/ma/ha');
+
         $response->assertStatus(403);
     }
 
@@ -49,8 +48,8 @@ class MasterAdminManipulationTest extends TestCase
     {
         $user = User::factory(5)->verified()->hAdmin()->create();
 
-        $response = $this->json('DELETE',  '/api/ma/ha/'.$user[0]->id);
-        
+        $response = $this->json('DELETE', '/api/ma/ha/'.$user[0]->id);
+
         $response->assertStatus(200);
     }
 
@@ -58,8 +57,8 @@ class MasterAdminManipulationTest extends TestCase
     {
         $user = User::factory()->verified()->hAdmin()->create();
 
-        $response = $this->actingAs($this->wrongUser)->json('DELETE',  '/api/ma/ha/'.$user->id);
-        
+        $response = $this->actingAs($this->wrongUser)->json('DELETE', '/api/ma/ha/'.$user->id);
+
         $response->assertStatus(403);
     }
 }

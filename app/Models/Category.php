@@ -10,7 +10,7 @@ class Category extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function scopeMinimal($query)
@@ -20,27 +20,27 @@ class Category extends Model
 
     public function firstChildCategories()
     {
-        return $this->hasMany('App\Models\Category', 'parent_category_id');
+        return $this->hasMany(Category::class, 'parent_category_id');
     }
 
     public function childCategoriesRecursive()
     {
-        return $this->hasMany('App\Models\Category')->with('childCategoriesRecursive');
+        return $this->hasMany(Category::class)->with('childCategoriesRecursive');
     }
 
     public function parentCategory()
     {
-        return $this->belongsTo('App\Models\Category', 'parent_category_id');
+        return $this->belongsTo(Category::class, 'parent_category_id');
     }
 
     public function parentCategoriesRecursive()
     {
-        return $this->belongsTo('App\Models\Category', 'parent_category_id')->with('parentCategoriesRecursive'.Category::minimalWithData());
+        return $this->belongsTo(Category::class, 'parent_category_id')->with('parentCategoriesRecursive' . Category::minimalWithData());
     }
 
     public function rootParentCategory()
     {
-        return $this->belongsTo('App\Models\Category', 'root_category_id');
+        return $this->belongsTo(Category::class, 'root_category_id');
     }
 
     public static function minimalWithData()
@@ -50,11 +50,11 @@ class Category extends Model
 
     public function products()
     {
-        return $this->hasMany('App\Models\Product');
+        return $this->hasMany(Product::class);
     }
 
     public function courses()
     {
-        return $this->hasMany('App\Models\Course');
+        return $this->hasMany(Course::class);
     }
 }

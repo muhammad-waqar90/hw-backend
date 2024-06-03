@@ -53,8 +53,9 @@ class CleanExpiredRestoreUser extends Command
     public function handle()
     {
         $expiredRestoreUsers = $this->getExpiredRestoreUsers();
-        if ($expiredRestoreUsers->isEmpty())
+        if ($expiredRestoreUsers->isEmpty()) {
             return;
+        }
 
         foreach ($expiredRestoreUsers as $expiredRestoreUser) {
             CleanExpiredRestoreUserJob::dispatch($expiredRestoreUser->user_id, $expiredRestoreUser->userProfile->email, $expiredRestoreUser->token);
@@ -62,6 +63,7 @@ class CleanExpiredRestoreUser extends Command
         }
 
         $this->info('Clean expired restore users, soft delete, prefix email and expire links');
+
         return true;
     }
 

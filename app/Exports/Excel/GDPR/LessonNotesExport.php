@@ -30,16 +30,16 @@ class LessonNotesExport implements FromQuery, WithHeadings, WithMapping
             'name',
             'content',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
     public function prepareRows($rows)
     {
         return $rows->transform(function ($lessonNote) {
-            $lessonNote->name = $lessonNote->lesson->courseModule->course->name . ' ' .
-                Lang::get('iu.course.level') . ' ' . $lessonNote->lesson->courseModule->courseLevel->value . ' ' .
-                $lessonNote->lesson->courseModule->name . ' ' .
+            $lessonNote->name = $lessonNote->lesson->courseModule->course->name.' '.
+                Lang::get('iu.course.level').' '.$lessonNote->lesson->courseModule->courseLevel->value.' '.
+                $lessonNote->lesson->courseModule->name.' '.
                 $lessonNote->lesson->name;
 
             return $lessonNote;
@@ -53,7 +53,7 @@ class LessonNotesExport implements FromQuery, WithHeadings, WithMapping
             $row->name,
             $row->content,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 }

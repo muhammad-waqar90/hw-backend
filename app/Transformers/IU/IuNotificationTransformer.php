@@ -9,21 +9,21 @@ class IuNotificationTransformer extends TransformerAbstract
 {
     /**
      * A Fractal transformer.
-     * @param Notification $notification
+     *
      * @return array
      */
     public function transform(Notification $notification)
     {
         return [
-            'id'            => $notification->id,
-            'title'         => $notification->title,
-            'description'   => $notification->description,
-            'body'          => $notification->body,
-            'type'          => $notification->type,
-            'read'          => !!$notification->read,
-            'modal_read'    => !!$notification->modal_read,
-            'action'        => json_decode($notification->action),
-            'created_at'    => $notification->created_at,
+            'id' => $notification->id,
+            'title' => $notification->title,
+            'description' => $notification->description,
+            'body' => $notification->body,
+            'type' => $notification->type,
+            'read' => (bool) $notification->read,
+            'modal_read' => (bool) $notification->modal_read,
+            'action' => json_decode($notification->action),
+            'created_at' => $notification->created_at,
         ];
     }
 }

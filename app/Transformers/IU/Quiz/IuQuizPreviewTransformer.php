@@ -10,14 +10,13 @@ class IuQuizPreviewTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param Quiz $quiz
      * @return array
      */
     public function transform(Quiz $quiz)
     {
         return [
-            'id'    => $quiz->id,
-            'duration'  => $quiz->duration,
+            'id' => $quiz->id,
+            'duration' => $quiz->duration,
         ];
     }
 }

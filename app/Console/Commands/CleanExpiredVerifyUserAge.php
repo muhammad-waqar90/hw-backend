@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\CleanExpiredVerifyUserAgeJob;
 use App\Models\VerifyUserAge;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 
 class CleanExpiredVerifyUserAge extends Command
@@ -32,7 +32,6 @@ class CleanExpiredVerifyUserAge extends Command
 
     /**
      * CleanExpiredVerifyUserAge constructor.
-     * @param VerifyUserAge $verifyUserAge
      */
     public function __construct(VerifyUserAge $verifyUserAge)
     {
@@ -48,12 +47,14 @@ class CleanExpiredVerifyUserAge extends Command
     public function handle()
     {
         $expiredVerifications = $this->verifyUserAge
-            ->where('updated_at', '<',Carbon::now()->subHours(24))
+            ->where('updated_at', '<', Carbon::now()->subHours(24))
             ->get();
-        if($expiredVerifications->isEmpty())
+        if ($expiredVerifications->isEmpty()) {
             return;
-        foreach($expiredVerifications as $expiredVerification)
+        }
+        foreach ($expiredVerifications as $expiredVerification) {
             CleanExpiredVerifyUserAgeJob::dispatch($expiredVerification)->onQueue('low');
+        }
 
         $this->info('Cleaning expired age verifications');
     }

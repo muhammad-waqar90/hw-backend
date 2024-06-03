@@ -28,22 +28,28 @@ class CreateMasterAdmin extends Command
      * @var string
      */
     protected $description = 'Create master admin for the system';
+
     /**
      * @var User
      */
     private $user;
+
     /**
      * @var AuthenticationRepository
      */
     private $authenticationRepository;
+
     /**
      * @var IuUserRepository
      */
     private $iuUserRepository;
 
     private $email;
+
     private $firstName;
+
     private $lastName;
+
     /**
      * @var AdminManipulationRepository
      */
@@ -51,13 +57,7 @@ class CreateMasterAdmin extends Command
 
     /**
      * Create a new command instance.
-     *
-     * @param User $user
-     * @param AuthenticationRepository $authenticationRepository
-     * @param IuUserRepository $iuUserRepository
-     * @param AdminManipulationRepository $adminManipulationRepository
      */
-
     public function __construct(User $user, AuthenticationRepository $authenticationRepository, IuUserRepository $iuUserRepository,
         AdminManipulationRepository $adminManipulationRepository)
     {
@@ -75,8 +75,9 @@ class CreateMasterAdmin extends Command
      */
     public function handle()
     {
-        if($this->checkIfMasterAdminExists())
+        if ($this->checkIfMasterAdminExists()) {
             return $this->error('Master admin already exists in the system');
+        }
 
         $this->email = $this->ask('Input email');
         $this->firstName = $this->ask('Input first name');
@@ -84,11 +85,13 @@ class CreateMasterAdmin extends Command
 
         $this->displaySelectedValues();
 
-        if (!$this->confirm('Do you wish to proceed?'))
+        if (! $this->confirm('Do you wish to proceed?')) {
             return;
+        }
 
-        if(!$this->isValidInput())
+        if (! $this->isValidInput()) {
             return $this->error('Invalid input!');
+        }
 
         $this->createMasterAdmin();
         $this->info('Successfully created master admin');
@@ -120,7 +123,7 @@ class CreateMasterAdmin extends Command
 
             Mail::to($this->email)->queue(new AdminAccountCreatedEmail($user, $passwordReset->token, $userName));
             DB::commit();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             DB::rollback();
             throw $e;
         }
@@ -129,9 +132,9 @@ class CreateMasterAdmin extends Command
     private function isValidInput()
     {
         $values = [
-            'email'     => $this->email,
-            'firstName' => $this-> firstName,
-            'lastName'  => $this->lastName
+            'email' => $this->email,
+            'firstName' => $this->firstName,
+            'lastName' => $this->lastName,
         ];
 
         $validator = Validator::make($values, [
@@ -140,8 +143,9 @@ class CreateMasterAdmin extends Command
             'email' => 'required|email|max:255',
         ]);
 
-        if($validator->fails())
+        if ($validator->fails()) {
             return false;
+        }
 
         return true;
     }

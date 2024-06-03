@@ -8,9 +8,6 @@ class TestEmail extends AbstractMail
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $name
      */
     public function __construct($userProfile, $name)
     {

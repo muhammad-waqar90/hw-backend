@@ -12,34 +12,23 @@ use Illuminate\Support\Facades\Storage;
 class AfBulkImportQuizzesRepository
 {
     use ZipTrait;
-    /**
-     * @var BulkImportStatus
-     */
+
     private BulkImportStatus $bulkImportStatus;
 
-    /**
-     * @param BulkImportStatus $bulkImportStatus
-     */
     public function __construct(BulkImportStatus $bulkImportStatus)
     {
         $this->bulkImportStatus = $bulkImportStatus;
     }
 
-    /**
-     * @param int $userId
-     * @param int $courseId
-     * @param int $entityId
-     * @param string $entityType
-     */
-    public function initImport($userId, $courseId, $entityId, $entityType, $type = BulkImportTypeData::QUIZ)
+    public function initImport(int $userId, int $courseId, int $entityId, string $entityType, $type = BulkImportTypeData::QUIZ)
     {
         return $this->bulkImportStatus->create([
-            'user_id'     => $userId,
-            'course_id'   => $courseId,
-            'entity_id'   => $entityId,
+            'user_id' => $userId,
+            'course_id' => $courseId,
+            'entity_id' => $entityId,
             'entity_type' => $entityType,
-            'type'        => $type,
-            'status'      => BulkImportStatusData::PENDING
+            'type' => $type,
+            'status' => BulkImportStatusData::PENDING,
         ]);
     }
 
@@ -69,7 +58,7 @@ class AfBulkImportQuizzesRepository
     {
         return Storage::path(
             AfBulkImportQuizzesRepository::getStoragePath($bisId)
-        ) . "/$bisId.zip";
+        )."/$bisId.zip";
     }
 
     public function getTmpImportQuizzesPath($bisId)
@@ -86,14 +75,14 @@ class AfBulkImportQuizzesRepository
             ->with('admin', function ($query) {
                 $query->with('adminProfile');
             })
-            ->orderBy('id', 'DESC')
+            ->latest('id')
             ->paginate(20);
     }
 
     public function cleanup($tmpExportDirectory)
     {
         Storage::deleteDirectory($tmpExportDirectory);
-        Storage::delete($tmpExportDirectory . '.zip');
+        Storage::delete($tmpExportDirectory.'.zip');
     }
 
     public function makeImportReady($tmpImportQuizzesDirPath, $tmpImportQuizFileName, $file)
@@ -104,16 +93,16 @@ class AfBulkImportQuizzesRepository
 
     public function getTmpImportQuizFileName($entityId, $file)
     {
-        return $entityId . "_" . $file->getClientOriginalName();
+        return $entityId.'_'.$file->getClientOriginalName();
     }
 
     public function makeLessonImportIndexFile($lessonId, $duration, $sampleSize, $tmpImportQuizzesDirPath, $tmpImportQuizFileName)
     {
-        (new makeIndexImportFile($lessonId, "", "", $tmpImportQuizFileName, $sampleSize, $duration, ""))->store($tmpImportQuizzesDirPath . '/index.xlsx');
+        (new makeIndexImportFile($lessonId, '', '', $tmpImportQuizFileName, $sampleSize, $duration, ''))->store($tmpImportQuizzesDirPath.'/index.xlsx');
     }
 
-    public function makeModuleImportIndexFile($moduleId, $duration, $sampleSize, $price = "", $tmpImportQuizzesDirPath, $tmpImportQuizFileName)
+    public function makeModuleImportIndexFile($moduleId, $duration, $sampleSize, $price, $tmpImportQuizzesDirPath, $tmpImportQuizFileName)
     {
-        (new makeIndexImportFile("", $moduleId, "", $tmpImportQuizFileName, $sampleSize, $duration, $price))->store($tmpImportQuizzesDirPath . '/index.xlsx');
+        (new makeIndexImportFile('', $moduleId, '', $tmpImportQuizFileName, $sampleSize, $duration, $price))->store($tmpImportQuizzesDirPath.'/index.xlsx');
     }
 }

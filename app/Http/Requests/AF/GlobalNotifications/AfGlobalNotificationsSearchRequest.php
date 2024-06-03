@@ -24,8 +24,14 @@ class AfGlobalNotificationsSearchRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'    => 'string|nullable|max:100',
-            'archiveStatus' => 'boolean'
+            'searchText'    => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
+            'archiveStatus' => [
+                'boolean',
+            ],
         ];
     }
 }

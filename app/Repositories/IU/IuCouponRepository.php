@@ -2,24 +2,26 @@
 
 namespace App\Repositories\IU;
 
-use App\Models\Coupon;
-use App\Models\Course;
-use App\Traits\UtilsTrait;
-use App\DataObject\CouponData;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use App\DataObject\AF\CourseStatusData;
-use App\Repositories\IU\IuCourseRepository;
 use App\DataObject\AF\SalaryScale\SalaryScaleData;
+use App\DataObject\CouponData;
 use App\DataObject\DiscountTypeData;
 use App\DataObject\Purchases\PurchaseItemTypeData;
+use App\Models\Coupon;
+use App\Models\Course;
+use App\Repositories\IU\IuCourseRepository;
+use App\Traits\UtilsTrait;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class IuCouponRepository
 {
     use UtilsTrait;
 
     private Coupon $coupon;
+
     private IuCourseRepository $iuCourseRepository;
+
     private Course $course;
 
     public function __construct(Coupon $coupon, IuCourseRepository $iuCourseRepository, Course $course)
@@ -68,15 +70,19 @@ class IuCouponRepository
             $salaryScaleDiscountIndicator = array_key_exists(SalaryScaleData::DISCOUNT_INDICATOR, $cartItem);
 
             // Check if the course salary discount is disabled or enabled
-            $courseSalaryScaleDiscountEnabled = (bool)$this->course->isSalaryScaleDiscountEnabled($entity->id);
+            $courseSalaryScaleDiscountEnabled = (bool) $this->course->isSalaryScaleDiscountEnabled($entity->id);
 
-            if (!$salaryScaleDiscountIndicator && $courseSalaryScaleDiscountEnabled) return false;
+            if (! $salaryScaleDiscountIndicator && $courseSalaryScaleDiscountEnabled) {
+                return false;
+            }
 
-            if (!$courseSalaryScaleDiscountEnabled && $salaryScaleDiscountIndicator) return false;
+            if (! $courseSalaryScaleDiscountEnabled && $salaryScaleDiscountIndicator) {
+                return false;
+            }
 
             $actualPrice = $entity->price;
             $discount = [];
-            if($userSalaryScale && isset($cartItem[SalaryScaleData::DISCOUNT_INDICATOR])) {
+            if ($userSalaryScale && isset($cartItem[SalaryScaleData::DISCOUNT_INDICATOR])) {
                 $discount[] = IuPurchaseRepository::makeDiscountItem(
                     DiscountTypeData::SALARY_SCALE,
                     $userSalaryScale->discountedCountryRange->discount_percentage,
@@ -84,7 +90,7 @@ class IuCouponRepository
                 );
 
                 // update price to discounted price
-                $entity->price = round((float)$cartItem[SalaryScaleData::DISCOUNT_INDICATOR], 2);
+                $entity->price = round((float) $cartItem[SalaryScaleData::DISCOUNT_INDICATOR], 2);
             }
             if ($this->canApplyCouponToEntity($coupon->restrictions, $entity->id, CouponData::ENTITY_MODEL['course'])) {
                 $discount[] = IuPurchaseRepository::makeDiscountItem(
@@ -96,7 +102,7 @@ class IuCouponRepository
                 $entity->price = $this->getEntityDiscountedPrice($coupon->value, $coupon->value_type, $entity->price);
             }
 
-            if(count($discount)) {
+            if (count($discount)) {
                 $entity->summary = IuPurchaseRepository::makePurchaseItemSummary($actualPrice, $discount);
             }
         }
@@ -107,15 +113,18 @@ class IuCouponRepository
     public function canApplyCouponToEntity($restrictions, $entityId, $entityType)
     {
         return $restrictions->contains(function ($restriction, $key) use ($entityId, $entityType) {
-            if ($restriction->entity_id === $entityId && $restriction->entity_type === $entityType) return true;
+            if ($restriction->entity_id === $entityId && $restriction->entity_type === $entityType) {
+                return true;
+            }
         });
     }
 
     public function getEntityDiscountedPrice($discount, $discountType, $price)
     {
         $discountedPrice = $price;
-        if ($discountType === CouponData::PERCENTAGE)
+        if ($discountType === CouponData::PERCENTAGE) {
             $discountedPrice = $price - ($price * ($discount / 100));
+        }
 
         // if($discountType === CouponData::FLAT)
         //     $discountedPrice = $price - $discount;
@@ -126,10 +135,10 @@ class IuCouponRepository
     public function createCouponPurchaseHistory($couponId, $purchaseHistoryId)
     {
         return DB::table('coupon_purchase_history')->insert([
-            'coupon_id'             => $couponId,
-            'purchase_history_id'   => $purchaseHistoryId,
-            'created_at'            => Carbon::now(),
-            'updated_at'            => Carbon::now()
+            'coupon_id' => $couponId,
+            'purchase_history_id' => $purchaseHistoryId,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
         ]);
     }
 

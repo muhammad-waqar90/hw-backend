@@ -15,12 +15,12 @@ class AfLessonEbookTransformer extends TransformerAbstract
     public function transform(Ebook $ebook)
     {
         return [
-            'id'            => $ebook->id,
-            'lesson_id'     => $ebook->lesson_id,
-            'name'          => $ebook->content,
-            'src'           => $ebook->src,
-            'created_at'    => $ebook->created_at,
-            'updated_at'    => $ebook->updated_at
+            'id' => $ebook->id,
+            'lesson_id' => $ebook->lesson_id,
+            'name' => $ebook->content,
+            'src' => $ebook->src,
+            'created_at' => $ebook->created_at,
+            'updated_at' => $ebook->updated_at,
         ];
     }
 }

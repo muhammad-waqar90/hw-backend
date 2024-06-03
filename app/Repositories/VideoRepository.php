@@ -15,7 +15,8 @@ class VideoRepository
 
         if ($cdn) {
             $this->generateQueuedSignedCookie($file);
-            return config('aws.cloudfront.cname') . $file;
+
+            return config('aws.cloudfront.cname').$file;
         }
 
         return Storage::disk('s3')->temporaryUrl($file, now()->addMinutes(config('course.video_expiry')));

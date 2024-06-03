@@ -11,6 +11,7 @@ use Illuminate\Validation\Rules\Password;
 class UpdatePasswordRequest extends FormRequest
 {
     private IuUserRepository $iuUserRepository;
+
     private AuthenticationRepository $authRepository;
 
     public function __construct(IuUserRepository $iuUserRepository, AuthenticationRepository $authRepository)
@@ -37,11 +38,15 @@ class UpdatePasswordRequest extends FormRequest
     public function rules()
     {
         return [
-            'token' => 'required|string|size:20',
+            'token' => [
+                'required',
+                'string',
+                'size:20',
+            ],
             'password' => [
                 'required', 'max:255', 'confirmed',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
-                new NotFromPasswordHistory($this->getUserByPasswordResetToken(request()->token), request()->password)
+                new NotFromPasswordHistory($this->getUserByPasswordResetToken(request()->token), request()->password),
             ],
         ];
     }
@@ -49,6 +54,7 @@ class UpdatePasswordRequest extends FormRequest
     public function getUserByPasswordResetToken($token)
     {
         $passwordReset = $this->authRepository->getPasswordReset($token);
+
         return $this->iuUserRepository->findByName($passwordReset?->name);
     }
 }

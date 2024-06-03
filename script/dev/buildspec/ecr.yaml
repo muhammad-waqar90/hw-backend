@@ -1,28 +1,29 @@
 version: 0.2
 phases:
   install:
-    runtime-versions:
-      docker: 18
+    # runtime-versions:
+    #   docker: 18
     commands:
       - aws sts get-caller-identity
       - mkdir ~/.aws/ && touch ~/.aws/config
       - echo "[profile buildprofile]" > ~/.aws/config
       - echo "role_arn = arn:aws:iam::850441520537:role/Secretassumerole" >> ~/.aws/config
       - echo "credential_source = EcsContainer" >> ~/.aws/config
-      - STRIPE_KEY=$(aws secretsmanager get-secret-value --secret-id stripe-credentials --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .stripekey)
-      - STRIPE_SECRET=$(aws secretsmanager get-secret-value --secret-id stripe-credentials --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .stripescret)
-      - MIX_GA_KEY=$(aws secretsmanager get-secret-value --secret-id mix-ga-key --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixgakey)
-      - HCAPTCHA_SITE_KEY=$(aws secretsmanager get-secret-value --secret-id hcaptcha-credentials --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .hcaptchasitekey)
-      - HCAPTCHA_SECRET_KEY=$(aws secretsmanager get-secret-value --secret-id hcaptcha-credentials --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .hcaptchasecretkey)
-      - MIX_TERMS_LINK=$(aws secretsmanager get-secret-value --secret-id mix-terms-privacy --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixterms)
-      - MIX_PRIVACY_LINK=$(aws secretsmanager get-secret-value --secret-id mix-terms-privacy --region us-east-1 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixprivacy)
+      - STRIPE_KEY=$(aws secretsmanager get-secret-value --secret-id stripe-credentials --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .stripekey)
+      - STRIPE_SECRET=$(aws secretsmanager get-secret-value --secret-id stripe-credentials --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .stripescret)
+      - MIX_GA_KEY=$(aws secretsmanager get-secret-value --secret-id mix-ga-key --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixgakey)
+      - HCAPTCHA_SITE_KEY=$(aws secretsmanager get-secret-value --secret-id hcaptcha-credentials --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .hcaptchasitekey)
+      - HCAPTCHA_SECRET_KEY=$(aws secretsmanager get-secret-value --secret-id hcaptcha-credentials --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .hcaptchasecretkey)
+      - MIX_TERMS_LINK=$(aws secretsmanager get-secret-value --secret-id mix-terms-privacy --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixterms)
+      - MIX_PRIVACY_LINK=$(aws secretsmanager get-secret-value --secret-id mix-terms-privacy --region us-east-2 --profile buildprofile | jq --raw-output '.SecretString' | jq -r .mixprivacy)
       - aws secretsmanager get-secret-value --secret-id cf_privatekey --query 'SecretString' --output text > private_key.pem
 
   pre_build:
     commands:
       - AccountID=$(aws sts get-caller-identity --query Account --output text)
       - CommitID="$(echo $GitCommitID | head -c 8)"
-      - $(aws ecr get-login --registry-ids $AccountID --no-include-email --region ${AWS_DEFAULT_REGION})
+      # - $(aws ecr get-login --registry-ids $AccountID --no-include-email --region ${AWS_DEFAULT_REGION})
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AccountID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/$ServiceName
       - REPO_URI="$AccountID.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/$ServiceName"
       - REPOSITORY_URI="$REPO_URI-$BranchName"
   build:

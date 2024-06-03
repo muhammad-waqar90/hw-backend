@@ -21,13 +21,13 @@ class AfEventRepository
     public function createEvent($title, $description, $type, $img, $url, $startDate, $endDate)
     {
         return $this->event->create([
-            'title'         => $title,
-            'description'   => $description,
-            'type'          => $type,
-            'img'           => $img,
-            'url'           => $url,
-            'start_date'    => $startDate,
-            'end_date'      => $endDate
+            'title' => $title,
+            'description' => $description,
+            'type' => $type,
+            'img' => $img,
+            'url' => $url,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
     }
 
@@ -40,8 +40,8 @@ class AfEventRepository
             ->when($type, function ($query) use ($type) {
                 $query->where('type', $type);
             })
-            ->orderBy('start_date')
-            ->orderBy('id', 'DESC')
+            ->oldest('start_date')
+            ->latest('id')
             ->paginate(20);
     }
 
@@ -53,13 +53,13 @@ class AfEventRepository
     public function updateEvent($id, $title, $description, $type, $img, $url, $startDate, $endDate)
     {
         return $this->event->where('id', $id)->update([
-            'title'         => $title,
-            'description'   => $description,
-            'type'          => $type,
-            'img'           => $img,
-            'url'           => $url,
-            'start_date'    => $startDate,
-            'end_date'      => $endDate
+            'title' => $title,
+            'description' => $description,
+            'type' => $type,
+            'img' => $img,
+            'url' => $url,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
         ]);
     }
 

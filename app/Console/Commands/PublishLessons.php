@@ -23,6 +23,7 @@ class PublishLessons extends Command
     protected $description = 'Publish lessons which have the publish_at expired and remove entry';
 
     private AfLessonRepository $afLessonRepository;
+
     private AfPublishLessonRepository $afPublishLessonRepository;
 
     /**
@@ -43,8 +44,9 @@ class PublishLessons extends Command
     public function handle()
     {
         $readyToPublishLessons = $this->afPublishLessonRepository->getReadyToPublishLessons();
-        if ($readyToPublishLessons->isEmpty())
+        if ($readyToPublishLessons->isEmpty()) {
             return;
+        }
 
         $this->publishLessons($readyToPublishLessons);
         $this->info('Lessons published which have the publish_at expired and entry removed');

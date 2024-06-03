@@ -2,15 +2,15 @@
 
 namespace App\Listeners;
 
-use App\DataObject\Notifications\NotificationTypeData;
 use App\DataObject\CertificateEntityData;
-use App\Events\Certificates\CourseModuleCompleted;
-use App\Events\Certificates\CourseLevelCompleted;
+use App\DataObject\Notifications\NotificationTypeData;
 use App\Events\Certificates\CourseCompleted;
+use App\Events\Certificates\CourseLevelCompleted;
+use App\Events\Certificates\CourseModuleCompleted;
 use App\Mail\IU\Certificate\IuCertificateEmail;
 use App\Repositories\IU\IuCertificateRepository;
-use App\Repositories\NotificationRepository;
 use App\Repositories\IU\IuUserRepository;
+use App\Repositories\NotificationRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
@@ -35,9 +35,6 @@ class CertificateEventSubscriber
 
     /**
      * CertificateEventSubscriber constructor.
-     * @param IuCertificateRepository $iuCertificateRepository
-     * @param NotificationRepository $notificationRepository
-     * @param IuUserRepository $iuUserRepository
      */
     public function __construct(IuCertificateRepository $iuCertificateRepository, NotificationRepository $notificationRepository, IuUserRepository $iuUserRepository)
     {
@@ -49,7 +46,8 @@ class CertificateEventSubscriber
     /**
      * Handle Course Module Completed
      */
-    public function handleCourseModuleCompleted($event) {
+    public function handleCourseModuleCompleted($event)
+    {
         DB::beginTransaction();
         try {
             // create certificate
@@ -78,6 +76,7 @@ class CertificateEventSubscriber
             DB::rollback();
 
             Log::error('Exception: CertificateEventSubscriber@handleCourseModuleCompleted', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -85,7 +84,8 @@ class CertificateEventSubscriber
     /**
      * Handle Course Level Completed
      */
-    public function handleCourseLevelCompleted($event) {
+    public function handleCourseLevelCompleted($event)
+    {
         DB::beginTransaction();
         try {
             // create certificate
@@ -114,6 +114,7 @@ class CertificateEventSubscriber
             DB::rollback();
 
             Log::error('Exception: CertificateEventSubscriber@handleCourseLevelCompleted', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -121,7 +122,8 @@ class CertificateEventSubscriber
     /**
      * Handle Course Completed
      */
-    public function handleCourseCompleted($event) {
+    public function handleCourseCompleted($event)
+    {
         DB::beginTransaction();
         try {
             // create certificate
@@ -150,27 +152,25 @@ class CertificateEventSubscriber
             DB::rollback();
 
             Log::error('Exception: CertificateEventSubscriber@handleCourseCompleted', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
 
     /**
      * generate action for certificate notifications
-     * @param $id - certificate id
      */
-    public function generateAction($id) {
+    public function generateAction($id)
+    {
         return [
-            "redirect" => [
-                "id" => $id
-            ]
+            'redirect' => [
+                'id' => $id,
+            ],
         ];
     }
 
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
-     * @return void
      */
     public function subscribe($events)
     {

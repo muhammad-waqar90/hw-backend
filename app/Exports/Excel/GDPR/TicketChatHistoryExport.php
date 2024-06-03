@@ -3,8 +3,8 @@
 namespace App\Exports\Excel\GDPR;
 
 use App\Models\TicketMessage;
-use Maatwebsite\Excel\Concerns\Exportable;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -27,7 +27,7 @@ class TicketChatHistoryExport implements FromView, WithColumnWidths, WithStyles
             'ticketId' => $this->ticketId,
             'ticketSubject' => $this->ticketSubject,
             'createdAt' => $this->ticketSubmittedAt,
-            'ticketMessage' => TicketMessage::with('user')->where('ticket_id', $this->ticketId)->get()
+            'ticketMessage' => TicketMessage::with('user')->where('ticket_id', $this->ticketId)->get(),
         ]);
     }
 
@@ -40,12 +40,12 @@ class TicketChatHistoryExport implements FromView, WithColumnWidths, WithStyles
     {
         return [
             // Styling an entire column.
-            'A'  => [
-                'font' => ['size' => 10]
+            'A' => [
+                'font' => ['size' => 10],
             ],
 
             // Styling row
-            'A1'  => ['font' => ['bold' => true]],
+            'A1' => ['font' => ['bold' => true]],
         ];
     }
 }

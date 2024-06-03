@@ -9,11 +9,9 @@ class AfCouponTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'restrictions'
+        'restrictions',
     ];
 
     /**
@@ -24,19 +22,19 @@ class AfCouponTransformer extends TransformerAbstract
     public function transform(Coupon $coupon)
     {
         return [
-            'id'                    => $coupon->id,
-            'name'                  => $coupon->name,
-            'description'           => $coupon->description,
-            'code'                  => $coupon->code,
-            'value'                 => $coupon->value,
-            'value_type'            => $coupon->value_type,
-            'status'                => $coupon->status,
-            'redeem_count'          => $coupon->redeem_count,
-            'redeem_limit'          => $coupon->redeem_limit,
+            'id' => $coupon->id,
+            'name' => $coupon->name,
+            'description' => $coupon->description,
+            'code' => $coupon->code,
+            'value' => $coupon->value,
+            'value_type' => $coupon->value_type,
+            'status' => $coupon->status,
+            'redeem_count' => $coupon->redeem_count,
+            'redeem_limit' => $coupon->redeem_limit,
             'redeem_limit_per_user' => $coupon->redeem_limit_per_user,
-            'individual_use'        => $coupon->individual_use,
-            'created_at'            => $coupon->created_at,
-            'updated_at'            => $coupon->updated_at,
+            'individual_use' => $coupon->individual_use,
+            'created_at' => $coupon->created_at,
+            'updated_at' => $coupon->updated_at,
         ];
     }
 

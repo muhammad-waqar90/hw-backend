@@ -10,27 +10,26 @@ class FaqCategory extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function faqs()
     {
-        return $this->hasMany('App\Models\Faq');
+        return $this->hasMany(Faq::class);
     }
 
     public function publishedFaqs()
     {
-        return $this->hasMany('App\Models\Faq')->where('published', 1);
+        return $this->hasMany(Faq::class)->where('published', 1);
     }
 
     public function faqCategories()
     {
-        return $this->hasMany('App\Models\FaqCategory');
+        return $this->hasMany(FaqCategory::class);
     }
 
     public function publishedFaqCategories()
     {
-        return $this->hasMany('App\Models\FaqCategory')->where('published', 1);
+        return $this->hasMany(FaqCategory::class)->where('published', 1);
     }
-
 }

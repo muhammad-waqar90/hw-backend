@@ -10,15 +10,12 @@ class UserPasswordUpdated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $userId, $password;
+    public $userId;
+
+    public $password;
 
     /**
      * Create a new event instance.
-     *
-     * @param $userId
-     * @param $password
-     * 
-     * @return void
      */
     public function __construct($userId, $password)
     {

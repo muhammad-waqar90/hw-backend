@@ -23,8 +23,11 @@ class AfCourseController extends Controller
     use FileSystemsCloudTrait;
 
     private AfCourseRepository $afCourseRepository;
+
     private AfCourseLevelRepository $afCourseLevelRepository;
+
     private AfCourseModuleRepository $afCourseModuleRepository;
+
     private AfLessonRepository $afLessonRepository;
 
     public function __construct(
@@ -43,7 +46,7 @@ class AfCourseController extends Controller
     {
         $data = $this->afCourseRepository
             ->getCoursesListQuery((string) $request->query('searchText'))
-            ->orderBy('name', 'ASC')
+            ->oldest('name')
             ->limit(10)
             ->get();
 
@@ -53,8 +56,9 @@ class AfCourseController extends Controller
     public function getCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         return response()->json($course, 200);
     }
@@ -67,6 +71,7 @@ class AfCourseController extends Controller
 
         $fractal = fractal($courses->getCollection(), new AfCourseListTransformer);
         $courses->setCollection(collect($fractal));
+
         return response()->json($courses, 200);
     }
 
@@ -97,12 +102,13 @@ class AfCourseController extends Controller
     public function getCourseDetailed(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id, true);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $data = (object) [
             'course' => fractal($course, new AfCourseTransformer()),
-            'courseHasUsersEnrolled' => $this->afCourseRepository->courseHasUsersEnrolled($id)
+            'courseHasUsersEnrolled' => $this->afCourseRepository->courseHasUsersEnrolled($id),
         ];
 
         return response()->json($data, 200);
@@ -111,8 +117,9 @@ class AfCourseController extends Controller
     public function updateCourse(AfCourseUpdateRequest $request, int $id)
     {
         $course = $this->afCourseRepository->getCourse($id, true);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $thumbnail = $request->img ? $this->updateFile($this->afCourseRepository->getThumbnailS3StoragePath(), $course->img, $request->img) : $course->img;
 
@@ -133,8 +140,9 @@ class AfCourseController extends Controller
     public function deleteCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afCourseRepository->deleteCourse($id);
 
@@ -144,8 +152,9 @@ class AfCourseController extends Controller
     public function validateCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $lessonsHaveNoQuiz = $this->afLessonRepository->getLessonsHaveNoQuiz($id);
 
@@ -155,17 +164,21 @@ class AfCourseController extends Controller
     public function publishCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id, true);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if ($course->status === CourseStatusData::PUBLISHED)
+        if ($course->status === CourseStatusData::PUBLISHED) {
             return response()->json(['errors' => 'Course already published'], 403);
+        }
 
-        if (count($course->courseLevels->toArray()) < 1)
+        if (count($course->courseLevels->toArray()) < 1) {
             return response()->json(['errors' => 'Course can not be published. Please make sure you have atleast one level'], 403);
+        }
 
-        if (!$this->courseContainsLesson($course->courseLevels->toArray()))
+        if (! $this->courseContainsLesson($course->courseLevels->toArray())) {
             return response()->json(['errors' => 'Course can not be published. Please make sure all levels have modules/lessons'], 403);
+        }
 
         $course->status = CourseStatusData::PUBLISHED;
         $course->save();
@@ -176,17 +189,21 @@ class AfCourseController extends Controller
     public function unpublishCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id, true);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if ($course->status === CourseStatusData::UNPUBLISHED)
+        if ($course->status === CourseStatusData::UNPUBLISHED) {
             return response()->json(['errors' => 'Course already unpublished'], 403);
+        }
 
-        if (count($course->courseLevels->toArray()) < 1)
+        if (count($course->courseLevels->toArray()) < 1) {
             return response()->json(['errors' => 'Course can not be unpublished. Please make sure you have atleast one level'], 403);
+        }
 
-        if (!$this->courseContainsLesson($course->courseLevels->toArray()))
+        if (! $this->courseContainsLesson($course->courseLevels->toArray())) {
             return response()->json(['errors' => 'Course can not be unpublished. Please make sure all levels have modules/lessons'], 403);
+        }
 
         $course->status = CourseStatusData::UNPUBLISHED;
         $course->save();
@@ -197,15 +214,18 @@ class AfCourseController extends Controller
     public function draftCourse(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if ($course->status === CourseStatusData::DRAFT)
+        if ($course->status === CourseStatusData::DRAFT) {
             return response()->json(['errors' => 'Course already in draft'], 403);
+        }
 
         $courseHasUsersEnrolled = $this->afCourseRepository->courseHasUsersEnrolled($id);
-        if ($courseHasUsersEnrolled)
+        if ($courseHasUsersEnrolled) {
             return response()->json(['errors' => 'Course cannot be put in draft because it already has one or more enrolled users'], 403);
+        }
 
         $course->status = CourseStatusData::DRAFT;
         $course->save();
@@ -216,15 +236,18 @@ class AfCourseController extends Controller
     public function markCourseAsComingSoon(int $id)
     {
         $course = $this->afCourseRepository->getCourse($id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
-        if ($course->status === CourseStatusData::COMING_SOON)
+        if ($course->status === CourseStatusData::COMING_SOON) {
             return response()->json(['errors' => 'Course already in coming soon'], 403);
+        }
 
         $courseHasUsersEnrolled = $this->afCourseRepository->courseHasUsersEnrolled($id);
-        if ($courseHasUsersEnrolled)
+        if ($courseHasUsersEnrolled) {
             return response()->json(['errors' => 'Course cannot be put in coming soon because it already has one or more enrolled users'], 403);
+        }
 
         $course->status = CourseStatusData::COMING_SOON;
         $course->save();
@@ -235,8 +258,9 @@ class AfCourseController extends Controller
     public function courseContainsLesson($levels)
     {
         $courseLevelModules = array_column($levels, 'course_modules');
-        if (in_array([], $courseLevelModules, true))
+        if (in_array([], $courseLevelModules, true)) {
             return false;
+        }
 
         return $this->modulesContainLesson($courseLevelModules);
     }
@@ -246,11 +270,15 @@ class AfCourseController extends Controller
         $modules = $courseLevelModules[$index];
 
         foreach ($modules as $module) {
-            if (empty($module['lessons'])) return false;
+            if (empty($module['lessons'])) {
+                return false;
+            }
         }
 
         $index = $index + 1;
-        if ($index >= count($courseLevelModules)) return true;
+        if ($index >= count($courseLevelModules)) {
+            return true;
+        }
 
         return $this->modulesContainLesson($courseLevelModules, $index);
     }
@@ -258,10 +286,12 @@ class AfCourseController extends Controller
     public function updateDiscountStatus(AfCourseDiscountStatusUpdateRequest $request)
     {
         $course = $this->afCourseRepository->getCourse($request->course_id);
-        if (!$course)
+        if (! $course) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         $this->afCourseRepository->updateCourseDiscountStatus($course, $request->is_discounted);
+
         return response()->json(['message' => 'Course discount status successfully updated'], 200);
     }
 }

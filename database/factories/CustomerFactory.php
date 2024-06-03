@@ -9,13 +9,6 @@ use Illuminate\Support\Facades\DB;
 class CustomerFactory extends Factory
 {
     /**
-     * The name of the customer's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Customer::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
@@ -23,19 +16,20 @@ class CustomerFactory extends Factory
     public function definition()
     {
         $user_id = DB::table('users')->pluck('id');
+
         return [
-            'user_id'           =>  $user_id->random(),
-            'email'             =>  fake()->email,
-            'stripe_id'         =>  "cus_JTeINfrZ8rXYJg",
-            'card_brand'        =>  "visa",
-            'card_last_four'    =>  "4242"
+            'user_id' => $user_id->random(),
+            'email' => fake()->email,
+            'stripe_id' => 'cus_JTeINfrZ8rXYJg',
+            'pm_type' => 'visa',
+            'pm_last_four' => '4242',
         ];
     }
 
     public function withUserId($id)
     {
         return $this->state(fn () => [
-            'user_id'   =>  $id,
+            'user_id' => $id,
         ]);
     }
 }

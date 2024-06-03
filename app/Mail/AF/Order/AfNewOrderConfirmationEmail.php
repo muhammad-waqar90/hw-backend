@@ -3,6 +3,7 @@
 namespace App\Mail\AF\Order;
 
 use App\DataObject\Purchases\PurchaseHistoryEntityData;
+use App\DataObject\Purchases\PurchaseItemTypeData;
 use App\Models\PurchaseHistory;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -14,21 +15,15 @@ class AfNewOrderConfirmationEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $purchaseHistoryId;
-    public $purchaseHistory;
-    public $userProfile;
 
-    /**
-     * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $purchaseHistoryId
-     */
+    public $purchaseHistory;
+
+    public $userProfile;
 
     public function __construct($userProfile, $purchaseHistoryId)
     {
-        $this->purchaseHistoryId = $purchaseHistoryId;
         $this->userProfile = $userProfile;
-
+        $this->purchaseHistoryId = $purchaseHistoryId;
     }
 
     /**
@@ -36,12 +31,13 @@ class AfNewOrderConfirmationEmail extends Mailable
      *
      * @return $this
      */
-
     public function build()
     {
-        $this->purchaseHistory = PurchaseHistory::where('user_id', $this->userProfile->userProfile->user_id)
-            ->where('id', $this->purchaseHistoryId)
+        $this->purchaseHistory = PurchaseHistory::where('id', $this->purchaseHistoryId)
             ->with('purchaseItems', 'shippingDetails')
+            ->withCount(['purchaseItems' => function ($q) {
+                $q->where('entity_type', '!=', PurchaseItemTypeData::SHIPPING);
+            }])
             ->first();
 
         $this->purchaseHistory->currency_symbol = PurchaseHistoryEntityData::ENTITY_TYPE[$this->purchaseHistory->entity_type]['currency_symbol'];

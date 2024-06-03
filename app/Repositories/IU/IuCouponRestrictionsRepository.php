@@ -17,7 +17,7 @@ class IuCouponRestrictionsRepository
     {
         return $this->couponRestriction
             ->where('coupon_id', $couponId)
-            ->whereIn('entity_id', $entities->map(function($item) {
+            ->whereIn('entity_id', $entities->map(function ($item) {
                 return $item['id'];
             }))
             ->where('entity_type', $entityType)

@@ -8,6 +8,7 @@ use App\Models\CouponRestriction;
 class AfCouponRestrictionsRepository
 {
     private CouponRestriction $couponRestriction;
+
     private AfCourseRepository $afCourseRepository;
 
     public function __construct(CouponRestriction $couponRestriction, AfCourseRepository $afCourseRepository)
@@ -22,18 +23,18 @@ class AfCouponRestrictionsRepository
         $entityModel = CouponData::ENTITY_MODEL[$entityType];
         $courses = $this->afCourseRepository->getCoursesListQuery(null, false, $entities)->get();
 
-        foreach($courses as $course)
+        foreach ($courses as $course) {
             $this->createCouponRestriction($couponId, $course->id, $entityModel);
+        }
 
-        return;
     }
 
     public function createCouponRestriction($couponId, $entityId, $entityType)
     {
         return $this->couponRestriction->create([
-            'coupon_id'     => $couponId,
-            'entity_id'     => $entityId,
-            'entity_type'   => $entityType
+            'coupon_id' => $couponId,
+            'entity_id' => $entityId,
+            'entity_type' => $entityType,
         ]);
     }
 }

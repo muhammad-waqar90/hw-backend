@@ -24,7 +24,12 @@ class IuFeedbackRequest extends FormRequest
     public function rules()
     {
         return [
-            'feedback'   => 'required|string|min:1|max:10000',
+            'feedback'   => [
+                'required',
+                'string',
+                'min:1',
+                'max:10000',
+            ],
         ];
     }
 }

@@ -5,9 +5,10 @@ namespace App\Traits\Tests;
 use App\Models\Faq;
 use App\Models\FaqCategory;
 
-
-trait FaqCategoryTestTrait {
-    public function FaqFactorisation($factoryNumber) {
+trait FaqCategoryTestTrait
+{
+    public function FaqFactorisation($factoryNumber)
+    {
         $faqCategory = FaqCategory::factory($factoryNumber)->create();
         $faq = Faq::factory($factoryNumber)->create();
 
@@ -19,7 +20,8 @@ trait FaqCategoryTestTrait {
         return $data;
     }
 
-    public function FaqFactorisationPublished($factoryNumber) {
+    public function FaqFactorisationPublished($factoryNumber)
+    {
         $faqCategory = FaqCategory::factory($factoryNumber)->published()->create();
         $faq = Faq::factory($factoryNumber)->published()->create();
 
@@ -30,6 +32,4 @@ trait FaqCategoryTestTrait {
 
         return $data;
     }
-
-
 }

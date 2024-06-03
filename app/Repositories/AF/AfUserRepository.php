@@ -5,7 +5,7 @@ namespace App\Repositories\AF;
 use App\DataObject\ActivityStatusData;
 use App\DataObject\RoleData;
 use App\Models\User;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class AfUserRepository
 {
@@ -25,9 +25,9 @@ class AfUserRepository
             ->withTrashed()
             ->paginate(20)
             ->appends([
-                'searchText'    => $searchText,
-                'activeStatus'  => $activeStatus,
-                'courseId'      => $courseId,
+                'searchText' => $searchText,
+                'activeStatus' => $activeStatus,
+                'courseId' => $courseId,
             ]);
     }
 
@@ -61,13 +61,12 @@ class AfUserRepository
             ->when($role === RoleData::ADMIN, function ($query) {
                 return $query->withCount('permGroups');
             })
-            ->orderBy('users.name', 'ASC');
+            ->oldest('users.name');
     }
 
     /**
      * generate filter wrt activeStatus
-     * @param $query
-     * @param $activeStatus
+     *
      * @return mixed
      */
     public function lastActiveQuery($query, $activeStatus)
@@ -76,8 +75,9 @@ class AfUserRepository
         $from = Carbon::now()->subDays($filterLastActive['from']);
         $to = Carbon::now()->subDays($filterLastActive['to']);
 
-        if ((int)$activeStatus === 5)
+        if ((int) $activeStatus === 5) {
             return $query->where('last_active', '<=', $to);
+        }
 
         return $query->where('last_active', '>=', $from)->where('last_active', '<=', $to);
     }

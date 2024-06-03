@@ -6,15 +6,13 @@ use App\Models\Product;
 use App\Traits\FileSystemsCloudTrait;
 use App\Transformers\IU\IuCategoryTransformer;
 use League\Fractal\TransformerAbstract;
-use App\Transformers\IU\Product\IuProductMetasTransformer;
 
 class IuProductsTransformer extends TransformerAbstract
 {
     use FileSystemsCloudTrait;
+
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'category',
@@ -33,14 +31,13 @@ class IuProductsTransformer extends TransformerAbstract
             'course_module_id' => $product->course_module_id,
             'name' => $product->name,
             'description' => $product->description,
-            'img' => $this->generateS3Link('products/thumbnails/' . $product->img, 1),
+            'img' => $this->generateS3Link('products/thumbnails/'.$product->img, 1),
             'price' => $product->price,
             'is_available' => $product->is_available,
             'created_at' => $product->created_at,
             'updated_at' => $product->updated_at,
         ];
     }
-
 
     public function includeCategory(Product $product)
     {

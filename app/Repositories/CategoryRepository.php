@@ -6,7 +6,6 @@ use App\Models\Category;
 
 class CategoryRepository
 {
-
     private Category $category;
 
     public function __construct(Category $category)

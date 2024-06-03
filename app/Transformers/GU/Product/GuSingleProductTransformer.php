@@ -13,8 +13,6 @@ class GuSingleProductTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'category',
@@ -32,7 +30,7 @@ class GuSingleProductTransformer extends TransformerAbstract
             'id' => $product->id,
             'name' => $product->name,
             'description' => $product->description,
-            'img' => $this->generateS3Link('products/thumbnails/' . $product->img, 1),
+            'img' => $this->generateS3Link('products/thumbnails/'.$product->img, 1),
             'meta' => $product->meta,
             'price' => $product->price,
             'is_available' => $product->is_available,

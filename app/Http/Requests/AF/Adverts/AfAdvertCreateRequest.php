@@ -3,9 +3,9 @@
 namespace App\Http\Requests\AF\Adverts;
 
 use App\DataObject\AdvertData;
-use Carbon\Carbon;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class AfAdvertCreateRequest extends FormRequest
 {
@@ -27,10 +27,28 @@ class AfAdvertCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'          => 'required|string|min:3|max:20',
-            'url'           => 'required|url|min:10|max:2048',
-            'img'           => 'required|mimes:jpg,jpeg,png,gif|max_mb:2',
-            'expires_at'    => 'required|date|after_or_equal:' . Carbon::now()->format('Y-m-d'),
+            'name'          => [
+                'required',
+                'string',
+                'min:3',
+                'max:20',
+            ],
+            'url'           => [
+                'required',
+                'url',
+                'min:10',
+                'max:2048',
+            ],
+            'img'           => [
+                'required',
+                'mimes:jpg,jpeg,png,gif',
+                'max_mb:2',
+            ],
+            'expires_at'    => [
+                'required',
+                'date',
+                'after_or_equal:' . Carbon::now()->format('Y-m-d'),
+            ],
             'status'        => ['required', Rule::in(AdvertData::getStatuses())]
         ];
     }
@@ -38,7 +56,7 @@ class AfAdvertCreateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'img'   => 'image',
+            'img' => 'image',
         ];
     }
 }

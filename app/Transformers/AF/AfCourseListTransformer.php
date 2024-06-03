@@ -5,23 +5,20 @@ namespace App\Transformers\AF;
 use App\DataObject\InAppData;
 use App\Models\Course;
 use League\Fractal\TransformerAbstract;
-use App\Transformers\AF\AfPurchaseItemTransformer;
-use App\Transformers\AF\AfTierTransformer;
 
 class AfCourseListTransformer extends TransformerAbstract
 {
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'tier'
+        'tier',
     ];
 
     protected array $availableIncludes = [
-        'purchaseItems'
+        'purchaseItems',
     ];
+
     /**
      * A Fractal transformer.
      *
@@ -30,15 +27,15 @@ class AfCourseListTransformer extends TransformerAbstract
     public function transform(Course $course)
     {
         return [
-            'id'            => $course->id,
-            'product_id'    => InAppData::PRODUCT_ID_PREFIX_COURSE . $course->id,
-            'name'          => $course->name,
-            'category'      => $course->category->name,
-            'price'         => $course->price,
-            'levels'        => $course->course_levels_count,
-            'status'        => $course->status,
-            'created_at'    => $course->created_at,
-            'updated_at'    => $course->updated_at,
+            'id' => $course->id,
+            'product_id' => InAppData::PRODUCT_ID_PREFIX_COURSE.$course->id,
+            'name' => $course->name,
+            'category' => $course->category->name,
+            'price' => $course->price,
+            'levels' => $course->course_levels_count,
+            'status' => $course->status,
+            'created_at' => $course->created_at,
+            'updated_at' => $course->updated_at,
         ];
     }
 

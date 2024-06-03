@@ -20,7 +20,7 @@ class IuCategoryTransformer extends TransformerAbstract
             'root_category_id' => $category->root_category_id,
             'name' => $category->name,
             'created_at' => $category->created_at,
-            'updated_at' => $category->updated_at
+            'updated_at' => $category->updated_at,
         ];
     }
 }

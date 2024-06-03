@@ -26,10 +26,14 @@ class AfFaqCategoryListRequest extends FormRequest
     public function rules()
     {
         return [
-            'searchText'    => 'string|nullable|max:100',
+            'searchText'    => [
+                'string',
+                'nullable',
+                'max:100',
+            ],
             'type'        => [
                 'integer',
-                Rule::in(array_values(FaqCategoryTypeData::getConstants()))
+                Rule::in(array_values(FaqCategoryTypeData::getConstants())),
             ],
         ];
     }

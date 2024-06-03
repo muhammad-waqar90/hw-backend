@@ -8,16 +8,12 @@ use Illuminate\Support\Facades\Lang;
 class IuTicketNotClaimedReminderEmail extends AbstractMail
 {
     public $ticketSubject;
+
     public $ticketId;
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $ticketSubject
-     * @param $ticketId
      */
-
     public function __construct($userProfile, $ticketSubject, $ticketId)
     {
         parent::__construct($userProfile);

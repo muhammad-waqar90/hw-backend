@@ -30,7 +30,7 @@ class IuChangePasswordRequest extends FormRequest
             'password' => [
                 'required', 'max:255', 'confirmed', 'different:current_password',
                 Password::min(8)->mixedCase()->numbers()->symbols(),
-                new NotFromPasswordHistory(request()->user(), request()->password)
+                new NotFromPasswordHistory(request()->user(), request()->password),
             ],
         ];
     }

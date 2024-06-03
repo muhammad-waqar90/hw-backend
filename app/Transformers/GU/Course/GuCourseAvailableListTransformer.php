@@ -13,13 +13,11 @@ class GuCourseAvailableListTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
-        'category'
+        'category',
     ];
-    
+
     /**
      * A Fractal transformer.
      *
@@ -28,13 +26,13 @@ class GuCourseAvailableListTransformer extends TransformerAbstract
     public function transform(Course $course)
     {
         return [
-            'id'            => $course->id,
-            'category_id'   => $course->category_id,
-            'name'          => $course->name,
-            'description'   => $course->description,
-            'price'         => $course->price,
-            'status'        => $course->status,
-            'img'           => $this->generateS3Link('courses/thumbnails/' . $course->img, 1),
+            'id' => $course->id,
+            'category_id' => $course->category_id,
+            'name' => $course->name,
+            'description' => $course->description,
+            'price' => $course->price,
+            'status' => $course->status,
+            'img' => $this->generateS3Link('courses/thumbnails/'.$course->img, 1),
         ];
     }
 

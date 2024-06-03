@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 class CleanExpiredVerifyUserAgeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * @var VerifyUserAge
      */
@@ -20,8 +21,6 @@ class CleanExpiredVerifyUserAgeJob implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param VerifyUserAge $verifyUserAge
      */
     public function __construct(VerifyUserAge $verifyUserAge)
     {
@@ -31,7 +30,6 @@ class CleanExpiredVerifyUserAgeJob implements ShouldQueue
     /**
      * Execute the job.
      *
-     * @param AuthenticationRepository $authenticationRepository
      * @return void
      */
     public function handle(AuthenticationRepository $authenticationRepository)

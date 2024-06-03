@@ -15,7 +15,7 @@ class CouponsTest extends TestCase
 {
     private $user;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -30,17 +30,17 @@ class CouponsTest extends TestCase
         $course = Course::factory()->withId($category->id)->withStatus(CourseStatusData::PUBLISHED)->create();
         DB::table('coupon_restrictions')->insert(
             [
-                'coupon_id'     =>  $coupon->id,
-                'entity_id'     =>  $course->id,
-                'entity_type'   =>  CouponData::ENTITY_MODEL['course']
+                'coupon_id' => $coupon->id,
+                'entity_id' => $course->id,
+                'entity_type' => CouponData::ENTITY_MODEL['course'],
             ]
         );
 
-        $response = $this->json('POST',  '/api/iu/coupons/redeem/can', [
-            "code"  => $coupon->code,
-            "cart"  => [
-                "course"    => [$course->id]
-            ]
+        $response = $this->json('POST', '/api/iu/coupons/redeem/can', [
+            'code' => $coupon->code,
+            'cart' => [
+                'course' => [$course->id],
+            ],
         ]);
 
         $response->assertStatus(200);

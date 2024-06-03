@@ -10,18 +10,18 @@ class CouponRestriction extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     public function coupon()
     {
-        return $this->belongsTo('App\Models\Coupon');
+        return $this->belongsTo(Coupon::class);
     }
 
     /**
      * Get the parent entity model.
-        * Course
-        * ...
+     * Course
+     * ...
      */
     public function entity()
     {

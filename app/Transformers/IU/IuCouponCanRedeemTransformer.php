@@ -16,7 +16,7 @@ class IuCouponCanRedeemTransformer extends TransformerAbstract
     public function transform(CouponRestriction $couponRestriction)
     {
         return [
-            'item_id'   => $couponRestriction->entity_id,
+            'item_id' => $couponRestriction->entity_id,
             'item_type' => CouponData::MODEL_ENTITY[$couponRestriction->entity_type],
         ];
     }

@@ -10,17 +10,16 @@ class IuCartModuleExamTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param CourseModule $courseModule
      * @return array
      */
     public function transform(CourseModule $courseModule)
     {
         return [
-            'id'    => $courseModule->quizId,
+            'id' => $courseModule->quizId,
             'course_module_id' => $courseModule->courseModuleId,
-            'name'  => $courseModule->name,
+            'name' => $courseModule->name,
             'price' => $courseModule->price,
-            'disabled' => !!$courseModule->purchased
+            'disabled' => (bool) $courseModule->purchased,
         ];
     }
 }

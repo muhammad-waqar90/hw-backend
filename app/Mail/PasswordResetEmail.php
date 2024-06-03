@@ -8,9 +8,6 @@ class PasswordResetEmail extends AbstractMail
 
     /**
      * Create a new message instance.
-     *
-     * @param $userProfile
-     * @param $token
      */
     public function __construct($userProfile, $token)
     {

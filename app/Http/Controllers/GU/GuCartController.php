@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\GU;
 
-use Exception;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GU\GuestCart\GuCreateCartRequest;
 use App\Http\Requests\GU\GuestCart\GuFetchCombinedCartProductsRequest;
 use App\Repositories\GU\GuCartRepository;
+use Exception;
 
 class GuCartController extends Controller
 {

@@ -15,7 +15,7 @@ class AfCouponCourseRestrictionTransformer extends TransformerAbstract
     public function transform(Course $course)
     {
         return [
-            'name'  => $course->name,
+            'name' => $course->name,
         ];
     }
 }

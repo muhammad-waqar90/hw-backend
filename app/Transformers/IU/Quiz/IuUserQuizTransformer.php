@@ -10,18 +10,17 @@ class IuUserQuizTransformer extends TransformerAbstract
     /**
      * A Fractal transformer.
      *
-     * @param UserQuiz $userQuiz
      * @return array
      */
     public function transform(UserQuiz $userQuiz)
     {
         return [
-            'id'    => $userQuiz->id,
-            'questions'  => $userQuiz->questions,
-            'duration'  => $userQuiz->duration,
-            'started_at'  => $userQuiz->started_at,
+            'id' => $userQuiz->id,
+            'questions' => $userQuiz->questions,
+            'duration' => $userQuiz->duration,
+            'started_at' => $userQuiz->started_at,
             'num_of_questions' => $userQuiz->num_of_questions,
-            'uuid' => $userQuiz->uuid
+            'uuid' => $userQuiz->uuid,
         ];
     }
 }

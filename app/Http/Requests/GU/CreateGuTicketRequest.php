@@ -24,12 +24,37 @@ class CreateGuTicketRequest extends FormRequest
     public function rules()
     {
         return [
-            'subjectId' => 'required|integer',
-            'message'   => 'required|string|min:5|max:4000',
-            'assets'    => 'sometimes|array|max:3',
-            'assets.*'  => 'required_with:assets.*|image|mimes:jpg,jpeg,png|max:500',
-            'email' => 'required|email|max:255',
-            'log' => 'present|array|max:65535',
+            'subjectId' => [
+                'required',
+                'integer',
+            ],
+            'message'   => [
+                'required',
+                'string',
+                'min:5',
+                'max:4000',
+            ],
+            'assets'    => [
+                'sometimes',
+                'array',
+                'max:3',
+            ],
+            'assets.*'  => [
+                'required_with:assets.*',
+                'image',
+                'mimes:jpg,jpeg,png',
+                'max:500',
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+            ],
+            'log' => [
+                'present',
+                'array',
+                'max:65535',
+            ],
         ];
     }
 }

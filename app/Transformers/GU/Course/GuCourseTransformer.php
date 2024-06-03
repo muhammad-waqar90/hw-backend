@@ -13,8 +13,6 @@ class GuCourseTransformer extends TransformerAbstract
 
     /**
      * List of resources to automatically include
-     *
-     * @var array
      */
     protected array $defaultIncludes = [
         'course_levels',
@@ -36,8 +34,8 @@ class GuCourseTransformer extends TransformerAbstract
             'course_levels_count' => $course->course_levels_count,
             'video_preview' => $course->video_preview,
             'status' => $course->status,
-            'img' => $this->generateS3Link('courses/thumbnails/' . $course->img, 1),
-            'type' => 'course'
+            'img' => $this->generateS3Link('courses/thumbnails/'.$course->img, 1),
+            'type' => 'course',
         ];
     }
 

@@ -16,9 +16,10 @@ use Illuminate\Support\Facades\Log;
 class AfCouponController extends Controller
 {
     private AfCouponRepository $afCouponRepository;
-    private AfCouponRestrictionsRepository  $afCouponRestrictionsRepository;
 
-    public function __construct(AfCouponRepository $afCouponRepository, AfCouponRestrictionsRepository  $afCouponRestrictionsRepository)
+    private AfCouponRestrictionsRepository $afCouponRestrictionsRepository;
+
+    public function __construct(AfCouponRepository $afCouponRepository, AfCouponRestrictionsRepository $afCouponRestrictionsRepository)
     {
         $this->afCouponRepository = $afCouponRepository;
         $this->afCouponRestrictionsRepository = $afCouponRestrictionsRepository;
@@ -29,6 +30,7 @@ class AfCouponController extends Controller
         $coupon = $this->afCouponRepository->getCoupon($id, true);
 
         $coupon = fractal($coupon, new AfCouponTransformer);
+
         return response()->json($coupon, 200);
     }
 
@@ -38,6 +40,7 @@ class AfCouponController extends Controller
 
         $fractal = fractal($coupons->getCollection(), new AfCouponTransformer);
         $coupons->setCollection(collect($fractal));
+
         return response()->json($coupons, 200);
     }
 
@@ -57,17 +60,20 @@ class AfCouponController extends Controller
                 $request->individual_use
             );
 
-            if($request->restrictions) {
-                foreach($request->restrictions as $restriction)
+            if ($request->restrictions) {
+                foreach ($request->restrictions as $restriction) {
                     $this->afCouponRestrictionsRepository->createCouponRestrictions($coupon->id, $restriction['id'], $restriction['type']);
+                }
             }
 
             DB::commit();
+
             return response()->json(['message' => Lang::get('general.successfullyCreated', ['model' => 'coupon'])], 200);
         } catch (\Exception $e) {
             DB::rollback();
 
             Log::error('Exception: AfCouponController@createCoupon', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }
@@ -75,8 +81,9 @@ class AfCouponController extends Controller
     public function updateCoupon(int $id, AfCouponUpdateRequest $request)
     {
         $coupon = $this->afCouponRepository->getCoupon($id);
-        if(!$coupon)
+        if (! $coupon) {
             return response()->json(['errors' => Lang::get('general.notFound')], 404);
+        }
 
         try {
             $this->afCouponRepository->updateCoupon(
@@ -91,6 +98,7 @@ class AfCouponController extends Controller
             return response()->json(['message' => Lang::get('general.successfullyUpdated', ['model' => 'coupon'])], 200);
         } catch (\Exception $e) {
             Log::error('Exception: AfCouponController@updateCoupon', [$e->getMessage()]);
+
             return response()->json(['errors' => Lang::get('general.pleaseContactSupportWithCode', ['code' => 500])], 500);
         }
     }

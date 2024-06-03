@@ -10,24 +10,24 @@ class PermGroup extends Model
     use HasFactory;
 
     protected $guarded = [
-        'id', 'created_at', 'updated_at'
+        'id', 'created_at', 'updated_at',
     ];
 
     protected $hidden = [
-        'created_at', 'updated_at', 'pivot'
+        'created_at', 'updated_at', 'pivot',
     ];
 
     public function permissions()
     {
-        return $this->belongsToMany('App\Models\Permission');
+        return $this->belongsToMany(Permission::class);
     }
 
     public function users()
     {
-        return $this->belongsToMany('App\Models\User');
+        return $this->belongsToMany(User::class);
     }
 
     public function adminProfile() {
-        return $this->hasOne('App\Models\AdminProfile');
+        return $this->hasOne(AdminProfile::class);
     }
 }

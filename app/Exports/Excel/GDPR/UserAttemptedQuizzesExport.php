@@ -38,7 +38,7 @@ class UserAttemptedQuizzesExport implements FromQuery, WithHeadings, WithMapping
             'score',
             'started_at',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -61,20 +61,20 @@ class UserAttemptedQuizzesExport implements FromQuery, WithHeadings, WithMapping
             $row->score,
             $row->started_at,
             $row->created_at,
-            $row->updated_at
+            $row->updated_at,
         ];
     }
 
     public function getEntityName($userQuiz)
     {
         $hierarchy = [];
-        if($userQuiz->entity_type == QuizData::ENTITY_LESSON) {
+        if ($userQuiz->entity_type == QuizData::ENTITY_LESSON) {
             $userQuiz->with('lesson');
             $hierarchy = collect(fractal($userQuiz->lesson, new IuLessonHierarchyTransformer()))->toArray();
-        } elseif($userQuiz->entity_type == QuizData::ENTITY_COURSE_MODULE) {
+        } elseif ($userQuiz->entity_type == QuizData::ENTITY_COURSE_MODULE) {
             $userQuiz->with('courseModule');
             $hierarchy = collect(fractal($userQuiz->courseModule, new IuCourseModuleHierarchyTransformer()))->toArray();
-        } elseif($userQuiz->entity_type == QuizData::ENTITY_COURSE_LEVEL) {
+        } elseif ($userQuiz->entity_type == QuizData::ENTITY_COURSE_LEVEL) {
             $userQuiz->with('courseLevel');
             $hierarchy = collect(fractal($userQuiz->courseLevel, new IuCourseLevelHierarchyTransformer()))->toArray();
         }

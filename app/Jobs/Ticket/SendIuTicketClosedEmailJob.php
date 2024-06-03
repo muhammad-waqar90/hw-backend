@@ -14,9 +14,6 @@ class SendIuTicketClosedEmailJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var Ticket $ticket
-     */
     protected $ticket;
 
     /**
@@ -31,9 +28,6 @@ class SendIuTicketClosedEmailJob implements ShouldQueue
 
     /**
      * Execute the job.
-     *
-     * @param TicketRepository $ticketRepository
-     * @return void
      */
     public function handle(TicketRepository $ticketRepository)
     {

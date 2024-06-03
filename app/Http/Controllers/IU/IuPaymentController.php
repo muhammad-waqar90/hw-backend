@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Lang;
 
 class IuPaymentController extends Controller
 {
-
     private IuPaymentRepository $iuPaymentRepository;
 
     public function __construct(IuPaymentRepository $iuPaymentRepository)
@@ -22,8 +21,14 @@ class IuPaymentController extends Controller
     {
         try {
             $customer = $this->iuPaymentRepository->updateOrCreateCustomer($request->user());
-            return $customer->createSetupIntent();
-        }catch(\Exception $e) {
+
+            return $customer->createSetupIntent([
+                'automatic_payment_methods' => [
+                    'enabled' => true,
+                    'allow_redirects' => 'never',
+                ],
+            ]);
+        } catch (\Exception $e) {
             return response()->json(['errors' => Lang::get('general.wentWrong')], 400);
         }
     }

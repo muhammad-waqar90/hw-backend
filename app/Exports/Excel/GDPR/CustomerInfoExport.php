@@ -27,11 +27,11 @@ class CustomerInfoExport implements FromQuery, WithHeadings, WithMapping
         return [
             'id',
             'stripe_id',
-            'card_brand',
-            'card_last_four',
+            'pm_type',
+            'pm_last_four',
             'trial_ends_at',
             'created_at',
-            'updated_at'
+            'updated_at',
         ];
     }
 
@@ -40,8 +40,8 @@ class CustomerInfoExport implements FromQuery, WithHeadings, WithMapping
         return [
             $row->id,
             $row->stripe_id,
-            $row->card_brand,
-            $row->card_last_four,
+            $row->pm_type,
+            $row->pm_last_four,
             $row->trial_ends_at,
             $row->created_at,
             $row->updated_at,

@@ -79,7 +79,7 @@ class PermissionSeeder extends Seeder
                 'display_name' => 'User Records RU',
                 'description' => "Allows an administrator to view user records, enable/disable user, view user's enrolled courses",
                 'related_permissions' => 'userPurchaseHistory_R permission needed to view purchase history tab. '
-                    . 'userRecords_D permission needed to delete the user',
+                    .'userRecords_D permission needed to delete the user',
             ]
         );
         Permission::updateOrCreate(
@@ -284,37 +284,37 @@ class PermissionSeeder extends Seeder
         );
         Permission::updateOrCreate(
             [
-                'id'            => PermissionData::COUPON_MANAGEMENT,
+                'id' => PermissionData::COUPON_MANAGEMENT,
             ],
             [
-                'name'          => 'coupon_CRUD',
-                'display_name'  => 'Coupon CRUD',
-                'description'   => 'Allows an administrator to create, read, update and delete coupons',
-                'related_permissions' => ''
+                'name' => 'coupon_CRUD',
+                'display_name' => 'Coupon CRUD',
+                'description' => 'Allows an administrator to create, read, update and delete coupons',
+                'related_permissions' => '',
             ]
         );
 
         // Permissions for managing salary scale discounts
         Permission::updateOrCreate(
             [
-                'id'            => PermissionData::SALARY_SCALE_DISCOUNTS_MANAGEMENT,
+                'id' => PermissionData::SALARY_SCALE_DISCOUNTS_MANAGEMENT,
             ],
             [
-                'name'          => 'salary_scale_CRUD',
-                'display_name'  => 'Salary Scale CRUD',
-                'description'   => 'Allows an administrator to create, read, update and delete salary scale discounts',
-                'related_permissions' => ''
+                'name' => 'salary_scale_CRUD',
+                'display_name' => 'Salary Scale CRUD',
+                'description' => 'Allows an administrator to create, read, update and delete salary scale discounts',
+                'related_permissions' => '',
             ]
         );
         Permission::updateOrCreate(
             [
-                'id'            => PermissionData::COUPON_MANAGEMENT,
+                'id' => PermissionData::COUPON_MANAGEMENT,
             ],
             [
-                'name'          => 'coupon_CRUD',
-                'display_name'  => 'Coupon CRUD',
-                'description'   => 'Allows an administrator to create, read, update and delete coupons',
-                'related_permissions' => ''
+                'name' => 'coupon_CRUD',
+                'display_name' => 'Coupon CRUD',
+                'description' => 'Allows an administrator to create, read, update and delete coupons',
+                'related_permissions' => '',
             ]
         );
     }

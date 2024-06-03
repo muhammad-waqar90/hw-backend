@@ -3,15 +3,12 @@
 namespace Tests\Feature\AF\Notification;
 
 use App\DataObject\Notifications\NotificationTypeData;
-use App\Models\User;
 use App\Models\Notification;
-
-use Illuminate\Support\Facades\Lang;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\JSONResponseTestTrait;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\Lang;
+use Tests\TestCase;
 
 class NotificationsTest extends TestCase
 {
@@ -20,7 +17,7 @@ class NotificationsTest extends TestCase
 
     private $admin;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -31,7 +28,7 @@ class NotificationsTest extends TestCase
 
     public function testNoNotificationsAvailability()
     {
-        $response = $this->json('GET',  '/api/admins/notifications/me');
+        $response = $this->json('GET', '/api/admins/notifications/me');
 
         $response->assertStatus(200);
 
@@ -43,7 +40,7 @@ class NotificationsTest extends TestCase
         Notification::factory(3)->withUserId($this->admin->id)->withType(NotificationTypeData::SUPPORT_TICKET)->read()->create();
         Notification::factory(3)->withUserId($this->admin->id)->withType(NotificationTypeData::SUPPORT_TICKET)->create();
 
-        $response = $this->json('GET',  '/api/admins/notifications/me');
+        $response = $this->json('GET', '/api/admins/notifications/me');
 
         $response->assertStatus(200);
 
@@ -54,7 +51,7 @@ class NotificationsTest extends TestCase
     public function testSingleNotificationRead()
     {
         $notification = Notification::factory()->withUserId($this->admin->id)->withType(NotificationTypeData::SUPPORT_TICKET)->create();
-        $response = $this->json('PUT',  '/api/notifications/' . $notification->id . '/read');
+        $response = $this->json('PUT', '/api/notifications/'.$notification->id.'/read');
 
         $this->assertEquals($response['message'], Lang::get('notifications.success.read'));
 
@@ -67,7 +64,7 @@ class NotificationsTest extends TestCase
     {
         $notification = Notification::factory()->withUserId($this->admin->id)->withType(NotificationTypeData::SUPPORT_TICKET)->read()->create();
 
-        $response = $this->json('PUT',  '/api/notifications/' . $notification->id . '/read');
+        $response = $this->json('PUT', '/api/notifications/'.$notification->id.'/read');
 
         $this->assertEquals($response['errors'], Lang::get('notifications.errors.alreadyRead'));
     }
@@ -76,7 +73,7 @@ class NotificationsTest extends TestCase
     {
         Notification::factory(10)->withUserId($this->admin->id)->withType(NotificationTypeData::SUPPORT_TICKET)->create();
 
-        $response = $this->json('PUT',  '/api/admins/notifications/all/read');
+        $response = $this->json('PUT', '/api/admins/notifications/all/read');
 
         $response->assertStatus(200);
 

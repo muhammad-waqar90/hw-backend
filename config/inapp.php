@@ -50,6 +50,6 @@ return [
     |
     */
 
-    'url' => env('APPLE_STORE_URL', 'https://sandbox.itunes.apple.com')
+    'url' => env('APPLE_STORE_URL', 'https://sandbox.itunes.apple.com'),
 
 ];

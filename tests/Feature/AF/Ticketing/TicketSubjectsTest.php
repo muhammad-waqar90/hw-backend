@@ -2,22 +2,23 @@
 
 namespace Tests\Feature\AF\Ticketing;
 
-use App\Models\User;
 use App\Models\TicketSubject;
-
-use Illuminate\Support\Facades\DB;
-
-use Tests\TestCase;
-
+use App\Models\User;
 use App\Traits\Tests\PermGroupUserTestTrait;
+use Illuminate\Support\Facades\DB;
+use Tests\TestCase;
 
 class TicketSubjectsTest extends TestCase
 {
     use PermGroupUserTestTrait;
 
-    private $user, $wrongUser, $tickets;
+    private $user;
 
-    public function setUp(): void
+    private $wrongUser;
+
+    private $tickets;
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');
@@ -30,21 +31,21 @@ class TicketSubjectsTest extends TestCase
 
     public function testTicketsCategoriesGetRouteValid()
     {
-        $response = $this->json('GET',  'api/af/tickets/categories');
+        $response = $this->json('GET', 'api/af/tickets/categories');
 
         $response->assertStatus(200);
     }
 
     public function testNoPermTicketsCategoriesGetRouteValid()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  'api/af/tickets/categories');
+        $response = $this->actingAs($this->wrongUser)->json('GET', 'api/af/tickets/categories');
 
         $response->assertStatus(200);
     }
 
     public function testTicketsSubjectsGetRouteValid()
     {
-        $response = $this->json('GET',  'api/af/tickets/subjects');
+        $response = $this->json('GET', 'api/af/tickets/subjects');
 
         $response->assertStatus(200);
 
@@ -53,35 +54,35 @@ class TicketSubjectsTest extends TestCase
 
     public function testNoPermsTicketsSubjectsGetRouteInvalid()
     {
-        $response = $this->actingAs($this->wrongUser)->json('GET',  'api/af/tickets/subjects');
+        $response = $this->actingAs($this->wrongUser)->json('GET', 'api/af/tickets/subjects');
 
         $response->assertStatus(403);
     }
 
     public function testTicketsSubjectsPostRouteValid()
     {
-        $response = $this->json('POST',  'api/af/tickets/subjects', array('categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '1'));
+        $response = $this->json('POST', 'api/af/tickets/subjects', ['categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '1']);
 
         $response->assertStatus(200);
     }
 
     public function testTicketsSubjectsForGuestsPostRouteValid()
     {
-        $response = $this->json('POST',  'api/af/tickets/subjects', array('categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '0'));
+        $response = $this->json('POST', 'api/af/tickets/subjects', ['categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '0']);
 
         $response->assertStatus(200);
     }
 
     public function testTicketsSubjectsPostRouteInvalid()
     {
-        $response = $this->json('POST',  'api/af/tickets/subjects', array('categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '5'));
+        $response = $this->json('POST', 'api/af/tickets/subjects', ['categoryId' => '1', 'name' => 'Subject System 1', 'desc' => 'desc', 'only_logged_in' => '5']);
 
         $response->assertStatus(422);
     }
 
     public function testTicketsSubjectsGetRouteValidSearch()
     {
-        $response = $this->json('GET',  'api/af/tickets/subjects?searchText=' . $this->tickets[0]->name);
+        $response = $this->json('GET', 'api/af/tickets/subjects?searchText='.$this->tickets[0]->name);
 
         $response->assertStatus(200);
 
@@ -90,7 +91,7 @@ class TicketSubjectsTest extends TestCase
 
     public function testTicketsSubjectsGetRouteByIdValid()
     {
-        $response = $this->json('GET',  'api/af/tickets/subjects/' . $this->tickets[0]->id);
+        $response = $this->json('GET', 'api/af/tickets/subjects/'.$this->tickets[0]->id);
 
         $response->assertStatus(200);
 
@@ -99,7 +100,7 @@ class TicketSubjectsTest extends TestCase
 
     public function testTicketsSubjectsPutRouteValid()
     {
-        $response = $this->json('PUT',  'api/af/tickets/subjects/' . $this->tickets[0]->id, array('categoryId' => '1', 'name' => 'Test Subject', 'only_logged_in' => '1'));
+        $response = $this->json('PUT', 'api/af/tickets/subjects/'.$this->tickets[0]->id, ['categoryId' => '1', 'name' => 'Test Subject', 'only_logged_in' => '1']);
 
         $response->assertStatus(200);
 
@@ -108,14 +109,14 @@ class TicketSubjectsTest extends TestCase
 
     public function testTicketsSubjectsPutRouteInvalidUnprocessable()
     {
-        $response = $this->json('PUT',  'api/af/tickets/subjects/' . $this->tickets[0]->id, array('categoryId' => '1', 'name' => 'Test Subject', 'desc' => 'desc', 'only_logged_in' => '5'));
+        $response = $this->json('PUT', 'api/af/tickets/subjects/'.$this->tickets[0]->id, ['categoryId' => '1', 'name' => 'Test Subject', 'desc' => 'desc', 'only_logged_in' => '5']);
 
         $response->assertStatus(422);
     }
 
     public function testTicketsSubjectsDelRouteValid()
     {
-        $response = $this->json('DELETE',  'api/af/tickets/subjects/' . $this->tickets[0]->id);
+        $response = $this->json('DELETE', 'api/af/tickets/subjects/'.$this->tickets[0]->id);
 
         $response->assertStatus(200);
 

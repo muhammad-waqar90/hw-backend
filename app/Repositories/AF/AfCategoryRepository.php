@@ -38,8 +38,8 @@ class AfCategoryRepository
     {
         return $this->category->create([
             'parent_category_id' => $parentCategoryId,
-            'root_category_id'   => $rootCategoryId,
-            'name'               => $name
+            'root_category_id' => $rootCategoryId,
+            'name' => $name,
         ]);
     }
 
@@ -47,8 +47,8 @@ class AfCategoryRepository
     {
         return $this->category->where('id', $id)->update([
             'parent_category_id' => $parentCategoryId,
-            'root_category_id'   => $rootCategoryId,
-            'name'               => $name
+            'root_category_id' => $rootCategoryId,
+            'name' => $name,
         ]);
     }
 

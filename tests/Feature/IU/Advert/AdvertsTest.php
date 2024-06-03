@@ -2,16 +2,15 @@
 
 namespace Tests\Feature\IU\Advert;
 
-use App\Models\User;
 use App\Models\Advert;
-
+use App\Models\User;
 use Tests\TestCase;
 
 class AdvertsTest extends TestCase
 {
     private $user;
-    
-    public function setUp(): void
+
+    protected function setUp(): void
     {
         parent::setUp();
         $this->artisan('db:seed');

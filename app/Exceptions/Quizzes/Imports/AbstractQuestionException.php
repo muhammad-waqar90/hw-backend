@@ -6,15 +6,19 @@ use Exception;
 use JetBrains\PhpStorm\Pure;
 use Throwable;
 
-abstract class AbstractQuestionException extends Exception {
+abstract class AbstractQuestionException extends Exception
+{
     protected ?int $row;
+
     protected ?string $fileName;
+
     protected ?array $details;
 
-    abstract function handle();
+    abstract public function handle();
 
-    #[Pure] public function __construct(string $message = "", int $code = 0, ?int $row = null,
-                                        ?string $fileName = null, ?array $details = null, ?Throwable $previous = null)
+    #[Pure]
+    public function __construct(string $message = '', int $code = 0, ?int $row = null,
+        ?string $fileName = null, ?array $details = null, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
         $this->row = $row;
@@ -27,12 +31,12 @@ abstract class AbstractQuestionException extends Exception {
         return $this->row;
     }
 
-    public function getFileName(): string|null
+    public function getFileName(): ?string
     {
         return $this->fileName;
     }
 
-    public function getDetails(): array|null
+    public function getDetails(): ?array
     {
         return $this->details;
     }
@@ -42,10 +46,11 @@ abstract class AbstractQuestionException extends Exception {
         $formatted = [
             'message' => $this->getMessage(),
             'row' => $this->getRow(),
-            'fileName' => $this->getFileName()
+            'fileName' => $this->getFileName(),
         ];
-        if($this->getDetails())
+        if ($this->getDetails()) {
             $formatted['details'] = $this->getDetails();
+        }
 
         return $formatted;
     }

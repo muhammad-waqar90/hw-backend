@@ -12,20 +12,15 @@ class IuTicketResolved
 
     /**
      * IU ticket resolved
-     *
-     * @var $userId
-     * @var $userName
      */
     public $userId;
+
     public $userName;
+
     public $ticketId;
 
     /**
      * Create a new event instance.
-     *
-     * @param $ticketId
-     * @param $userId
-     * @param $userName
      */
     public function __construct($ticketId, $userId, $userName)
     {

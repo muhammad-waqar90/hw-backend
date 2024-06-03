@@ -2,14 +2,14 @@
 
 namespace App\Repositories\GU;
 
+use App\DataObject\Purchases\PurchaseItemTypeData;
+use App\Models\Category;
 use App\Models\Product;
 use App\Models\PurchaseItem;
-use Illuminate\Http\Response;
-use App\Models\Category;
-use App\DataObject\Purchases\PurchaseItemTypeData;
 use App\Transformers\GU\GuCategoryTransformer;
 use App\Transformers\GU\Product\GuProductsTransformer;
 use App\Transformers\GU\Product\GuSingleProductTransformer;
+use Illuminate\Http\Response;
 
 class GuProductRepository
 {
@@ -39,7 +39,7 @@ class GuProductRepository
         if ($request->has('name')) {
 
             // Filter books by title
-            $productsQuery = $productsQuery->where('name', 'like', '%' . $request->name . '%');
+            $productsQuery = $productsQuery->where('name', 'like', '%'.$request->name.'%');
         }
 
         // Check if request has param author
@@ -47,7 +47,7 @@ class GuProductRepository
 
             // Filter books by author
             $productsQuery = $productsQuery->whereHas('category', function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->category . '%');
+                $q->where('name', 'like', '%'.$request->category.'%');
             });
         }
 
@@ -130,7 +130,7 @@ class GuProductRepository
         // Return response
         return response()->json([
             'success' => true,
-            'categories' => $categoryGroups
+            'categories' => $categoryGroups,
         ]);
     }
 
@@ -146,7 +146,7 @@ class GuProductRepository
         // Return response
         return response()->json([
             'success' => true,
-            'category' => $transformedCategory
+            'category' => $transformedCategory,
         ]);
     }
 
@@ -162,7 +162,7 @@ class GuProductRepository
             })
             ->selectRaw('COUNT(purchase_items.entity_id) as trending')
             ->groupBy('products.id')
-            ->orderByDesc('trending')
+            ->latest('trending')
             ->paginate(10);
 
         // Transform
@@ -173,7 +173,7 @@ class GuProductRepository
         // Return response
         return response()->json([
             'success' => true,
-            'top-books' => $topBooks
+            'top-books' => $topBooks,
         ]);
     }
 }
